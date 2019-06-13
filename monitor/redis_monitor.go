@@ -32,7 +32,9 @@ var noneClusterVersions = map[string]bool{
 func init() {
 	funcGetPrimaryKeys[RedisProductName] = nonClusterRedisGetMonitorData
 	funcGetPrimaryKeys[ClusterRedisProductName] = clusterRedisGetMonitorData
+
 	PrimaryKeys[RedisProductName] = "InstanceId"
+	PrimaryKeys[ClusterRedisProductName] = "InstanceId"
 }
 
 func nonClusterRedisGetMonitorData(instanceIds []string,

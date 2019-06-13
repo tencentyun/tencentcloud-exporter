@@ -105,7 +105,6 @@ getMoreInstanceId:
 	if err != nil {
 		response, err = client.DescribeInstances(request)
 	}
-	log.Errorf("api[%s] fail, request body [%s], reason[%s]", request.GetAction(), request.ToJsonString(), response.ToJsonString())
 
 	if err != nil {
 		errRet = err
