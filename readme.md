@@ -88,14 +88,15 @@ xxx_cvm_cpu_usage_max{instance_name="my_b_test",zone="ap-guangzhou-1",project_id
 
 如:CDN业务,只能支持tc_myself_dimensions, 里边必须设置"projectId"和"domain"两个属性,多设置属性、少设置或者设置"ProjectId"等请求皆无法拉取到监控数据
 
-### 2.各属性在细微的差异
+### 2.不同产品的同属性存细微差异
 同一个属性(label)产品api的支持情形不同, 如cvm的InstanceName不支持模糊匹配, 而mysql\redis等产品支持模糊匹配 ,这个可以参考各个产品拉取实例列表的接口
 
-###3.各个指标period_seconds是不同的
+### 3.各个指标period_seconds是不同的
+
 如COS的InternetTraffic指标支持60和300,而StdStorage指标是小时级别的,这部分差异比较多需要参考监控的官方文档
 
 
-##各个产品风格及说明
+## 各个产品风格及说明
 
 - **数据库:mysql**   (tc_labels风格)
 
@@ -126,6 +127,7 @@ eg:
 {"Zone", "VpcId", "SubnetId","InstanceName", "InstanceId", "PrivateIpAddress","PublicIpAddress",
  "InstanceChargeType","InstanceType","CreatedTime","ImageId","RenewFlag","SubnetId","CPU","Memory"}
 ```
+eg:
 
 ```
  - tc_namespace: guauga/cvm
@@ -148,6 +150,8 @@ eg:
  "InstanceChargeType","InstanceType","CreatedTime","ImageId","RenewFlag","SubnetId","CPU","Memory"}
 ```
 
+eg:
+
 ```
  - tc_namespace: guauga/cvm
    tc_metric_name: CPUUsage  
@@ -167,6 +171,7 @@ eg:
 ```
 {"LoadBalancerName","LoadBalancerVip","ProjectId"}
 ```
+eg:
 
 ```
  - tc_namespace: Tencent/public_clb
@@ -181,7 +186,11 @@ eg:
 ```
 
 - **内容分发网络:cdn**   (tc_myself_dimensions风格)
- 可用维度 [projectId,domain]
+ 
+可用维度 [projectId,domain]
+
+eg:
+
 ```
  - tc_namespace: guauga/cdn
    tc_metric_name: Requests  
@@ -195,7 +204,11 @@ eg:
 ```
 
 - **对象存储:cos**   (tc_myself_dimensions风格)
- 可用维度 [appid,bucket]
+ 
+可用维度 [appid,bucket]
+
+eg:
+
 ```
  - tc_namespace: guauga/cos
    tc_metric_name: StdWriteRequests  
