@@ -1,0 +1,13 @@
+credential:
+  access_key: ""
+  secret_key: ""
+  region: "ap-shanghai"
+metrics:
+ - tc_namespace: test/cvm
+   tc_metric_name: CPUUsage  
+   tc_metric_rename: cpu_use  
+   tc_labels: [InstanceName,Zone]  
+   tc_statistics: [max] 
+   period_seconds: 60
+   delay_seconds: 300
+   range_seconds: 120
