@@ -163,7 +163,7 @@ eg:
    delay_seconds: 300
    range_seconds: 120
 ```
-### **键值存储(Redis集群版):cluster_redis**   (tc_labels风格)
+### **键值存储集群(Redis 2.8主从版\Redis 2.8单机版\Redis 4.0集群版等):cluster_redis**   (tc_labels风格)
 
 支持属性:
 ```
