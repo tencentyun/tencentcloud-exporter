@@ -15,7 +15,8 @@ func mysqlGetMonitorData(instanceIds []string,
 	metricName string,
 	periodSeconds int64,
 	rangeSeconds int64,
-	delaySeconds int64) (allDataRet map[string]map[int64]float64, errRet error) {
+	delaySeconds int64,
+	instances map[string]map[string]interface{}) (allDataRet map[string]map[int64]float64, errRet error) {
 
 	return getMonitorDataByPrimarykey(mysqlNamespaceInMonitor,
 		instanceIds,

@@ -18,7 +18,8 @@ type funcGetMonitorDatasByPrimaryKeys func([]string,
 	string,
 	int64,
 	int64,
-	int64) (map[string]map[int64]float64, error)
+	int64,
+	map[string]map[string]interface{}) (map[string]map[int64]float64, error)
 
 type funcGetMonitorDatasByMultiKeys func(map[string]interface{},
 	string,

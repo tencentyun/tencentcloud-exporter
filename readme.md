@@ -142,29 +142,49 @@ eg:
    delay_seconds: 300
    range_seconds: 120
 ```
-### **键值存储:redis**   (tc_labels风格)
+### **键值存储(Redis老集群版\CKV主从版\CKV集群版):redis**   (tc_labels风格)
 
 支持属性:
 ```
-{"Zone", "VpcId", "SubnetId","InstanceName", "InstanceId", "PrivateIpAddress","PublicIpAddress",
- "InstanceChargeType","InstanceType","CreatedTime","ImageId","RenewFlag","SubnetId","CPU","Memory"}
+{"InstanceId", "InstanceName","ProjectId","VpcId","SubnetId"}
 ```
 
 eg:
 
 ```
- - tc_namespace: guauga/cvm
-   tc_metric_name: CPUUsage  
-   tc_metric_rename: cpu_use  
-   tc_labels: [Zone,InstanceId,InstanceName]
+ - tc_namespace: guauga/redis
+   tc_metric_name: CmdstatGet  
+   tc_metric_rename: cmd_get  
+   tc_labels: [InstanceId, InstanceName,ProjectId,VpcId,SubnetId]
    tc_filters: 
-     InstanceName: "dev"
-     Zone: "ap-guangzhou-4" 
+     InstanceName: "cdn"
    tc_statistics: [Max,Min,Avg] 
    period_seconds: 60
    delay_seconds: 300
    range_seconds: 120
 ```
+### **键值存储(Redis集群版):cluster_redis**   (tc_labels风格)
+
+支持属性:
+```
+{"InstanceId", "InstanceName","ProjectId","VpcId","SubnetId"}
+```
+eg:
+
+```
+ - tc_namespace: guauga/cluster_redis
+   tc_metric_name: KeysMin  
+   tc_metric_rename: keys  
+   tc_labels: [InstanceId, InstanceName,ProjectId,VpcId,SubnetId]
+   tc_filters: 
+     InstanceName: "cdn"
+   tc_statistics: [Avg] 
+   period_seconds: 60
+   delay_seconds: 300
+   range_seconds: 120
+```
+
+
 ### **负载均衡(公网):public_clb**   (tc_labels风格)
 
 支持属性:

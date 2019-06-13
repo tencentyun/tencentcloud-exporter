@@ -12,9 +12,11 @@ import (
 
 /*what we call this product in prom*/
 const RedisProductName = "redis"
+const ClusterRedisProductName = "cluster_redis"
 
 func init() {
 	funcGets[RedisProductName] = getRedisInstancesIds
+	funcGets[ClusterRedisProductName] = getRedisInstancesIds
 }
 func getRedisInstancesIds(filters map[string]interface{}) (instanceIdsMap map[string]map[string]interface{},
 	errRet error) {
@@ -103,6 +105,8 @@ getMoreInstanceId:
 	if err != nil {
 		response, err = client.DescribeInstances(request)
 	}
+	log.Errorf("api[%s] fail, request body [%s], reason[%s]", request.GetAction(), request.ToJsonString(), response.ToJsonString())
+
 	if err != nil {
 		errRet = err
 		log.Errorf("api[%s] fail, request body [%s], reason[%s]", request.GetAction(), request.ToJsonString(), errRet.Error())

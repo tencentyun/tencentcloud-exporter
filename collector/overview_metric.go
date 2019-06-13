@@ -142,7 +142,8 @@ func (me *OverviewMetric) collect(ch chan<- prometheus.Metric) (errRet error) {
 		me.MetricConfig.MetricName,
 		me.MetricConfig.PeriodSeconds,
 		me.MetricConfig.RangeSeconds,
-		me.MetricConfig.DelaySeconds)
+		me.MetricConfig.DelaySeconds,
+		instances)
 
 	if err != nil {
 		me.collector.reportSdkError(monitorProductName)
