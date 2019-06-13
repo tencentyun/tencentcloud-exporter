@@ -98,7 +98,7 @@ xxx_cvm_cpu_usage_max{instance_name="my_b_test",zone="ap-guangzhou-1",project_id
 
 ## 各个产品风格及说明
 
-- **数据库:mysql**   (tc_labels风格)
+###  **数据库:mysql**   (tc_labels风格)
 
 
 
@@ -120,7 +120,7 @@ eg:
    delay_seconds: 300
    range_seconds: 120
 ```
-- **虚拟主机:cvm**   (tc_labels风格)
+### **虚拟主机:cvm**   (tc_labels风格)
 
 支持属性:
 ```
@@ -142,7 +142,7 @@ eg:
    delay_seconds: 300
    range_seconds: 120
 ```
-- **键值存储:redis**   (tc_labels风格)
+### **键值存储:redis**   (tc_labels风格)
 
 支持属性:
 ```
@@ -165,7 +165,7 @@ eg:
    delay_seconds: 300
    range_seconds: 120
 ```
-- **负载均衡(公网):public_clb**   (tc_labels风格)
+### **负载均衡(公网):public_clb**   (tc_labels风格)
 
 支持属性:
 ```
@@ -185,9 +185,13 @@ eg:
    range_seconds: 120
 ```
 
-- **内容分发网络:cdn**   (tc_myself_dimensions风格)
+### **内容分发网络:cdn**   (tc_myself_dimensions风格)
  
-可用维度 [projectId,domain]
+可用维度 
+
+
+- [projectId,domain]
+
 
 eg:
 
@@ -203,9 +207,13 @@ eg:
    range_seconds: 60
 ```
 
-- **对象存储:cos**   (tc_myself_dimensions风格)
+### **对象存储:cos**   (tc_myself_dimensions风格)
  
-可用维度 [appid,bucket]
+
+可用维度 
+
+
+- [appid,bucket]
 
 eg:
 
