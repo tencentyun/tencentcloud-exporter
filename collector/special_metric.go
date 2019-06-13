@@ -82,6 +82,8 @@ func (me *SpecailMetric) collect(ch chan<- prometheus.Metric) (errRet error) {
 		errRet = fmt.Errorf("error,this product [%s] get self control monitor datas func not support yet", me.ProductName)
 		return
 	}
+
+	nowts := time.Now().Unix()
 	var cacheMetrics = make([]*prometheus.Metric, 0, len(me.MetricConfig.Statistics))
 	for _, statistic := range me.MetricConfig.Statistics {
 		statistic = strings.ToLower(statistic)
@@ -89,12 +91,12 @@ func (me *SpecailMetric) collect(ch chan<- prometheus.Metric) (errRet error) {
 
 		if cacheMetric != nil &&
 			cacheMetric.metric != nil &&
-			cacheMetric.insertTime+metricCacheTime > time.Now().Unix() {
+			cacheMetric.insertTime+metricCacheTime > nowts {
 			cacheMetrics = append(cacheMetrics, cacheMetric.metric)
 		}
 	}
 
-	if len(cacheMetrics) == len(me.MetricConfig.Statistics) {
+	if len(cacheMetrics) > 0 {
 		for _, cacheMetric := range cacheMetrics {
 			ch <- *cacheMetric
 			log.Debugf("metric read from cache,%s", (*cacheMetric).Desc().String())
@@ -111,6 +113,8 @@ func (me *SpecailMetric) collect(ch chan<- prometheus.Metric) (errRet error) {
 		me.collector.reportSdkError(monitorProductName)
 		return
 	}
+
+	nowts = time.Now().Unix()
 
 	for _, statistic := range me.MetricConfig.Statistics {
 
@@ -130,7 +134,7 @@ func (me *SpecailMetric) collect(ch chan<- prometheus.Metric) (errRet error) {
 		proMetric := prometheus.MustNewConstMetric(promDesc, prometheus.GaugeValue, float64(statisticRet), labels...)
 		me.caches[statistic] = &MetricCache{
 			metric:     &proMetric,
-			insertTime: time.Now().Unix(),
+			insertTime: nowts,
 		}
 		ch <- proMetric
 		_ = lastTime

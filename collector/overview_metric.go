@@ -117,24 +117,25 @@ func (me *OverviewMetric) collect(ch chan<- prometheus.Metric) (errRet error) {
 
 	var cacheMetrics = make([]*prometheus.Metric, 0, len(me.MetricConfig.Statistics))
 
+	nowts := time.Now().Unix()
+
 	for _, instanceId := range instanceIds {
 		for _, statistic := range me.MetricConfig.Statistics {
 			statistic = strings.ToLower(statistic)
 			cacheMetric := me.caches[instanceId+"#"+statistic]
 			if cacheMetric != nil &&
 				cacheMetric.metric != nil &&
-				cacheMetric.insertTime+metricCacheTime > time.Now().Unix() {
+				cacheMetric.insertTime+metricCacheTime > nowts {
 				cacheMetrics = append(cacheMetrics, cacheMetric.metric)
 			}
 		}
 	}
 
-	if len(cacheMetrics) == len(me.MetricConfig.Statistics)*len(instanceIds) {
+	if len(cacheMetrics) > 0 {
 		for _, cacheMetric := range cacheMetrics {
 			ch <- *cacheMetric
 			log.Debugf("metric read from cache,%s", (*cacheMetric).Desc().String())
 		}
-
 		return
 	}
 
@@ -151,6 +152,7 @@ func (me *OverviewMetric) collect(ch chan<- prometheus.Metric) (errRet error) {
 	/*
 		Have to deal with allDataRet whether it's wrong or not.
 	*/
+	nowts = time.Now().Unix()
 	for instanceId, datas := range allDataRet {
 		if instances[instanceId] == nil {
 			log.Errorf("It was a big api bug, because monitor api return a not exist instance id [%s] ", instanceId)
@@ -178,7 +180,7 @@ func (me *OverviewMetric) collect(ch chan<- prometheus.Metric) (errRet error) {
 			proMetric := prometheus.MustNewConstMetric(promDesc, prometheus.GaugeValue, float64(statisticRet), labels...)
 			me.caches[instanceId+"#"+statistic] = &MetricCache{
 				metric:     &proMetric,
-				insertTime: time.Now().Unix(),
+				insertTime: nowts,
 			}
 			ch <- proMetric
 			_ = lastTime
