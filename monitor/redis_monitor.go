@@ -22,11 +22,11 @@ const (
 	REDIS_VERSION_CLUSTER_REDIS      = "7"
 )
 
-var clusterVersions = map[string]bool{
-	REDIS_VERSION_MASTER_SLAVE_REDIS: true,
-	REDIS_VERSION_STANDALONE_REDIS:   true,
-	REDIS_VERSION_CLUSTER_REDIS_V4:   true,
-	REDIS_VERSION_CLUSTER_REDIS:      true,
+var noneClusterVersions = map[string]bool{
+
+	REDIS_VERSION_OLD_CLUSTER_REDIS: true,
+	REDIS_VERSION_MASTER_SLAVE_CKV:  true,
+	REDIS_VERSION_CLUSTER_CKV:       true,
 }
 
 func init() {
@@ -46,7 +46,7 @@ func nonClusterRedisGetMonitorData(instanceIds []string,
 	noneClusterIds := make([]string, 0, len(instanceIds))
 	for id, data := range instances {
 		redisVersion := fmt.Sprintf("%v", data["Type"])
-		if !clusterVersions[redisVersion] {
+		if noneClusterVersions[redisVersion] {
 			noneClusterIds = append(noneClusterIds, id)
 		}
 	}
@@ -73,7 +73,7 @@ func clusterRedisGetMonitorData(instanceIds []string,
 	clusterIds := make([]string, 0, len(instanceIds))
 	for id, data := range instances {
 		redisVersion := fmt.Sprintf("%v", data["Type"])
-		if clusterVersions[redisVersion] {
+		if !noneClusterVersions[redisVersion] {
 			clusterIds = append(clusterIds, id)
 		}
 	}
