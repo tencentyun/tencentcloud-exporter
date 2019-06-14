@@ -249,8 +249,41 @@ eg:
    range_seconds: 60
 ```
 
+### **专线(逻辑通道):dcx**   (tc_labels风格)
+ 
 
 
+支持属性:
+```
+{"DirectConnectTunnelId","DirectConnectTunnelName","VpcId","TencentAddress","CustomerAddress"}
+```
+eg:
+
+```
+ - tc_namespace: Tencent/dc
+   tc_metric_name: Outbandwidth  
+   tc_labels: [DirectConnectTunnelName]  
+   tc_statistics: [Max] 
+   period_seconds: 60
+   delay_seconds: 600
+   range_seconds: 600
+```
+### **专线(物理通道):dc**   (tc_labels风格)
+
+```
+{"DirectConnectId","DirectConnectName","VpcId","TencentAddress","CustomerAddress"}
+```
+eg:
+
+```
+ - tc_namespace: Tencent/dc
+   tc_metric_name: Outbandwidth  
+   tc_labels: [DirectConnectName]  
+   tc_statistics: [Max] 
+   period_seconds: 60
+   delay_seconds: 600
+   range_seconds: 600
+```
 
 
 

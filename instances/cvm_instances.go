@@ -13,8 +13,6 @@ import (
 /*what we call this product in prom*/
 const CvmProductName = "cvm"
 
-type cvmToolStruct struct{}
-
 var cvmTools cvmToolStruct
 
 func init() {
@@ -45,7 +43,7 @@ func getCvmInstancesIds(filters map[string]interface{}) (instanceIdsMap map[stri
 		if errRet != nil {
 			if oldInstanceIdsMap := getCache(cacheKey, false); oldInstanceIdsMap != nil {
 				instanceIdsMap = oldInstanceIdsMap
-				log.Warnf("product [%s]  from old cache, because product list api error", MysqlProductName)
+				log.Warnf("product [%s]  from old cache, because product list api error", CvmProductName)
 			}
 		}
 	}()

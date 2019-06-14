@@ -30,7 +30,7 @@ func getRedisInstancesIds(filters map[string]interface{}) (instanceIdsMap map[st
 	cacheKey := getCacheKey(RedisProductName, filters)
 
 	if instanceIdsMap = getCache(cacheKey, true); instanceIdsMap != nil {
-		log.Debugf("product [%s] list from new  cache", MysqlProductName)
+		log.Debugf("product [%s] list from new  cache", RedisProductName)
 		return
 	}
 
@@ -39,7 +39,7 @@ func getRedisInstancesIds(filters map[string]interface{}) (instanceIdsMap map[st
 		if errRet != nil {
 			if oldInstanceIdsMap := getCache(cacheKey, false); oldInstanceIdsMap != nil {
 				instanceIdsMap = oldInstanceIdsMap
-				log.Warnf("product [%s]  from old cache, because product list api error", MysqlProductName)
+				log.Warnf("product [%s]  from old cache, because product list api error", RedisProductName)
 			}
 		}
 	}()

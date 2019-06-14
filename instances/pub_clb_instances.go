@@ -42,7 +42,7 @@ func getClbLoadBalancerVips(filters map[string]interface{}) (instanceIdsMap map[
 		if errRet != nil {
 			if oldInstanceIdsMap := getCache(cacheKey, false); oldInstanceIdsMap != nil {
 				instanceIdsMap = oldInstanceIdsMap
-				log.Warnf("product [%s]  from old cache, because product list api error", MysqlProductName)
+				log.Warnf("product [%s]  from old cache, because product list api error", ClbProductName)
 			}
 		}
 	}()

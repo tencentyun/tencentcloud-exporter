@@ -6,6 +6,8 @@ import (
 	cvm "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cvm/v20170312"
 )
 
+type cvmToolStruct struct{}
+
 /*
 	ProjectId ---- > project-id
 */
