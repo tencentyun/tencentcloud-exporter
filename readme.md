@@ -260,8 +260,8 @@ eg:
 eg:
 
 ```
- - tc_namespace: Tencent/dc
-   tc_metric_name: Outbandwidth  
+ - tc_namespace: Tencent/dcx
+   tc_metric_name: Delay  
    tc_labels: [DirectConnectTunnelName]  
    tc_statistics: [Max] 
    period_seconds: 60
