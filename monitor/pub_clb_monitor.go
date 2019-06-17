@@ -18,6 +18,8 @@ func clbGetMonitorData(instanceIds []string,
 	delaySeconds int64,
 	instances map[string]map[string]interface{}) (allDataRet map[string]map[int64]float64, errRet error) {
 
+	_ = instances
+
 	return getMonitorDataByPrimarykey(clbNamespaceInMonitor,
 		instanceIds,
 		"vip", //in redis they call LoadBalancerVip  "vip" in monitor.

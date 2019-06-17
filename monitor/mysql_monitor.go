@@ -18,6 +18,8 @@ func mysqlGetMonitorData(instanceIds []string,
 	delaySeconds int64,
 	instances map[string]map[string]interface{}) (allDataRet map[string]map[int64]float64, errRet error) {
 
+	_ = instances
+
 	return getMonitorDataByPrimarykey(mysqlNamespaceInMonitor,
 		instanceIds,
 		PrimaryKeys[MysqlProductName],

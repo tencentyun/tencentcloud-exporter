@@ -24,6 +24,8 @@ func dcGetMonitorData(instanceIds []string,
 	delaySeconds int64,
 	instances map[string]map[string]interface{}) (allDataRet map[string]map[int64]float64, errRet error) {
 
+	_ = instances
+
 	return getMonitorDataByPrimarykey(dcNamespaceInMonitor,
 		instanceIds,
 		"directConnectId",
@@ -39,6 +41,8 @@ func dcxGetMonitorData(instanceIds []string,
 	rangeSeconds int64,
 	delaySeconds int64,
 	instances map[string]map[string]interface{}) (allDataRet map[string]map[int64]float64, errRet error) {
+
+	_ = instances
 
 	return getMonitorDataByPrimarykey(dcxNamespaceInMonitor,
 		instanceIds,

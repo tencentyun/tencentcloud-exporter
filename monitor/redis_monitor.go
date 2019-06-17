@@ -45,6 +45,8 @@ func nonClusterRedisGetMonitorData(instanceIds []string,
 	instances map[string]map[string]interface{}) (allDataRet map[string]map[int64]float64,
 	errRet error) {
 
+	_ = instances
+
 	noneClusterIds := make([]string, 0, len(instanceIds))
 	for id, data := range instances {
 		redisVersion := fmt.Sprintf("%v", data["Type"])
@@ -71,6 +73,8 @@ func clusterRedisGetMonitorData(instanceIds []string,
 	delaySeconds int64,
 	instances map[string]map[string]interface{}) (allDataRet map[string]map[int64]float64,
 	errRet error) {
+
+	_ = instances
 
 	clusterIds := make([]string, 0, len(instanceIds))
 	for id, data := range instances {

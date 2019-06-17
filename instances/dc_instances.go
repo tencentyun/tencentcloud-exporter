@@ -41,6 +41,16 @@ func getDcInstancesIds(filters map[string]interface{}) (instanceIdsMap map[strin
 	request := dc.NewDescribeDirectConnectsRequest()
 
 	var apiCanFilters = map[string]bool{}
+
+	nameFilterMap := map[string]string{
+		"DirectConnectName": "direct-connect-name",
+		"DirectConnectId":   "direct-connect-id"}
+
+	for name, nameInFilter := range nameFilterMap {
+		dcTools.fillStringFilter(nameInFilter, filters[name], request)
+		apiCanFilters[name] = true
+	}
+
 	instanceIdsMap = make(map[string]map[string]interface{})
 	hasGet := make(map[string]bool)
 
