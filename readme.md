@@ -56,11 +56,11 @@ metrics:
    tc_metric_rename: cpu_usage #上报的指标名字(默认是tc_metric_name)
    tc_myself_dimensions:#使用者自己指定上报维度,一般用不到设置
       appid: 123456789
-	  bucket :"test"
+      bucket :"test"
    tc_labels: [Zone,InstanceName,ProjectId,Vip,UniqVpcId] #tag, labels会按照tc_labels元素字节序进行排序
    tc_filters: #过滤实例
      InstanceName: test  #InstanceName必须存在test和my才会上报
-	 VpcId: vpc-dk8zmwuf #VpcId必须为vpc-dk8zmwuf才会上报
+     VpcId: vpc-dk8zmwuf #VpcId必须为vpc-dk8zmwuf才会上报
    tc_statistics: [Max]#计算方法 支持Max Min 和Avg (字母大小写无关)
    period_seconds: 60 #数据统计周期
    range_seconds: 300 #取多少数据进行统计(如例子是取300/60+1==6个进行max,min,avg或sum,越多数据越平稳)
