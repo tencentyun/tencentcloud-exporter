@@ -61,5 +61,15 @@ func main() {
 
 	http.Handle(*metricsPath, promhttp.HandlerFor(registry, promhttp.HandlerOpts{}))
 
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(`<html>
+             <head><title>TencentCloud Exporter</title></head>
+             <body>
+             <h1>TencentCloud Exporter</h1>
+             <p><a href='` + *metricsPath + `'>Metrics</a></p>
+             </body>
+             </html>`))
+	})
+
 	log.Fatal(http.ListenAndServe(*listenAddress, nil))
 }
