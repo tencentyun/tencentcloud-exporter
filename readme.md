@@ -238,11 +238,9 @@ eg:
 
 可用维度 
 
-
 - [appid,bucket]
 
 eg:
-
 ```
  - tc_namespace: guauga/cos
    tc_metric_name: StdWriteRequests  
@@ -254,7 +252,6 @@ eg:
    delay_seconds: 300
    range_seconds: 60
 ```
-
 ### **专线(逻辑层-专线通道):dcx**   (tc_labels风格)
  
 
@@ -264,7 +261,6 @@ eg:
 {"DirectConnectTunnelId","DirectConnectTunnelName","VpcId","TencentAddress","CustomerAddress"}
 ```
 eg:
-
 ```
  - tc_namespace: Tencent/dcx
    tc_metric_name: Delay  
@@ -275,12 +271,10 @@ eg:
    range_seconds: 600
 ```
 ### **专线(物理层-物理通道):dc**   (tc_labels风格)
-
 ```
 {"DirectConnectId","DirectConnectName"}
 ```
 eg:
-
 ```
  - tc_namespace: Tencent/dc
    tc_metric_name: Outbandwidth  
@@ -293,12 +287,10 @@ eg:
 
 
 ### **NAT 网关:nat**   (tc_labels风格)
-
 ```
 {"InstanceId","InstanceName", "Zone"}
 ```
 eg:
-
 ```
 - tc_namespace: test/nat
    tc_metric_name: Outbandwidth
