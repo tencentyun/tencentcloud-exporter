@@ -3,22 +3,20 @@ package instances
 import (
 	"encoding/json"
 	"fmt"
-
 	"github.com/prometheus/common/log"
-	cdb "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cdb/v20170320"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/profile"
+	vpc "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/vpc/v20170312"
 )
 
 /*what we call this product in prom*/
-const MysqlProductName = "mysql"
-
+const NatProductName = "nat"
 
 func init() {
-	funcGets[MysqlProductName] = getMysqlInstancesIds
+	funcGets[NatProductName] = getNatInstancesIds
 }
 
-func getMysqlInstancesIds(filters map[string]interface{}) (instanceIdsMap map[string]map[string]interface{},
+func getNatInstancesIds(filters map[string]interface{}) (instanceIdsMap map[string]map[string]interface{},
 	errRet error) {
 
 	if credentialConfig.AccessKey == "" {
@@ -27,10 +25,10 @@ func getMysqlInstancesIds(filters map[string]interface{}) (instanceIdsMap map[st
 		return
 	}
 
-	cacheKey := getCacheKey(MysqlProductName, filters)
+	cacheKey := getCacheKey(NatProductName, filters)
 
 	if instanceIdsMap = getCache(cacheKey, true); instanceIdsMap != nil {
-		log.Debugf("product [%s] list from new cache", MysqlProductName)
+		log.Debugf("product [%s] list from new cache", NatProductName)
 		return
 	}
 
@@ -39,10 +37,11 @@ func getMysqlInstancesIds(filters map[string]interface{}) (instanceIdsMap map[st
 		if errRet != nil {
 			if oldInstanceIdsMap := getCache(cacheKey, false); oldInstanceIdsMap != nil {
 				instanceIdsMap = oldInstanceIdsMap
-				log.Warnf("product [%s]  from old cache, because product list api error", MysqlProductName)
+				log.Warnf("product [%s]  from old cache, because product list api error", NatProductName)
 			}
 		}
 	}()
+
 
 	credential := common.NewCredential(
 		credentialConfig.AccessKey,
@@ -52,47 +51,63 @@ func getMysqlInstancesIds(filters map[string]interface{}) (instanceIdsMap map[st
 	cpf.HttpProfile.ReqMethod = "POST"
 	cpf.HttpProfile.ReqTimeout = 10
 
-	mysqlClient, err := cdb.NewClient(credential, credentialConfig.Region, cpf)
+	client, err := vpc.NewClient(credential, credentialConfig.Region, cpf)
 	if err != nil {
 		errRet = err
 		return
 	}
-	request := cdb.NewDescribeDBInstancesRequest()
+	request := vpc.NewDescribeNatGatewaysRequest()
+	request.Filters = make([]*vpc.Filter, 0, 3)
 
 	var apiCanFilters = map[string]bool{}
 
-	fiterName := "ProjectId"
-	apiCanFilters[fiterName] = true
-	if temp, ok := filters[fiterName].(int); ok {
-		tempInt64 := int64(temp)
-		request.ProjectId = &tempInt64
-	}
-
-	fiterName = "InstanceName"
+	fiterName := "VpcId"
 	apiCanFilters[fiterName] = true
 	if temp, ok := filters[fiterName].(string); ok {
-		request.InstanceNames = []*string{&temp}
+		name := "vpc-id";
+		request.Filters = append(request.Filters,
+			&vpc.Filter{
+				Name:   &name,
+				Values: []*string{&temp},
+			})
 	}
 
 	fiterName = "InstanceId"
 	apiCanFilters[fiterName] = true
 	if temp, ok := filters[fiterName].(string); ok {
-		request.InstanceIds = []*string{&temp}
+		name := "nat-gateway-id";
+		request.Filters = append(request.Filters,
+			&vpc.Filter{
+				Name:   &name,
+				Values: []*string{&temp},
+			})
+	}
+
+	fiterName = "InstanceName"
+	apiCanFilters[fiterName] = true
+	if temp, ok := filters[fiterName].(string); ok {
+		name := "nat-gateway-name";
+		request.Filters = append(request.Filters,
+			&vpc.Filter{
+				Name:   &name,
+				Values: []*string{&temp},
+			})
 	}
 
 	instanceIdsMap = make(map[string]map[string]interface{})
+
 	hasGet := make(map[string]bool)
 
 	var offset uint64 = 0
-	var limit uint64 = 2000
+	var limit uint64 = 20
 	var total int64 = -1
 
 getMoreInstanceId:
 	request.Offset = &offset
 	request.Limit = &limit
-	response, err := mysqlClient.DescribeDBInstances(request)
+	response, err := client.DescribeNatGateways(request)
 	if err != nil {
-		response, err = mysqlClient.DescribeDBInstances(request)
+		response, err = client.DescribeNatGateways(request)
 	}
 	if err != nil {
 		errRet = err
@@ -100,39 +115,37 @@ getMoreInstanceId:
 		return
 	}
 	if total == -1 {
-		total = *response.Response.TotalCount
+		total = int64(*response.Response.TotalCount)
 	}
-	if len(response.Response.Items) == 0 {
+	if len(response.Response.NatGatewaySet) == 0 {
 		goto hasGetAll
 	}
-	for _, v := range response.Response.Items {
-		if _, ok := hasGet[*v.InstanceId]; ok {
-			errRet = fmt.Errorf("api[%s] return error, has repeat instance id [%s]", request.GetAction(), *v.InstanceId)
+	for _, v := range response.Response.NatGatewaySet {
+		if _, ok := hasGet[*v.NatGatewayId]; ok {
+			errRet = fmt.Errorf("api[%s] return error, has repeat instance id [%s]", request.GetAction(), *v.NatGatewayId)
 			log.Errorf(errRet.Error())
 			return
 		}
 		js, err := json.Marshal(v)
 		if err != nil {
-			errRet = fmt.Errorf("api[%s] return error, can not json encode [%s]", request.GetAction(), *v.InstanceId)
+			errRet = fmt.Errorf("api[%s] return error, can not json encode [%s]", request.GetAction(), *v.NatGatewayId)
 			log.Errorf(errRet.Error())
 		}
 		var data map[string]interface{}
 
 		err = json.Unmarshal(js, &data)
 		if err != nil {
-			errRet = fmt.Errorf("api[%s] return error, can not json decode [%s]", request.GetAction(), *v.InstanceId)
+			errRet = fmt.Errorf("api[%s] return error, can not json decode [%s]", request.GetAction(), *v.NatGatewayId)
 			log.Errorf(errRet.Error())
 		}
 
-		setNonStandardStr("VpcId", v.UniqVpcId, data)
-		setNonStandardStr("SubnetId", v.UniqSubnetId, data)
-		setNonStandardInt64("ProjectId", v.ProjectId, data)
+		setNonStandardStr("InstanceId", v.NatGatewayId, data)
+		setNonStandardStr("InstanceName", v.NatGatewayName, data)
 
 		if meetConditions(filters, data, apiCanFilters) {
-			instanceIdsMap[*v.InstanceId] = data
+			instanceIdsMap[*v.NatGatewayId] = data
 		}
-		hasGet[*v.InstanceId] = true
-
+		hasGet[*v.NatGatewayId] = true
 	}
 	offset += limit
 	if total != -1 && int64(offset) >= total {
@@ -141,7 +154,6 @@ getMoreInstanceId:
 	goto getMoreInstanceId
 
 hasGetAll:
-
 	if len(instanceIdsMap) > 0 {
 		setCache(cacheKey, instanceIdsMap)
 	}

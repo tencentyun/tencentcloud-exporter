@@ -28,7 +28,7 @@ github.com/prometheus/procfs
 github.com/prometheus/procfs/internal/fs
 # github.com/sirupsen/logrus v1.2.0
 github.com/sirupsen/logrus
-# github.com/tencentcloud/tencentcloud-sdk-go v3.0.72+incompatible
+# github.com/tencentcloud/tencentcloud-sdk-go v3.0.73-0.20190704135516-e86c9d8b05ee+incompatible
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cdb/v20170320
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/clb/v20180317
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common
@@ -36,6 +36,7 @@ github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/profile
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cvm/v20170312
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/dc/v20180410
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/redis/v20180412
+github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/vpc/v20170312
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/monitor/v20180724
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/http
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/errors

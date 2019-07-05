@@ -3,14 +3,20 @@ package config
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"strings"
 
-	yaml "gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v2"
 )
 
-const DefaultPeriodSeconds = 60
+const (
+	DefaultPeriodSeconds = 60
+	DefaultDelaySeconds  = 300
 
-const DefaultDelaySeconds = 300
+	EnvAccessKey = "TENCENTCLOUD_SECRET_ID"
+	EnvSecretKey = "TENCENTCLOUD_SECRET_KEY"
+	EnvRegion    = "TENCENTCLOUD_REGION"
+)
 
 type TencentCredential struct {
 	AccessKey string `yaml:"access_key"`
@@ -60,6 +66,13 @@ func (me *TencentConfig) LoadFile(filename string) (errRet error) {
 }
 
 func (me *TencentConfig) check() (errRet error) {
+
+	if me.Credential.AccessKey == "" {
+		me.Credential.AccessKey = os.Getenv(EnvAccessKey)
+		me.Credential.SecretKey = os.Getenv(EnvSecretKey)
+		me.Credential.Region = os.Getenv(EnvRegion)
+	}
+
 	if me.Credential.AccessKey == "" ||
 		me.Credential.SecretKey == "" ||
 		me.Credential.Region == "" {

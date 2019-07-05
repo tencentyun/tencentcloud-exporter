@@ -67,6 +67,12 @@ metrics:
    delay_seconds: 600 #数据延时时长
 ```
 
+credential中项目可以在环境变量中配置(如果设置了下面的环境变量, 删除credential这个block就可以了)
+```
+export TENCENTCLOUD_SECRET_ID="YOUR_ACCESS_KEY"
+export TENCENTCLOUD_SECRET_KEY="YOUR_ACCESS_SECRET"
+export TENCENTCLOUD_REGION="REGION"
+```
 
 上边说明上报例子:
 
@@ -286,7 +292,23 @@ eg:
 ```
 
 
+### **NAT 网关:nat**   (tc_labels风格)
 
+```
+{"InstanceId","InstanceName"}
+```
+eg:
+
+```
+- tc_namespace: test/nat
+   tc_metric_name: Outbandwidth
+   tc_metric_rename: out
+   tc_labels: [InstanceName,Zone]  
+   tc_statistics: [max] 
+   period_seconds: 60
+   delay_seconds: 300
+   range_seconds: 120
+```
 
 
 
