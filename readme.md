@@ -271,6 +271,7 @@ eg:
    range_seconds: 600
 ```
 ### **专线(物理层-物理通道):dc**   (tc_labels风格)
+支持属性:
 ```
 {"DirectConnectId","DirectConnectName"}
 ```
@@ -287,6 +288,7 @@ eg:
 
 
 ### **NAT 网关:nat**   (tc_labels风格)
+支持属性:
 ```
 {"InstanceId","InstanceName", "Zone"}
 ```
