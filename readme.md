@@ -295,7 +295,7 @@ eg:
 ### **NAT 网关:nat**   (tc_labels风格)
 
 ```
-{"InstanceId","InstanceName"}
+{"InstanceId","InstanceName", "Zone"}
 ```
 eg:
 
