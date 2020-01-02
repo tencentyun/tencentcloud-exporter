@@ -34,10 +34,12 @@ metrics:
 启动 Exporter
 
 ```bash
-> tencentcloud-exporter --web.listen-address "127.0.0.1:9123" --config.file "qcloud.yml" --web.telemetry-path "/metrics"
+> tencentcloud-exporter --web.listen-address "0.0.0.0:9123" --config.file "qcloud.yml" --web.telemetry-path "/metrics" --log.level "debug"
 ```
 
 访问 [http://127.0.0.1:9123/metrics](http://127.0.0.1:9123/metrics) 查看指标抓取是否成功
+
+`--log.level` 是打印的日志级别,方便定时使用,平时可以去除
 
 
 
