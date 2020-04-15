@@ -7,7 +7,7 @@ import (
 
 func TestCache(t *testing.T) {
 
-	oldMaxCacheTime :=maxCacheTime
+	oldMaxCacheTime := maxCacheTime
 
 	defer func() {
 		maxCacheTime = oldMaxCacheTime

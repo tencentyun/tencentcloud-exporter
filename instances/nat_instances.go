@@ -7,6 +7,7 @@ import (
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/profile"
 	vpc "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/vpc/v20170312"
+	"github.com/tencentyun/tencentcloud-exporter/lib/ratelimit"
 )
 
 /*what we call this product in prom*/
@@ -42,7 +43,6 @@ func getNatInstancesIds(filters map[string]interface{}) (instanceIdsMap map[stri
 		}
 	}()
 
-
 	credential := common.NewCredential(
 		credentialConfig.AccessKey,
 		credentialConfig.SecretKey,
@@ -64,7 +64,7 @@ func getNatInstancesIds(filters map[string]interface{}) (instanceIdsMap map[stri
 	fiterName := "VpcId"
 	apiCanFilters[fiterName] = true
 	if temp, ok := filters[fiterName].(string); ok {
-		name := "vpc-id";
+		name := "vpc-id"
 		request.Filters = append(request.Filters,
 			&vpc.Filter{
 				Name:   &name,
@@ -75,7 +75,7 @@ func getNatInstancesIds(filters map[string]interface{}) (instanceIdsMap map[stri
 	fiterName = "InstanceId"
 	apiCanFilters[fiterName] = true
 	if temp, ok := filters[fiterName].(string); ok {
-		name := "nat-gateway-id";
+		name := "nat-gateway-id"
 		request.Filters = append(request.Filters,
 			&vpc.Filter{
 				Name:   &name,
@@ -86,7 +86,7 @@ func getNatInstancesIds(filters map[string]interface{}) (instanceIdsMap map[stri
 	fiterName = "InstanceName"
 	apiCanFilters[fiterName] = true
 	if temp, ok := filters[fiterName].(string); ok {
-		name := "nat-gateway-name";
+		name := "nat-gateway-name"
 		request.Filters = append(request.Filters,
 			&vpc.Filter{
 				Name:   &name,
@@ -105,8 +105,10 @@ func getNatInstancesIds(filters map[string]interface{}) (instanceIdsMap map[stri
 getMoreInstanceId:
 	request.Offset = &offset
 	request.Limit = &limit
+	ratelimit.Check(request.GetAction())
 	response, err := client.DescribeNatGateways(request)
 	if err != nil {
+		ratelimit.Check(request.GetAction())
 		response, err = client.DescribeNatGateways(request)
 	}
 	if err != nil {

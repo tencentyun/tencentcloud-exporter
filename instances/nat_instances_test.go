@@ -40,9 +40,9 @@ func TestGetNatInstancesIds(t *testing.T) {
 		t.Errorf("%s get InstancesIds func fail,reason %s", NatProductName, err.Error())
 		return
 	}
-	for instanceId,instance:=range instances{
-		if !strings.Contains(fmt.Sprintf("%+v",instance["InstanceName"]),
-			fmt.Sprintf("%+v",filters["InstanceName"])){
+	for instanceId, instance := range instances {
+		if !strings.Contains(fmt.Sprintf("%+v", instance["InstanceName"]),
+			fmt.Sprintf("%+v", filters["InstanceName"])) {
 
 			t.Errorf("%s get InstancesIds return[%s] not match filters", NatProductName, instanceId)
 			return

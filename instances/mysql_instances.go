@@ -3,6 +3,7 @@ package instances
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/tencentyun/tencentcloud-exporter/lib/ratelimit"
 
 	"github.com/prometheus/common/log"
 	cdb "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cdb/v20170320"
@@ -12,7 +13,6 @@ import (
 
 /*what we call this product in prom*/
 const MysqlProductName = "mysql"
-
 
 func init() {
 	funcGets[MysqlProductName] = getMysqlInstancesIds
@@ -90,8 +90,10 @@ func getMysqlInstancesIds(filters map[string]interface{}) (instanceIdsMap map[st
 getMoreInstanceId:
 	request.Offset = &offset
 	request.Limit = &limit
+	ratelimit.Check(request.GetAction())
 	response, err := mysqlClient.DescribeDBInstances(request)
 	if err != nil {
+		ratelimit.Check(request.GetAction())
 		response, err = mysqlClient.DescribeDBInstances(request)
 	}
 	if err != nil {

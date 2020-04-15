@@ -1,7 +1,7 @@
 credential:
-  access_key: ""
-  secret_key: ""
-  region: "ap-shanghai"
+  access_key: "AKIDPTH3NY1BXXXXXXXXXXXXXXXXXXXXXXXXXX"
+  secret_key: "XoqmT7WlkYYYYYYYYYYYYYYYYYYYYYY"
+  region: "ap-guangzhou"
 metrics:
  - tc_namespace: test/cvm
    tc_metric_name: CPUUsage  

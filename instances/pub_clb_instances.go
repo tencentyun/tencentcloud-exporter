@@ -3,6 +3,7 @@ package instances
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/tencentyun/tencentcloud-exporter/lib/ratelimit"
 	"strings"
 
 	"github.com/prometheus/common/log"
@@ -98,8 +99,10 @@ func getClbLoadBalancerVips(filters map[string]interface{}) (instanceIdsMap map[
 getMoreInstanceId:
 	request.Offset = &offset
 	request.Limit = &limit
+	ratelimit.Check(request.GetAction())
 	response, err := client.DescribeLoadBalancers(request)
 	if err != nil {
+		ratelimit.Check(request.GetAction())
 		response, err = client.DescribeLoadBalancers(request)
 	}
 	if err != nil {
