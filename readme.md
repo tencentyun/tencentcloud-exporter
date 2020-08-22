@@ -1,311 +1,142 @@
-# 腾讯云监控 Exporter
+# 腾讯云监控 Exporter v2
 
-## 安装
+通过qcloud exporter将云监控支持的产品监控指标自动批量导出  
+(`兼容v1版本`)
 
-### 环境
-`go1.9.x` (and later)
-### 编译
+## 一、支持的产品列表
+
+产品     | 命名空间 |支持的指标
+--------|---------|----------
+MongoDB |QCE/CMONGO|[指标详情](https://cloud.tencent.com/document/product/248/45104)
+CDB|QCE/CDB|[指标详情](https://cloud.tencent.com/document/product/248/45147)
+Redis标准版|QCE/REDIS|[指标详情](https://cloud.tencent.com/document/product/248/45111)
+Redis集群版|QCE/REDIS|[指标详情](https://cloud.tencent.com/document/product/248/45111)
+CVM|QCE/CVM|[指标详情](https://cloud.tencent.com/document/product/248/6843)
+COS|QCE/COS|[指标详情](https://cloud.tencent.com/document/product/248/45140)
+CDN|QCE/CDN|[指标详情](https://cloud.tencent.com/document/product/248/45138)
+CLB|QCE/LB_PUBLIC|[指标详情](https://cloud.tencent.com/document/product/248/45047)
+NAT|QCE/NAT_GATEWAY|[指标详情](https://cloud.tencent.com/document/product/248/45069)
+物理专线|QCE/DC|[指标详情](https://cloud.tencent.com/document/product/248/45102)
+专用通道|QCE/DCX|[指标详情](https://cloud.tencent.com/document/product/248/45101)
+
+`后续会有更多的产品支持`
+
+## 二、快速开始
+### 1.构建
 ```shell
-cd $GOPATH/src
-go get github.com/tencentyun/tencentcloud-exporter
-go build
+git clone http://git.code.oa.com/rig/tencentcloud-exporter.git
+go build cmd/qcloud-exporter/qcloud_exporter.go
 ```
+或从release列表获取预编译的二进制, 目前只提供linux-amd64
+### 2. 定义产品实例配置
+- 配置云API的`credential`认证信息
+- 配置产品`products`指标、实例导出信息
 
-## 快速开始
-
-需要配置腾讯云提供的access_key,secret_key和地区id，例子(qcloud.yml)如下：
+如导出MongoDB所有指标所有实例
 
 ```yaml
 credential:
-  access_key: "your_fancy_accesskey"
-  secret_key: "your_fancy_accesskey"
-  region: "ap-shanghai"
-metrics:
- - tc_namespace: test/cvm
-   tc_metric_name: CPUUsage  
-   tc_metric_rename: cpu_use  
-   tc_labels: [InstanceName,Zone]  
-   tc_statistics: [max] 
-   period_seconds: 60
-   delay_seconds: 300
-   range_seconds: 120
+  access_key: "access_key"            // 云API的SecretId
+  secret_key: "secret_key"            // 云API的SecretKey
+  region: "ap-guangzhou"              // 实例所在区域信息
+
+products:
+  - namespace: QCE/CMONGO             // 产品命名空间
+    all_metrics: true                 // 导出支持的所有指标
+    all_instances: true               // 导出region下的所有实例
+    extra_labels: [InstanceName,Zone] // 将实例的字段作为指标的lables导出
 ```
 
-启动 Exporter
+### 3. 启动 Exporter
 
 ```bash
-> tencentcloud-exporter --web.listen-address "0.0.0.0:9123" --config.file "qcloud.yml" --web.telemetry-path "/metrics" --log.level "debug"
+> qcloud_exporter --config.file "qcloud.yml"
 ```
 
-访问 [http://127.0.0.1:9123/metrics](http://127.0.0.1:9123/metrics) 查看指标抓取是否成功
-
-`--log.level` 是打印的日志级别,方便定时使用,平时可以去除
+访问 [http://127.0.0.1:9123/metrics](http://127.0.0.1:9123/metrics) 查看所有导出的指标
 
 
 
-## 高级配置
-```
+
+## 三、qcloud.yml配置详情
+在git的`configs`里有支持产品的配置模版样例可参考
+```yaml
 credential:
-  access_key: <YOUR_ACCESS_KEY>
-  access_secret: <YOUR_ACCESS_SECRET>
-  region: <REGION>
+  access_key: <YOUR_ACCESS_KEY>                  // 必须, 云API的SecretId
+  access_secret: <YOUR_ACCESS_SECRET>            // 必须, 云API的SecretKey
+  region: <REGION>                               // 必须, 实例所在区域信息
 
-rate_limit: 10 #限制此实例接口调用频率, 一秒钟可以有几次监控接口调用
+rate_limit: 15                                   // 腾讯云监控拉取指标数据限制, 官方默认限制最大20qps 
 
+
+// 整个产品纬度配置, 每个产品一个item                                              
+products:
+  - namespace: QCE/CMONGO                        // 必须, 产品命名空间; QCE前缀可自定义,CMONGO产品名不区分大小写, 可用别名
+    all_metrics: true                            // 常用, 推荐开启, 导出支持的所有指标 
+    all_instances: true                          // 常用, 推荐开启, 导出该region下的所有实例 
+    extra_labels: [InstanceName,Zone]            // 可选, 将实例的字段作为指标的lables导出
+    only_include_metrics: [Inserts]              // 可选, 只导出这些指标, 配置时all_metrics失效
+    exclude_metrics: [Reads]                     // 可选, 不导出这些指标
+    instance_filters:                            // 可选, 在all_instances开启情况下, 根据每个实例的字段进行过滤
+      - ProjectId: 1
+        Status: 1                        
+    only_include_instances: [cmgo-xxxxxxxx]      // 可选, 只导出这些实例id, 配置时all_instances失效
+    exclude_instances: [cmgo-xxxxxxxx]           // 可选, 不导出这些实例id
+    custom_query_dimensions:                     // 可选, 不常用, 自定义指标查询条件, 配置时all_instances,only_include_instances,exclude_instances失效, 用于不支持按实例纬度查询的指标
+     - target: cmgo-xxxxxxxx
+    statistics_types: [avg]                      // 可选, 拉取N个数据点, 再进行max、min、avg、last计算, 默认last取最新值
+    period_seconds: 60                           // 可选, 指标统计周期, 默认自动获取指标支持的最小统计周期
+    range_seconds: 300                           // 可选, 选取时间范围, 开始时间=now-range_seconds, 结束时间=now
+    delay_seconds: 60                            // 可选, 时间偏移量, 结束时间=now-delay_seconds
+    metric_name_type: 1                          // 可选，导出指标的名字格式化类型, 1=大写转小写加下划线, 2=转小写; 默认2
+
+
+// 单个指标纬度配置, 每个指标一个item
 metrics:
- - tc_namespace: xxx/CVM #命名空间(xxx是a-z随意定的名字, 而后面的cvm是固定的,是每个产品的名字)
-   tc_metric_name: CPUUsage #腾讯云上指标名字
-   tc_metric_rename: cpu_usage #上报的指标名字(默认是tc_metric_name)
-   tc_myself_dimensions:#使用者自己指定上报维度,一般用不到设置
-      appid: 123456789
-      bucket :"test"
-   tc_labels: [Zone,InstanceName,ProjectId,Vip,UniqVpcId] #tag, labels会按照tc_labels元素字节序进行排序
-   tc_filters: #过滤实例
-     InstanceName: test  #InstanceName必须存在test和my才会上报
-     VpcId: vpc-dk8zmwuf #VpcId必须为vpc-dk8zmwuf才会上报
-   tc_statistics: [Max]#计算方法 支持Max Min 和Avg (字母大小写无关)
-   period_seconds: 60 #数据统计周期
-   range_seconds: 300 #取多少数据进行统计(如例子是取300/60+1==6个进行max,min,avg或sum,越多数据越平稳)
-   delay_seconds: 600 #数据延时时长
-```
+  - tc_namespace: QCE/CMONGO                     // 产品命名空间, 同namespace       
+    tc_metric_name: Inserts                      // 云监控定义的指标名
+    tc_metric_rename: Inserts                    // 导出指标的显示名
+    tc_metric_name_type: 1                       // 可选，导出指标的名字格式化类型, 1=大写转小写加下划线, 2=转小写; 默认1
+    tc_labels: [InstanceName]                    // 可选, 将实例的字段作为指标的lables导出
+    tc_filters:                                  // 可选, 根据每个实例的字段进行过滤, 否则默认导出region下所有实例
+      - ProjectId: 1
+        Status: 1                             
+    tc_myself_dimensions:                        // 可选, 同custom_query_dimensions
+    tc_statistics: [Avg]                         // 可选, 同statistics_types
+    period_seconds: 60                           // 可选, 同period_seconds
+    range_seconds: 300                           // 可选, 同range_seconds
+    delay_seconds: 60                            // 可选, 同delay_seconds
 
-credential中项目可以在环境变量中配置(如果设置了下面的环境变量, 删除credential这个block就可以了)
 ```
+特殊说明:
+1. **custom_query_dimensions**  
+每个实例的纬度字段信息, 可从对应的云监控产品指标文档查询, 如mongo支持的纬度字段信息可由[云监控指标详情](https://cloud.tencent.com/document/product/248/45104#%E5%90%84%E7%BB%B4%E5%BA%A6%E5%AF%B9%E5%BA%94%E5%8F%82%E6%95%B0%E6%80%BB%E8%A7%88) 查询 
+2. **extra_labels**  
+每个导出metric的labels还额外上报实例对应的字段信息, 实例可选的字段列表可从对应产品文档查询, 如mongo实例支持的字段可从[实例查询api文档](https://cloud.tencent.com/document/product/240/38568) 获取, 目前只支持str、int类型的字段
+3. **period_seconds**  
+每个指标支持的时间纬度统计, 一般支持60、300秒等, 具体可由对应产品的云监控产品指标文档查询, 如mongo可由[指标元数据查询](https://cloud.tencent.com/document/product/248/30351) , 假如不配置, 使用默认值(60), 假如该指标不支持60, 则自动使用该指标支持的最小值  
+4. **credential**  
+SecretId、SecretKey、Region可由环境变量获取
+```bash
 export TENCENTCLOUD_SECRET_ID="YOUR_ACCESS_KEY"
 export TENCENTCLOUD_SECRET_KEY="YOUR_ACCESS_SECRET"
 export TENCENTCLOUD_REGION="REGION"
 ```
 
-上边说明上报例子:
+## 四、qcloud_exporter支持的命令行参数说明
 
-```
-xxx_cvm_cpu_usage_max{instance_name="my_a_test",zone="ap-guangzhou-3",project_id:"0",vpc_id="vpc-dk8zmwuf"} 42.0
-xxx_cvm_cpu_usage_max{instance_name="my_b_test",zone="ap-guangzhou-1",project_id:"0",vpc_id="vpc-dk8zmwuf"} 7.0
-```
-
-
-
-## 使用注意
-### 1. tc_myself_dimensions风格 vs tc_labels风格
-配置存在两种风格,两种风格在字段上不兼容, tc_myself_dimensions风格里边有严格字段要求(大小写也有要求), tc_myself_dimensions和 [tc_filters、tc_labels]是冲突的.各个产品会按照业务模型、api不同选择tc_myself_dimensions风格或者tc_labels风格, 可以参考各产品文档了解产品使用那种风格
-
-- tc_myself_dimensions风格在生成prometheus tags时会按照key的字节序排序
+命令行参数|说明|默认值
+-------|----|-----
+--web.listen-address|http服务的端口|9123
+--web.telemetry-path|http访问的路径|/metrics
+--web.enable-exporter-metrics|是否开启服务自身的指标导出, promhttp_\*, process_\*, go_*|false
+--web.max-requests|最大同时抓取/metrics并发数, 0=disable|0
+--config.file|产品实例指标配置文件位置|qcloud.yml
+--log.level|日志级别|info
 
 
-- tc_labels风格在生成prometheus tags时会按照数组元素的字节序排序
-
-如:CDN业务,只能支持tc_myself_dimensions, 里边必须设置"projectId"和"domain"两个属性,多设置属性、少设置或者设置"ProjectId"等请求皆无法拉取到监控数据
-
-### 2.不同产品的同属性存细微差异
-同一个属性(label)产品api的支持情形不同, 如cvm的InstanceName不支持模糊匹配, 而mysql\redis等产品支持模糊匹配 ,这个可以参考各个产品拉取实例列表的接口
-
-### 3.各个指标period_seconds是不同的
-
-如COS的InternetTraffic指标支持60和300,而StdStorage指标是小时级别的,这部分差异比较多需要参考监控的官方文档
-
-
-## 各个产品风格及说明
-
-###  **数据库:mysql**   (tc_labels风格)
-
-
-
-支持属性:
-```
-{"Zone","VpcId","SubnetId","InstanceName","InstanceId","ProjectId","Qps",
-"EngineVersion",,"RenewFlag","SubnetId","CPU","Memory","Volume","Vip","Vport","CreateTime"}
-```
-
-
-eg:
-```
- - tc_namespace: guauga/Mysql
-   tc_metric_name: BytesSent  
-   tc_metric_rename: MyNewName  
-   tc_labels: [ProjectId,Zone]  
-   tc_statistics: [Max,Min,Avg] 
-   period_seconds: 60
-   delay_seconds: 300
-   range_seconds: 120
-```
-### **虚拟主机:cvm**   (tc_labels风格)
-
-支持属性:
-```
-{"Zone", "VpcId", "SubnetId","InstanceName", "InstanceId", "PrivateIpAddress","PublicIpAddress",
- "InstanceChargeType","InstanceType","CreatedTime","ImageId","RenewFlag","SubnetId","CPU","Memory"}
-```
-eg:
-
-```
- - tc_namespace: guauga/cvm
-   tc_metric_name: CPUUsage  
-   tc_metric_rename: cpu_use  
-   tc_labels: [Zone,InstanceId,InstanceName]
-   tc_filters: 
-     InstanceName: "dev"
-     Zone: "ap-guangzhou-4" 
-   tc_statistics: [Max,Min,Avg] 
-   period_seconds: 60
-   delay_seconds: 300
-   range_seconds: 120
-```
-### **键值存储(Redis老集群版\CKV主从版\CKV集群版):redis**   (tc_labels风格)
-
-支持属性:
-```
-{"InstanceId", "InstanceName","ProjectId","VpcId","SubnetId"}
-```
-
-eg:
-
-```
- - tc_namespace: guauga/redis
-   tc_metric_name: CmdstatGet  
-   tc_metric_rename: cmd_get  
-   tc_labels: [InstanceId, InstanceName,ProjectId,VpcId,SubnetId]
-   tc_filters: 
-     InstanceName: "cdn"
-   tc_statistics: [Max,Min,Avg] 
-   period_seconds: 60
-   delay_seconds: 300
-   range_seconds: 120
-```
-### **键值存储集群(Redis 2.8主从版\Redis 2.8单机版\Redis 4.0集群版等):cluster_redis**   (tc_labels风格)
-
-支持属性:
-```
-{"InstanceId", "InstanceName","ProjectId","VpcId","SubnetId"}
-```
-eg:
-
-```
- - tc_namespace: guauga/cluster_redis
-   tc_metric_name: KeysMin  
-   tc_metric_rename: keys  
-   tc_labels: [InstanceId, InstanceName,ProjectId,VpcId,SubnetId]
-   tc_filters: 
-     InstanceName: "cdn"
-   tc_statistics: [Avg] 
-   period_seconds: 60
-   delay_seconds: 300
-   range_seconds: 120
-```
-
-
-### **负载均衡(公网):public_clb**   (tc_labels风格)
-
-支持属性:
-```
-{"LoadBalancerName","LoadBalancerVip","ProjectId"}
-```
-eg:
-
-```
- - tc_namespace: Tencent/public_clb
-   tc_metric_name: Outtraffic  
-   tc_labels: [LoadBalancerVip,ProjectId]
-   tc_filters: 
-     LoadBalancerName: "SK1"   
-   tc_statistics: [Max] 
-   period_seconds: 60
-   delay_seconds: 120
-   range_seconds: 120
-```
-
-### **内容分发网络:cdn**   (tc_myself_dimensions风格)
- 
-可用维度 
-
-
-- [projectId,domain]
-
-
-eg:
-
-```
- - tc_namespace: guauga/cdn
-   tc_metric_name: Requests  
-   tc_myself_dimensions:
-     projectId: 0 
-     domain: "s5.hy.qcloudcdn.com" 
-   tc_statistics: [Max] 
-   period_seconds: 60
-   delay_seconds: 600
-   range_seconds: 60
-```
-
-### **对象存储:cos**   (tc_myself_dimensions风格)
- 
-
-可用维度 
-
-- [appid,bucket]
-
-eg:
-```
- - tc_namespace: guauga/cos
-   tc_metric_name: StdWriteRequests  
-   tc_myself_dimensions:
-     appid: 1251337138 
-     bucket: "test-1251337138" 
-   tc_statistics: [Max] 
-   period_seconds: 60
-   delay_seconds: 300
-   range_seconds: 60
-```
-### **专线(逻辑层-专线通道):dcx**   (tc_labels风格)
- 
-
-
-支持属性:
-```
-{"DirectConnectTunnelId","DirectConnectTunnelName","VpcId","TencentAddress","CustomerAddress"}
-```
-eg:
-```
- - tc_namespace: Tencent/dcx
-   tc_metric_name: Delay  
-   tc_labels: [DirectConnectTunnelName]  
-   tc_statistics: [Max] 
-   period_seconds: 300
-   delay_seconds: 600
-   range_seconds: 600
-```
-### **专线(物理层-物理通道):dc**   (tc_labels风格)
-支持属性:
-```
-{"DirectConnectId","DirectConnectName"}
-```
-eg:
-```
- - tc_namespace: Tencent/dc
-   tc_metric_name: Outbandwidth  
-   tc_labels: [DirectConnectName]  
-   tc_statistics: [Max] 
-   period_seconds: 300
-   delay_seconds: 600
-   range_seconds: 600
-```
-
-
-### **NAT 网关:nat**   (tc_labels风格)
-支持属性:
-```
-{"InstanceId","InstanceName", "Zone"}
-```
-eg:
-```
-- tc_namespace: test/nat
-   tc_metric_name: Outbandwidth
-   tc_metric_rename: out
-   tc_labels: [InstanceName,Zone]  
-   tc_statistics: [max] 
-   period_seconds: 60
-   delay_seconds: 300
-   range_seconds: 120
-```
-
+## 五、qcloud.yml样例  
+在git的configs里有支持产品的配置模版样例
 
 
 

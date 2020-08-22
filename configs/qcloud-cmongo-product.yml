@@ -1,0 +1,17 @@
+credential:
+  access_key: "access_key"
+  secret_key: "secret_key"
+  region: "region"
+
+rate_limit: 15                #云监控拉数据接口最大限制, 20/秒, 1200/分钟, https://cloud.tencent.com/document/product/248/31014
+
+products:
+  - namespace: QCE/CMONGO   #指标详情: https://cloud.tencent.com/document/product/248/45104
+    all_metrics: true       #自动导出所有实例的集群、副本集、节点3个纬度的指标数据
+    all_instances: true
+    #only_include_metrics: []
+    #only_include_instances: [cmgo-xxxxxxxx]
+    #extra_labels: [InstanceName]
+    #statistics_types: [last]
+    #period_seconds: 60
+    #metric_name_type: 2
