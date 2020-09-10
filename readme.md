@@ -5,7 +5,7 @@
 
 ## 一、支持的产品列表
 
-产品     | 命名空间 |支持的指标
+产品     | 命名空间 |支持的指标|
 --------|---------|----------
 MongoDB |QCE/CMONGO|[指标详情](https://cloud.tencent.com/document/product/248/45104)
 CDB|QCE/CDB|[指标详情](https://cloud.tencent.com/document/product/248/45147)
@@ -14,7 +14,8 @@ Redis集群版|QCE/REDIS|[指标详情](https://cloud.tencent.com/document/produ
 CVM|QCE/CVM|[指标详情](https://cloud.tencent.com/document/product/248/6843)
 COS|QCE/COS|[指标详情](https://cloud.tencent.com/document/product/248/45140)
 CDN|QCE/CDN|[指标详情](https://cloud.tencent.com/document/product/248/45138)
-CLB|QCE/LB_PUBLIC|[指标详情](https://cloud.tencent.com/document/product/248/45047)
+CLB(公网)|QCE/LB_PUBLIC|[指标详情](https://cloud.tencent.com/document/product/248/45047)
+CLB(7层)|QCE/LOADBALANCE|[指标详情](https://cloud.tencent.com/document/product/248/45045)
 NAT|QCE/NAT_GATEWAY|[指标详情](https://cloud.tencent.com/document/product/248/45069)
 物理专线|QCE/DC|[指标详情](https://cloud.tencent.com/document/product/248/45102)
 专用通道|QCE/DCX|[指标详情](https://cloud.tencent.com/document/product/248/45101)
