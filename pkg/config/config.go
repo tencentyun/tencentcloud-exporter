@@ -30,6 +30,8 @@ var (
 		"dcx":           "QCE/DCX",
 		"lb_public":     "QCE/LB_PUBLIC",
 		"public_clb":    "QCE/LB_PUBLIC",
+		"loadbalance":   "QCE/LOADBALANCE",
+		"7layer_clb":    "QCE/LOADBALANCE",
 		"nat_gateway":   "QCE/NAT_GATEWAY",
 		"nat":           "QCE/NAT_GATEWAY",
 		"cos":           "QCE/COS",

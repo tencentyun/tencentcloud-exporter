@@ -17,7 +17,6 @@ const (
 )
 
 var (
-	// TODO: Disk未找到
 	MongoClusterMetrics = []string{
 		"inserts", "reads", "updates", "deletes", "counts", "aggregates", "clusterconn", "commands", "connper", "clusterdiskusage",
 		"qps", "success", "delay10", "delay50", "delay100", "timeouts",
@@ -37,6 +36,10 @@ func init() {
 type mongoHandler struct {
 	collector *TcProductCollector
 	logger    log.Logger
+}
+
+func (h *mongoHandler) CheckMetricMeta(meta *metric.TcmMeta) bool {
+	return true
 }
 
 func (h *mongoHandler) GetNamespace() string {

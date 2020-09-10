@@ -36,6 +36,7 @@ var (
 	collectorState = make(map[string]int)
 )
 
+// 总指标采集器, 包含多个产品的采集器
 type TcMonitorCollector struct {
 	Collectors map[string]*TcProductCollector
 	config     *config.TencentConfig

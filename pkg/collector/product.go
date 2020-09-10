@@ -13,6 +13,7 @@ import (
 	"sync"
 )
 
+// 每个产品的指标采集默认实现, 不同的逻辑通过对应的productHandler实现
 type TcProductCollector struct {
 	Namespace    string
 	MetricRepo   metric.TcmMetricRepository
@@ -118,7 +119,12 @@ func (c *TcProductCollector) loadMetricsByProductConf() (err error) {
 		for _, mname := range metricNames {
 			meta, err := c.MetricRepo.GetMeta(c.Namespace, mname)
 			if err != nil {
-				level.Error(c.logger).Log("msg", "not found metric meta", "Namespace", c.Namespace, "name", mname)
+				level.Error(c.logger).Log("msg", "Not found metric meta", "Namespace", c.Namespace, "name", mname)
+				continue
+			}
+			// 指标元数据处理, false=跳过
+			if !c.handler.CheckMetricMeta(meta) {
+				level.Error(c.logger).Log("msg", " Metric meta check fail, skip", "Namespace", c.Namespace, "name", meta.MetricName)
 				continue
 			}
 
@@ -177,6 +183,7 @@ func (c *TcProductCollector) initQuerys() (err error) {
 	return
 }
 
+// 执行所有指标的采集
 func (c *TcProductCollector) Collect(ch chan<- prometheus.Metric) (err error) {
 	wg := sync.WaitGroup{}
 	wg.Add(len(c.Querys))
@@ -203,14 +210,16 @@ func (c *TcProductCollector) Collect(ch chan<- prometheus.Metric) (err error) {
 	return
 }
 
+// 创建新的TcProductCollector, 每个产品一个
 func NewTcProductCollector(namespace string, metricRepo metric.TcmMetricRepository, conf *config.TencentConfig, logger log.Logger) (*TcProductCollector, error) {
 	factory, exists := handlerFactoryMap[namespace]
 	if !exists {
-		return nil, fmt.Errorf("Product handler not found, Namespace=%s ", namespace)
+		return nil, fmt.Errorf("product handler not found, Namespace=%s ", namespace)
 	}
 
 	var instanceRepoCache instance.TcInstanceRepository
 	if !util.IsStrInList(instance.NotSupportInstances, namespace) {
+		// 支持实例自动发现的产品
 		instanceRepo, err := instance.NewTcInstanceRepository(namespace, conf, logger)
 		if err != nil {
 			return nil, err

@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// 腾讯云监控指标缓存, 在TcmMetricRepository封装一层, 指标元数据使用缓存, 转发获取数据点请求
 type TcmMetricCache struct {
 	Raw                TcmMetricRepository
 	metaCache          map[string]map[string]*TcmMeta //k1=namespace, k2=metricname(小写)
@@ -42,6 +43,7 @@ func (c *TcmMetricCache) ListSamples(metric *TcmMetric, startTime int64, endTime
 	return c.Raw.ListSamples(metric, startTime, endTime)
 }
 
+// 检测是否需要reload缓存的数据
 func (c *TcmMetricCache) checkMetaNeedreload(namespace string) (err error) {
 	v, ok := c.metaLastReloadTime[namespace]
 	if ok && v != 0 {
@@ -55,7 +57,6 @@ func (c *TcmMetricCache) checkMetaNeedreload(namespace string) (err error) {
 	if !ok {
 		np = map[string]*TcmMeta{}
 		c.metaCache[namespace] = np
-
 	}
 	for _, meta := range metas {
 		np[strings.ToLower(meta.MetricName)] = meta

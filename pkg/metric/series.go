@@ -5,6 +5,7 @@ import (
 	"github.com/tencentyun/tencentcloud-exporter/pkg/instance"
 )
 
+// 代表某个指标的一个时间线
 type TcmSeries struct {
 	Id          string
 	Metric      *TcmMetric

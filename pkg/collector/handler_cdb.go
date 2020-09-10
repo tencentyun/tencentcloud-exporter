@@ -18,6 +18,10 @@ type cdbHandler struct {
 	baseProductHandler
 }
 
+func (h *cdbHandler) CheckMetricMeta(meta *metric.TcmMeta) bool {
+	return true
+}
+
 func (h *cdbHandler) GetNamespace() string {
 	return CdbNamespace
 }

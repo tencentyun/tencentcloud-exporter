@@ -4,6 +4,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+// 负责一个指标的查询管理
 type TcmQuery struct {
 	Metric            *TcmMetric
 	LatestQueryStatus int

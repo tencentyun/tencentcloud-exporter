@@ -10,6 +10,7 @@ import (
 	"strings"
 )
 
+// 代表一个云监控指标的元数据
 type TcmMeta struct {
 	Id                string
 	Namespace         string

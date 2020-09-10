@@ -24,6 +24,10 @@ type cosHandler struct {
 	baseProductHandler
 }
 
+func (h *cosHandler) CheckMetricMeta(meta *metric.TcmMeta) bool {
+	return true
+}
+
 func (h *cosHandler) GetNamespace() string {
 	return CosNamespace
 }
