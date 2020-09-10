@@ -25,7 +25,7 @@ NAT|QCE/NAT_GATEWAY|[指标详情](https://cloud.tencent.com/document/product/24
 ## 二、快速开始
 ### 1.构建
 ```shell
-git clone http://git.code.oa.com/rig/tencentcloud-exporter.git
+git clone https://github.com/tencentyun/tencentcloud-exporter.git
 go build cmd/qcloud-exporter/qcloud_exporter.go
 ```
 或从release列表获取预编译的二进制, 目前只提供linux-amd64
