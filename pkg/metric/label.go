@@ -19,13 +19,15 @@ func (l *Labels) Md5() (string, error) {
 	return fmt.Sprintf("%x", h.Sum(jb)), nil
 }
 
+// 代表一个指标的labels
 type TcmLabels struct {
-	queryLableNames    []string
-	instanceLabelNames []string
-	constLabels        Labels
-	Names              []string
+	queryLableNames    []string // 用于查询数据的条件标签
+	instanceLabelNames []string // 从获取实例对象动态获取字段值的标签
+	constLabels        Labels   // 用户自定义的常量标签
+	Names              []string // 所有标签名列表
 }
 
+// 根据标签名, 获取所有标签的值
 func (l *TcmLabels) GetValues(filters map[string]string, ins instance.TcInstance) (values []string, err error) {
 	nameValues := map[string]string{}
 	for _, name := range l.queryLableNames {

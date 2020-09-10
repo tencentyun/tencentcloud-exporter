@@ -35,6 +35,10 @@ type redisHandler struct {
 	baseProductHandler
 }
 
+func (h *redisHandler) CheckMetricMeta(meta *metric.TcmMeta) bool {
+	return true
+}
+
 func (h *redisHandler) GetNamespace() string {
 	return RedisNamespace
 }

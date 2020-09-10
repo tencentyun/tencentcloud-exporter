@@ -5,11 +5,13 @@ import (
 	monitor "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/monitor/v20180724"
 )
 
+// 代表一个数据点
 type TcmSample struct {
 	Timestamp float64
 	Value     float64
 }
 
+// 代表一个时间线的多个数据点
 type TcmSamples struct {
 	Series  *TcmSeries
 	Samples []*TcmSample

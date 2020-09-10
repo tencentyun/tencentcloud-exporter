@@ -18,6 +18,10 @@ type natHandler struct {
 	baseProductHandler
 }
 
+func (h *natHandler) CheckMetricMeta(meta *metric.TcmMeta) bool {
+	return true
+}
+
 func (h *natHandler) GetNamespace() string {
 	return NatNamespace
 }

@@ -24,6 +24,10 @@ type cvmHandler struct {
 	baseProductHandler
 }
 
+func (h *cvmHandler) CheckMetricMeta(meta *metric.TcmMeta) bool {
+	return true
+}
+
 func (h *cvmHandler) GetNamespace() string {
 	return CvmNamespace
 }

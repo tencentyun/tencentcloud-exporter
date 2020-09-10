@@ -20,6 +20,10 @@ type cdnHandler struct {
 	baseProductHandler
 }
 
+func (h *cdnHandler) CheckMetricMeta(meta *metric.TcmMeta) bool {
+	return true
+}
+
 func (h *cdnHandler) GetNamespace() string {
 	return CdnNamespace
 }

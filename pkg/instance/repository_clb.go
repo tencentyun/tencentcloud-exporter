@@ -7,10 +7,13 @@ import (
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/clb/v20180317"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/client"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
+	"net"
 )
 
 func init() {
+	// LB_PUBLIC、LOADBALANCE实例对象是一样的
 	registerRepository("QCE/LB_PUBLIC", NewClbTcInstanceRepository)
+	registerRepository("QCE/LOADBALANCE", NewClbTcInstanceRepository)
 }
 
 type ClbTcInstanceRepository struct {
@@ -24,13 +27,24 @@ func (repo *ClbTcInstanceRepository) GetInstanceKey() string {
 
 func (repo *ClbTcInstanceRepository) Get(id string) (instance TcInstance, err error) {
 	req := sdk.NewDescribeLoadBalancersRequest()
-	req.LoadBalancerIds = []*string{&id}
+
+	ip := net.ParseIP(id)
+	if ip != nil {
+		ipstr := ip.String()
+		req.LoadBalancerVips = []*string{&ipstr}
+	} else {
+		req.LoadBalancerIds = []*string{&id}
+	}
+
 	resp, err := repo.client.DescribeLoadBalancers(req)
 	if err != nil {
 		return
 	}
-	if len(resp.Response.LoadBalancerSet) != 1 {
-		return nil, fmt.Errorf("Response instanceDetails size != 1, id=%s ", id)
+
+	if len(resp.Response.LoadBalancerSet) == 0 {
+		return nil, fmt.Errorf("loadBalancer instance not found")
+	} else if len(resp.Response.LoadBalancerSet) > 1 {
+		return nil, fmt.Errorf("response instanceDetails size != 1")
 	}
 	meta := resp.Response.LoadBalancerSet[0]
 	instance, err = NewClbTcInstance(id, meta)

@@ -11,12 +11,19 @@ var (
 	handlerFactoryMap = make(map[string]func(*TcProductCollector, log.Logger) (productHandler, error))
 )
 
+// 每个产品的指标处理逻辑
 type productHandler interface {
+	// 获取云监控指标namespace
 	GetNamespace() string
+	// 对指标元数据做检验和补充
+	CheckMetricMeta(meta *metric.TcmMeta) bool
+	// 是否包含该指标, ture=包含, false=不包含
 	IsIncludeMetric(m *metric.TcmMetric) bool
+	// 获取该指标下符合条件的所有实例, 并生成所有的series
 	GetSeries(tcmMetric *metric.TcmMetric) (series []*metric.TcmSeries, err error)
 }
 
+// 将对应的产品handler注册到Factory中
 func registerHandler(namespace string, isDefaultEnabled bool, factory func(*TcProductCollector, log.Logger) (productHandler, error)) {
 	handlerFactoryMap[namespace] = factory
 }
@@ -36,7 +43,7 @@ func (h *baseProductHandler) GetSeries(m *metric.TcmMetric) (slist []*metric.Tcm
 				continue
 			}
 			ql := map[string]string{
-				h.monitorQueryKey: ins.GetInstanceId(),
+				h.monitorQueryKey: ins.GetMonitorQueryKey(),
 			}
 			s, err := metric.NewTcmSeries(m, ql, ins)
 			if err != nil {
@@ -52,7 +59,7 @@ func (h *baseProductHandler) GetSeries(m *metric.TcmMetric) (slist []*metric.Tcm
 		}
 		for _, ins := range insList {
 			ql := map[string]string{
-				h.monitorQueryKey: ins.GetInstanceId(),
+				h.monitorQueryKey: ins.GetMonitorQueryKey(),
 			}
 			s, err := metric.NewTcmSeries(m, ql, ins)
 			if err != nil {
@@ -71,13 +78,13 @@ func (h *baseProductHandler) GetSeries(m *metric.TcmMetric) (slist []*metric.Tcm
 			}
 			ins, err := h.collector.InstanceRepo.Get(v)
 			if err != nil {
-				level.Error(h.logger).Log("msg", "Instance not found", "id", v)
+				level.Error(h.logger).Log("msg", "Instance not found", "err", err, "id", v)
 				continue
 			}
 
 			s, err := metric.NewTcmSeries(m, ql, ins)
 			if err != nil {
-				level.Error(h.logger).Log("msg", "Create metric series fail", "metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+				level.Error(h.logger).Log("msg", "Create metric series fail", "err", err, "metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
 				continue
 			}
 			slist = append(slist, s)

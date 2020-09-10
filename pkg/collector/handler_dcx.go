@@ -18,6 +18,10 @@ type dcxHandler struct {
 	baseProductHandler
 }
 
+func (h *dcxHandler) CheckMetricMeta(meta *metric.TcmMeta) bool {
+	return true
+}
+
 func (h *dcxHandler) GetNamespace() string {
 	return DcxNamespace
 }

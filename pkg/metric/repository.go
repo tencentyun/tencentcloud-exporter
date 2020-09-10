@@ -16,13 +16,15 @@ var (
 	timeStampFormat = "2006-01-02 15:04:05"
 )
 
+// 腾讯云监控指标Repository
 type TcmMetricRepository interface {
+	// 获取指标的元数据
 	GetMeta(namespace string, name string) (*TcmMeta, error)
-
+	// 根据namespace获取所有的指标元数据
 	ListMetaByNamespace(namespace string) ([]*TcmMeta, error)
-
+	// 按时间范围获取单个时间线的数据点
 	GetSamples(series *TcmSeries, startTime int64, endTime int64) (samples *TcmSamples, err error)
-
+	// 按时间范围获取单个指标下所有时间线的数据点
 	ListSamples(metric *TcmMetric, startTime int64, endTime int64) (samplesList []*TcmSamples, err error)
 }
 

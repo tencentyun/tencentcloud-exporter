@@ -8,12 +8,13 @@ import (
 	"time"
 )
 
+// 代表一个指标, 包含多个时间线
 type TcmMetric struct {
 	Id           string
-	Meta         *TcmMeta
-	Labels       *TcmLabels
-	Series       map[string]*TcmSeries
-	StatPromDesc map[string]*prometheus.Desc
+	Meta         *TcmMeta                    // 指标元数据
+	Labels       *TcmLabels                  // 指标labels
+	Series       map[string]*TcmSeries       // 包含的多个时间线
+	StatPromDesc map[string]*prometheus.Desc // 按统计纬度的Desc, max、min、avg、last
 	Conf         *TcmMetricConfig
 }
 
@@ -94,6 +95,7 @@ func (m TcmMetric) GetSeriesSplitByBatch(batch int) (steps [][]*TcmSeries) {
 	return
 }
 
+// 创建TcmMetric
 func NewTcmMetric(meta *TcmMeta, conf *TcmMetricConfig) (*TcmMetric, error) {
 	id := fmt.Sprintf("%s-%s", meta.Namespace, meta.MetricName)
 

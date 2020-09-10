@@ -18,6 +18,13 @@ type clbHandler struct {
 	baseProductHandler
 }
 
+func (h *clbHandler) CheckMetricMeta(meta *metric.TcmMeta) bool {
+	if len(meta.SupportDimensions) == 0 {
+		meta.SupportDimensions = append(meta.SupportDimensions, "vip")
+	}
+	return true
+}
+
 func (h *clbHandler) GetNamespace() string {
 	return ClbNamespace
 }
