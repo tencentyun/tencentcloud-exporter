@@ -55,7 +55,11 @@ products:
 
 访问 [http://127.0.0.1:9123/metrics](http://127.0.0.1:9123/metrics) 查看所有导出的指标
 
-
+### 4. 构建镜像
+```bash
+> docker build -t tencentyun/tencentcloud-exporter .
+> docker run -d -v $PWD/qcloud.yml:/qcloud.yml tencentyun/tencentcloud-exporter --config.file "/qcloud.yml"
+```
 
 
 ## 三、qcloud.yml配置详情
