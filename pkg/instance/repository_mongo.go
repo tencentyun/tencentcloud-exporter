@@ -51,6 +51,7 @@ func (repo *MongoTcInstanceRepository) ListByFilters(filters map[string]string) 
 	var limit uint64 = 100
 	var total int64 = -1
 
+	req.Offset = &offset
 	req.Limit = &limit
 
 	if v, ok := filters["ProjectId"]; ok {
@@ -82,6 +83,7 @@ getMoreInstances:
 	}
 	offset += limit
 	if offset < uint64(total) {
+		req.Offset = &offset
 		goto getMoreInstances
 	}
 
