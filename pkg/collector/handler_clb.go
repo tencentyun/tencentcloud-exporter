@@ -3,6 +3,7 @@ package collector
 import (
 	"github.com/go-kit/kit/log"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
+	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
 )
 
 const (
@@ -19,9 +20,10 @@ type clbHandler struct {
 }
 
 func (h *clbHandler) CheckMetricMeta(meta *metric.TcmMeta) bool {
-	if len(meta.SupportDimensions) == 0 {
-		meta.SupportDimensions = append(meta.SupportDimensions, "vip")
+	if !util.IsStrInList(meta.SupportDimensions, ClbInstanceidKey) {
+		meta.SupportDimensions = append(meta.SupportDimensions, ClbInstanceidKey)
 	}
+
 	return true
 }
 
