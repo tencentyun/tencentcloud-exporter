@@ -33,7 +33,10 @@ type clb7Handler struct {
 }
 
 func (h *clb7Handler) CheckMetricMeta(meta *metric.TcmMeta) bool {
-	meta.SupportDimensions = append(meta.SupportDimensions, "vip")
+	if !util.IsStrInList(meta.SupportDimensions, Clb7InstanceidKey) {
+		meta.SupportDimensions = append(meta.SupportDimensions, Clb7InstanceidKey)
+	}
+
 	return true
 }
 

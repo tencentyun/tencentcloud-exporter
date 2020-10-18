@@ -49,6 +49,7 @@ func (repo *NatTcInstanceRepository) ListByFilters(filters map[string]string) (i
 	var offset uint64 = 0
 	var limit uint64 = 100
 	var total int64 = -1
+	req.Offset = &offset
 	req.Limit = &limit
 
 getMoreInstances:
@@ -69,6 +70,7 @@ getMoreInstances:
 	}
 	offset += limit
 	if offset < uint64(total) {
+		req.Offset = &offset
 		goto getMoreInstances
 	}
 	return

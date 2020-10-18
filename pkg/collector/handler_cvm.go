@@ -25,6 +25,10 @@ type cvmHandler struct {
 }
 
 func (h *cvmHandler) CheckMetricMeta(meta *metric.TcmMeta) bool {
+	if !util.IsStrInList(meta.SupportDimensions, CvmInstanceidKey) {
+		meta.SupportDimensions = append(meta.SupportDimensions, CvmInstanceidKey)
+	}
+
 	return true
 }
 

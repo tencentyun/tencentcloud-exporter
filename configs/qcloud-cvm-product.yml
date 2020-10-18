@@ -11,7 +11,7 @@ products:
     all_instances: true
     #only_include_metrics: []
     #only_include_instances: [ins-xxxxxxxx]
-    #extra_labels: [InstanceName]
+    #extra_labels: [InstanceId, InstanceName]
     #statistics_types: [last]
     #period_seconds: 60
     #metric_name_type: 2

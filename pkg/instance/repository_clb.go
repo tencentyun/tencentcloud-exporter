@@ -63,6 +63,8 @@ func (repo *ClbTcInstanceRepository) ListByFilters(filters map[string]string) (i
 	var offset int64 = 0
 	var limit int64 = 100
 	var total int64 = -1
+
+	req.Offset = &offset
 	req.Limit = &limit
 
 getMoreInstances:
@@ -83,6 +85,7 @@ getMoreInstances:
 	}
 	offset += limit
 	if offset < total {
+		req.Offset = &offset
 		goto getMoreInstances
 	}
 
