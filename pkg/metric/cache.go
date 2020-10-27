@@ -1,6 +1,7 @@
 package metric
 
 import (
+	"fmt"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	"strings"
@@ -20,7 +21,15 @@ func (c *TcmMetricCache) GetMeta(namespace string, name string) (*TcmMeta, error
 	if err != nil {
 		return nil, err
 	}
-	return c.metaCache[namespace][strings.ToLower(name)], nil
+	np, exists := c.metaCache[namespace]
+	if !exists {
+		return nil, fmt.Errorf("namespace cache not exists")
+	}
+	m, exists := np[strings.ToLower(name)]
+	if !exists {
+		return nil, fmt.Errorf("metric cache not exists")
+	}
+	return m, nil
 }
 
 func (c *TcmMetricCache) ListMetaByNamespace(namespace string) ([]*TcmMeta, error) {
