@@ -50,6 +50,7 @@ func (repo *CdbTcInstanceRepository) ListByFilters(filters map[string]string) (i
 	var limit uint64 = 2000
 	var total int64 = -1
 
+	req.Offset = &offset
 	req.Limit = &limit
 
 getMoreInstances:
@@ -70,6 +71,7 @@ getMoreInstances:
 	}
 	offset += limit
 	if offset < uint64(total) {
+		req.Offset = &offset
 		goto getMoreInstances
 	}
 
