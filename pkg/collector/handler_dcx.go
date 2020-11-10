@@ -3,11 +3,17 @@ package collector
 import (
 	"github.com/go-kit/kit/log"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
+	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
+	"strings"
 )
 
 const (
 	DcxNamespace     = "QCE/DCX"
 	DcxInstanceidKey = "directConnectConnId"
+)
+
+var (
+	DcxInvalidMetricNames = []string{"rxbytes", "txbytes"}
 )
 
 func init() {
@@ -19,6 +25,9 @@ type dcxHandler struct {
 }
 
 func (h *dcxHandler) CheckMetricMeta(meta *metric.TcmMeta) bool {
+	if util.IsStrInList(DcxInvalidMetricNames, strings.ToLower(meta.MetricName)) {
+		return false
+	}
 	return true
 }
 

@@ -124,7 +124,7 @@ func (c *TcProductCollector) loadMetricsByProductConf() (err error) {
 			}
 			// 指标元数据处理, false=跳过
 			if !c.handler.CheckMetricMeta(meta) {
-				level.Error(c.logger).Log("msg", " Metric meta check fail, skip", "Namespace", c.Namespace, "name", meta.MetricName)
+				level.Warn(c.logger).Log("msg", " Metric not support, skip", "Namespace", c.Namespace, "name", meta.MetricName)
 				continue
 			}
 
@@ -143,7 +143,7 @@ func (c *TcProductCollector) loadMetricsByProductConf() (err error) {
 				}
 				// 指标过滤
 				if !c.handler.IsIncludeMetric(nm) {
-					level.Error(c.logger).Log("msg", " Metric not support, skip", "Namespace", c.Namespace, "name", nm.Meta.MetricName)
+					level.Warn(c.logger).Log("msg", " Metric not support, skip", "Namespace", c.Namespace, "name", nm.Meta.MetricName)
 					continue
 				}
 				c.MetricMap[meta.MetricName] = nm
