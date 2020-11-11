@@ -4,8 +4,10 @@ import (
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
-	"github.com/tencentyun/tencentcloud-exporter/pkg/instance"
 	"sort"
+	"strings"
+
+	"github.com/tencentyun/tencentcloud-exporter/pkg/instance"
 )
 
 type Labels map[string]string
@@ -29,9 +31,14 @@ type TcmLabels struct {
 
 // 根据标签名, 获取所有标签的值
 func (l *TcmLabels) GetValues(filters map[string]string, ins instance.TcInstance) (values []string, err error) {
+	lowerKeyFilters := map[string]string{}
+	for k, v := range filters {
+		lowerKeyFilters[strings.ToLower(k)] = v
+	}
+
 	nameValues := map[string]string{}
 	for _, name := range l.queryLableNames {
-		v, ok := filters[name]
+		v, ok := lowerKeyFilters[strings.ToLower(name)]
 		if ok {
 			nameValues[name] = v
 		} else {
