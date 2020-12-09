@@ -30,7 +30,7 @@ func (h *cdbHandler) IsIncludeMetric(m *metric.TcmMetric) bool {
 	return true
 }
 
-func NewCdbHandler(c *TcProductCollector, logger log.Logger) (handler productHandler, err error) {
+func NewCdbHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
 	handler = &cdbHandler{
 		baseProductHandler{
 			monitorQueryKey: CdbInstanceidKey,

@@ -2,8 +2,9 @@ package instance
 
 import (
 	"fmt"
-	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/clb/v20180317"
 	"reflect"
+
+	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/clb/v20180317"
 )
 
 type ClbInstance struct {

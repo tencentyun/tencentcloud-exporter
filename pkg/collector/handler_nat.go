@@ -30,7 +30,7 @@ func (h *natHandler) IsIncludeMetric(m *metric.TcmMetric) bool {
 	return true
 }
 
-func NewNatHandler(c *TcProductCollector, logger log.Logger) (handler productHandler, err error) {
+func NewNatHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
 	handler = &natHandler{
 		baseProductHandler{
 			monitorQueryKey: NatMonitorQueryKey,

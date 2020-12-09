@@ -35,7 +35,7 @@ func (h *clbHandler) IsIncludeMetric(m *metric.TcmMetric) bool {
 	return true
 }
 
-func NewClbHandler(c *TcProductCollector, logger log.Logger) (handler productHandler, err error) {
+func NewClbHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
 	handler = &clbHandler{
 		baseProductHandler{
 			monitorQueryKey: ClbInstanceidKey,

@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+	"os"
+
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
@@ -12,8 +15,6 @@ import (
 	"github.com/tencentyun/tencentcloud-exporter/pkg/collector"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
-	"net/http"
-	"os"
 )
 
 func newHandler(c *config.TencentConfig, includeExporterMetrics bool, maxRequests int, logger log.Logger) (*http.Handler, error) {

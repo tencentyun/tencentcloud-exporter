@@ -1,10 +1,11 @@
 package collector
 
 import (
+	"strings"
+
 	"github.com/go-kit/kit/log"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
-	"strings"
 )
 
 const (
@@ -51,7 +52,7 @@ func (h *clb7Handler) IsIncludeMetric(m *metric.TcmMetric) bool {
 	return true
 }
 
-func NewClb7Handler(c *TcProductCollector, logger log.Logger) (handler productHandler, err error) {
+func NewClb7Handler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
 	handler = &clb7Handler{
 		baseProductHandler{
 			monitorQueryKey: Clb7InstanceidKey,

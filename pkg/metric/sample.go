@@ -2,6 +2,7 @@ package metric
 
 import (
 	"fmt"
+
 	monitor "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/monitor/v20180724"
 )
 

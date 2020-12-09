@@ -2,12 +2,13 @@ package instance
 
 import (
 	"fmt"
+	"net"
+
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/clb/v20180317"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/client"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
-	"net"
 )
 
 func init() {

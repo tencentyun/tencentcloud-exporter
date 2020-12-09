@@ -2,8 +2,9 @@ package instance
 
 import (
 	"fmt"
-	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/dc/v20180410"
 	"reflect"
+
+	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/dc/v20180410"
 )
 
 type DcxTcInstance struct {

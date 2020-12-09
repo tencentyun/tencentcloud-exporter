@@ -3,11 +3,12 @@ package metric
 import (
 	"errors"
 	"fmt"
-	monitor "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/monitor/v20180724"
-	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
 	"sort"
 	"strconv"
 	"strings"
+
+	monitor "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/monitor/v20180724"
+	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
 )
 
 // 代表一个云监控指标的元数据

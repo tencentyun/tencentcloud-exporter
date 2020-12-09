@@ -2,8 +2,9 @@ package instance
 
 import (
 	"fmt"
-	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cdb/v20170320"
 	"reflect"
+
+	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cdb/v20170320"
 )
 
 type CdbTcInstance struct {

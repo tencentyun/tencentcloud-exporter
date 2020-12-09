@@ -1,14 +1,16 @@
 package collector
 
 import (
+	"context"
 	"fmt"
+	"sync"
+	"time"
+
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
-	"sync"
-	"time"
 )
 
 const exporterNamespace = "tcm"
@@ -39,6 +41,7 @@ var (
 // 总指标采集器, 包含多个产品的采集器
 type TcMonitorCollector struct {
 	Collectors map[string]*TcProductCollector
+	Reloaders  map[string]*TcProductCollectorReloader
 	config     *config.TencentConfig
 	logger     log.Logger
 	lock       sync.Mutex
@@ -85,6 +88,7 @@ func collect(name string, c *TcProductCollector, ch chan<- prometheus.Metric, lo
 
 func NewTcMonitorCollector(conf *config.TencentConfig, logger log.Logger) (*TcMonitorCollector, error) {
 	collectors := make(map[string]*TcProductCollector)
+	reloaders := make(map[string]*TcProductCollectorReloader)
 
 	metricRepo, err := metric.NewTcmMetricRepository(conf, logger)
 	if err != nil {
@@ -106,11 +110,26 @@ func NewTcMonitorCollector(conf *config.TencentConfig, logger log.Logger) (*TcMo
 		collectors[namespace] = collector
 		collectorState[namespace] = 1
 		level.Info(logger).Log("msg", "Create product collecter ok", "Namespace", namespace)
+
+		pconf, err := conf.GetProductConfig(namespace)
+		if err != nil {
+			return nil, err
+		}
+		if pconf.IsReloadEnable() {
+			relodInterval := time.Duration(conf.RelodIntervalMinutes * int64(time.Minute))
+			reloader := NewTcProductCollectorReloader(context.TODO(), collector, relodInterval, logger)
+			reloaders[namespace] = reloader
+			go reloader.Run()
+			level.Info(logger).Log(
+				"msg", fmt.Sprintf("reload %s instances every %d minutes", namespace, conf.RelodIntervalMinutes),
+			)
+		}
 	}
 
 	level.Info(logger).Log("msg", "Create all product collecter ok", "num", len(collectors))
 	return &TcMonitorCollector{
 		Collectors: collectors,
+		Reloaders:  reloaders,
 		config:     conf,
 		logger:     logger,
 	}, nil

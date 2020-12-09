@@ -2,10 +2,14 @@ package config
 
 import (
 	"fmt"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
 	"strings"
+
+	"github.com/tencentyun/tencentcloud-exporter/pkg/instance"
+	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
+
+	"gopkg.in/yaml.v2"
 )
 
 const (
@@ -84,12 +88,23 @@ type TencentProduct struct {
 	MetricNameType        int32               `yaml:"metric_name_type"` // 1=大写转下划线, 2=全小写
 }
 
+func (p *TencentProduct) IsReloadEnable() bool {
+	if len(p.OnlyIncludeMetrics) > 0 {
+		return false
+	}
+	if util.IsStrInList(instance.NotSupportInstances, p.Namespace) {
+		return false
+	}
+	return p.AllInstances
+}
+
 type TencentConfig struct {
-	Credential TencentCredential `yaml:"credential"`
-	Metrics    []TencentMetric   `yaml:"metrics"`
-	Products   []TencentProduct  `yaml:"products"`
-	RateLimit  float64           `yaml:"rate_limit"`
-	Filename   string            `yaml:"filename"`
+	Credential           TencentCredential `yaml:"credential"`
+	Metrics              []TencentMetric   `yaml:"metrics"`
+	Products             []TencentProduct  `yaml:"products"`
+	RateLimit            float64           `yaml:"rate_limit"`
+	RelodIntervalMinutes int64             `yaml:"relod_interval_minutes"`
+	Filename             string            `yaml:"filename"`
 }
 
 func NewConfig() *TencentConfig {
@@ -168,9 +183,12 @@ func (c *TencentConfig) check() (err error) {
 }
 
 func (c *TencentConfig) fillDefault() {
-
 	if c.RateLimit <= 0 {
 		c.RateLimit = 15
+	}
+
+	if c.RelodIntervalMinutes <= 0 {
+		c.RelodIntervalMinutes = 3
 	}
 
 	for index, metric := range c.Metrics {
@@ -218,14 +236,14 @@ func (c *TencentConfig) GetMetricConfigs(namespace string) (mconfigs []TencentMe
 	return
 }
 
-func (c *TencentConfig) GetProductConfigs(namespace string) (pconfigs []TencentProduct) {
+func (c *TencentConfig) GetProductConfig(namespace string) (TencentProduct, error) {
 	for _, pconf := range c.Products {
 		ns := GetStandardNamespaceFromCustomNamespace(pconf.Namespace)
 		if ns == namespace {
-			pconfigs = append(pconfigs, pconf)
+			return pconf, nil
 		}
 	}
-	return
+	return TencentProduct{}, fmt.Errorf("namespace config not found")
 }
 
 func GetStandardNamespaceFromCustomNamespace(cns string) string {

@@ -30,7 +30,7 @@ func (h *dcHandler) IsIncludeMetric(m *metric.TcmMetric) bool {
 	return true
 }
 
-func NewDcHandler(c *TcProductCollector, logger log.Logger) (handler productHandler, err error) {
+func NewDcHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
 	handler = &dcHandler{
 		baseProductHandler{
 			monitorQueryKey: DcInstanceidKey,

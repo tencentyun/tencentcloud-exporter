@@ -2,8 +2,9 @@ package instance
 
 import (
 	"fmt"
-	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/mongodb/v20190725"
 	"reflect"
+
+	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/mongodb/v20190725"
 )
 
 type MongoTcInstance struct {

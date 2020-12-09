@@ -1,19 +1,25 @@
 package instance
 
 import (
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
 	"sync"
 	"time"
+
+	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/log/level"
+)
+
+const (
+	DefaultReloadInterval = 60 * time.Minute
 )
 
 // 可用于产品的实例的缓存, TcInstanceRepository
 type TcInstanceCache struct {
 	Raw            TcInstanceRepository
 	cache          map[string]TcInstance
-	lastReloadTime int64
+	lastReloadTime time.Time
 	logger         log.Logger
 	mu             sync.Mutex
+	reloadInterval time.Duration
 }
 
 func (c *TcInstanceCache) GetInstanceKey() string {
@@ -74,11 +80,11 @@ func (c *TcInstanceCache) ListByFilters(filters map[string]string) (insList []Tc
 	return
 }
 
-func (c *TcInstanceCache) checkNeedreload() (err error) {
+func (c *TcInstanceCache) checkNeedreload() error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	if c.lastReloadTime != 0 {
+	if !c.lastReloadTime.IsZero() && time.Now().Sub(c.lastReloadTime) < c.reloadInterval {
 		return nil
 	}
 
@@ -86,19 +92,27 @@ func (c *TcInstanceCache) checkNeedreload() (err error) {
 	if err != nil {
 		return err
 	}
-	for _, instance := range inss {
-		c.cache[instance.GetInstanceId()] = instance
+	numChanged := 0
+	if len(inss) > 0 {
+		newCache := map[string]TcInstance{}
+		for _, instance := range inss {
+			newCache[instance.GetInstanceId()] = instance
+		}
+		numChanged = len(newCache) - len(c.cache)
+		c.cache = newCache
 	}
-	c.lastReloadTime = time.Now().Unix()
-	level.Info(c.logger).Log("msg", "Reload instance cache", "num", len(c.cache))
-	return
+	c.lastReloadTime = time.Now()
+
+	level.Info(c.logger).Log("msg", "Reload instance cache", "num", len(c.cache), "changed", numChanged)
+	return nil
 }
 
-func NewTcInstanceCache(repo TcInstanceRepository, logger log.Logger) TcInstanceRepository {
+func NewTcInstanceCache(repo TcInstanceRepository, reloadInterval time.Duration, logger log.Logger) TcInstanceRepository {
 	cache := &TcInstanceCache{
-		Raw:    repo,
-		cache:  map[string]TcInstance{},
-		logger: logger,
+		Raw:            repo,
+		cache:          map[string]TcInstance{},
+		reloadInterval: reloadInterval,
+		logger:         logger,
 	}
 	return cache
 

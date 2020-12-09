@@ -3,13 +3,14 @@ package metric
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	monitor "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/monitor/v20180724"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/client"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
 	"golang.org/x/time/rate"
-	"time"
 )
 
 var (
@@ -200,7 +201,7 @@ func (repo *TcmMetricRepositoryImpl) ListSamples(m *TcmMetric, st int64, et int6
 			samples, e := NewTcmSamples(s, points)
 			if e != nil {
 				level.Warn(repo.logger).Log(
-					"msg", "Instance has not monitor data",
+					"msg", "The instance has no metric data and may not have traffic",
 					"metric", m.Meta.MetricName,
 					"dimension", fmt.Sprintf("%v", ql))
 			} else {

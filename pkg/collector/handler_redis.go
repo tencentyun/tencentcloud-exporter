@@ -1,10 +1,11 @@
 package collector
 
 import (
+	"strings"
+
 	"github.com/go-kit/kit/log"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
-	"strings"
 )
 
 const (
@@ -57,7 +58,7 @@ func (h *redisHandler) IsIncludeMetric(m *metric.TcmMetric) bool {
 	return false
 }
 
-func NewRedisHandler(c *TcProductCollector, logger log.Logger) (handler productHandler, err error) {
+func NewRedisHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
 	handler = &redisHandler{
 		baseProductHandler{
 			monitorQueryKey: RedisInstanceidKey,

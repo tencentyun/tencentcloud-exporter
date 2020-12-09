@@ -1,10 +1,11 @@
 package collector
 
 import (
+	"strings"
+
 	"github.com/go-kit/kit/log"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
-	"strings"
 )
 
 const (
@@ -50,7 +51,7 @@ func (h *cvmHandler) GetSeries(m *metric.TcmMetric) (slist []*metric.TcmSeries, 
 	return h.baseProductHandler.GetSeries(m)
 }
 
-func NewCvmHandler(c *TcProductCollector, logger log.Logger) (handler productHandler, err error) {
+func NewCvmHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
 	handler = &cvmHandler{
 		baseProductHandler{
 			monitorQueryKey: CvmInstanceidKey,

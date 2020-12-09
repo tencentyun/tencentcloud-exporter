@@ -2,13 +2,14 @@ package collector
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	mongodb "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/mongodb/v20190725"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/instance"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
-	"strings"
 )
 
 const (
@@ -173,13 +174,11 @@ func (h *mongoHandler) getSeriesByMetricType(m *metric.TcmMetric, ins instance.T
 				}
 			}
 		}
-	} else {
-		level.Warn(h.logger).Log("msg", "not found metric type", "metric", m.Meta.MetricName)
 	}
 	return
 }
 
-func NewMongoHandler(c *TcProductCollector, logger log.Logger) (handler productHandler, err error) {
+func NewMongoHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
 	handler = &mongoHandler{
 		collector: c,
 		logger:    logger,

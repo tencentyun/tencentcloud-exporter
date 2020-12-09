@@ -2,6 +2,7 @@ package metric
 
 import (
 	"fmt"
+
 	"github.com/tencentyun/tencentcloud-exporter/pkg/instance"
 )
 

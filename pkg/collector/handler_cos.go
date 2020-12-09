@@ -2,6 +2,7 @@ package collector
 
 import (
 	"fmt"
+
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
@@ -70,7 +71,7 @@ func (h *cosHandler) checkMonitorQueryKeys(m *metric.TcmMetric, ql map[string]st
 	return true
 }
 
-func NewCosHandler(c *TcProductCollector, logger log.Logger) (handler productHandler, err error) {
+func NewCosHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
 	handler = &cosHandler{
 		baseProductHandler{
 			collector: c,
