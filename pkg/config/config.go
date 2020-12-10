@@ -89,6 +89,7 @@ type TencentProduct struct {
 	RangeSeconds          int64               `yaml:"range_seconds"`
 	DelaySeconds          int64               `yaml:"delay_seconds"`
 	MetricNameType        int32               `yaml:"metric_name_type"` // 1=大写转下划线, 2=全小写
+	RelodIntervalMinutes  int64               `yaml:"relod_interval_minutes"`
 }
 
 func (p *TencentProduct) IsReloadEnable() bool {
@@ -102,12 +103,11 @@ func (p *TencentProduct) IsReloadEnable() bool {
 }
 
 type TencentConfig struct {
-	Credential           TencentCredential `yaml:"credential"`
-	Metrics              []TencentMetric   `yaml:"metrics"`
-	Products             []TencentProduct  `yaml:"products"`
-	RateLimit            float64           `yaml:"rate_limit"`
-	RelodIntervalMinutes int64             `yaml:"relod_interval_minutes"`
-	Filename             string            `yaml:"filename"`
+	Credential TencentCredential `yaml:"credential"`
+	Metrics    []TencentMetric   `yaml:"metrics"`
+	Products   []TencentProduct  `yaml:"products"`
+	RateLimit  float64           `yaml:"rate_limit"`
+	Filename   string            `yaml:"filename"`
 }
 
 func NewConfig() *TencentConfig {
@@ -193,10 +193,6 @@ func (c *TencentConfig) fillDefault() {
 		c.RateLimit = DefaultRateLimit
 	}
 
-	if c.RelodIntervalMinutes <= 0 {
-		c.RelodIntervalMinutes = DefaultRelodIntervalMinutes
-	}
-
 	for index, metric := range c.Metrics {
 		if metric.PeriodSeconds == 0 {
 			c.Metrics[index].PeriodSeconds = DefaultPeriodSeconds
@@ -211,6 +207,12 @@ func (c *TencentConfig) fillDefault() {
 
 		if metric.MetricReName == "" {
 			c.Metrics[index].MetricReName = c.Metrics[index].MetricName
+		}
+	}
+
+	for index, product := range c.Products {
+		if product.RelodIntervalMinutes <= 0 {
+			c.Products[index].RelodIntervalMinutes = DefaultRelodIntervalMinutes
 		}
 	}
 }

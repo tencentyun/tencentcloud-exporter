@@ -26,6 +26,7 @@ type TcProductCollector struct {
 	InstanceMap  map[string]instance.TcInstance
 	Querys       metric.TcmQuerySet
 	Conf         *config.TencentConfig
+	ProductConf  *config.TencentProduct
 	handler      ProductHandler
 	logger       log.Logger
 	lock         sync.Mutex
@@ -292,7 +293,8 @@ func (r *TcProductCollectorReloader) reloadMetricsByProductConf() error {
 }
 
 // 创建新的TcProductCollector, 每个产品一个
-func NewTcProductCollector(namespace string, metricRepo metric.TcmMetricRepository, conf *config.TencentConfig, logger log.Logger) (*TcProductCollector, error) {
+func NewTcProductCollector(namespace string, metricRepo metric.TcmMetricRepository,
+	conf *config.TencentConfig, pconf *config.TencentProduct, logger log.Logger) (*TcProductCollector, error) {
 	factory, exists := handlerFactoryMap[namespace]
 	if !exists {
 		return nil, fmt.Errorf("product handler not found, Namespace=%s ", namespace)
@@ -306,7 +308,7 @@ func NewTcProductCollector(namespace string, metricRepo metric.TcmMetricReposito
 			return nil, err
 		}
 		// 使用instance缓存
-		reloadInterval := time.Duration(conf.RelodIntervalMinutes * int64(time.Minute))
+		reloadInterval := time.Duration(pconf.RelodIntervalMinutes * int64(time.Minute))
 		instanceRepoCache = instance.NewTcInstanceCache(instanceRepo, reloadInterval, logger)
 	}
 
@@ -315,6 +317,7 @@ func NewTcProductCollector(namespace string, metricRepo metric.TcmMetricReposito
 		MetricRepo:   metricRepo,
 		InstanceRepo: instanceRepoCache,
 		Conf:         conf,
+		ProductConf:  pconf,
 		logger:       logger,
 	}
 

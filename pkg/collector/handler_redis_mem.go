@@ -207,7 +207,7 @@ func NewRedisMemHandler(c *TcProductCollector, logger log.Logger) (ProductHandle
 	if err != nil {
 		return nil, err
 	}
-	relodInterval := time.Duration(c.Conf.RelodIntervalMinutes * int64(time.Minute))
+	relodInterval := time.Duration(c.ProductConf.RelodIntervalMinutes * int64(time.Minute))
 	nodeRepoCahe := instance.NewTcRedisInstanceNodeCache(nodeRepo, relodInterval, logger)
 
 	handler := &redisMemHandler{

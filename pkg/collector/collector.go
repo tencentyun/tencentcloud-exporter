@@ -103,7 +103,12 @@ func NewTcMonitorCollector(conf *config.TencentConfig, logger log.Logger) (*TcMo
 			continue
 		}
 
-		collector, err := NewTcProductCollector(namespace, metricRepoCache, conf, logger)
+		pconf, err := conf.GetProductConfig(namespace)
+		if err != nil {
+			return nil, err
+		}
+
+		collector, err := NewTcProductCollector(namespace, metricRepoCache, conf, &pconf, logger)
 		if err != nil {
 			panic(fmt.Sprintf("Create product collecter fail, err=%s, Namespace=%s", err, namespace))
 		}
@@ -111,17 +116,14 @@ func NewTcMonitorCollector(conf *config.TencentConfig, logger log.Logger) (*TcMo
 		collectorState[namespace] = 1
 		level.Info(logger).Log("msg", "Create product collecter ok", "Namespace", namespace)
 
-		pconf, err := conf.GetProductConfig(namespace)
-		if err != nil {
-			return nil, err
-		}
 		if pconf.IsReloadEnable() {
-			relodInterval := time.Duration(conf.RelodIntervalMinutes * int64(time.Minute))
+			relodInterval := time.Duration(pconf.RelodIntervalMinutes * int64(time.Minute))
 			reloader := NewTcProductCollectorReloader(context.TODO(), collector, relodInterval, logger)
 			reloaders[namespace] = reloader
 			go reloader.Run()
 			level.Info(logger).Log(
-				"msg", fmt.Sprintf("reload %s instances every %d minutes", namespace, conf.RelodIntervalMinutes),
+				"msg", fmt.Sprintf("reload %s instances every %d minutes",
+					namespace, pconf.RelodIntervalMinutes),
 			)
 		}
 	}
