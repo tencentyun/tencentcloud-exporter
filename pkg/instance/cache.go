@@ -4,6 +4,8 @@ import (
 	"sync"
 	"time"
 
+	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/redis/v20180412"
+
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 )
@@ -27,8 +29,8 @@ func (c *TcInstanceCache) GetInstanceKey() string {
 }
 
 func (c *TcInstanceCache) Get(id string) (TcInstance, error) {
-	ins, ok := c.cache[id]
-	if ok {
+	ins, exists := c.cache[id]
+	if exists {
 		return ins, nil
 	}
 
@@ -115,5 +117,44 @@ func NewTcInstanceCache(repo TcInstanceRepository, reloadInterval time.Duration,
 		logger:         logger,
 	}
 	return cache
+}
 
+type TcRedisInstanceNodeCache struct {
+	Raw            RedisTcInstanceNodeRepository
+	cache          map[string]*sdk.DescribeInstanceNodeInfoResponse
+	lastReloadTime map[string]time.Time
+	reloadInterval time.Duration
+	mu             sync.Mutex
+
+	logger log.Logger
+}
+
+func (c *TcRedisInstanceNodeCache) GetNodeInfo(instanceId string) (*sdk.DescribeInstanceNodeInfoResponse, error) {
+	lrtime, exists := c.lastReloadTime[instanceId]
+	if exists && time.Now().Sub(lrtime) < c.reloadInterval {
+		node, ok := c.cache[instanceId]
+		if ok {
+			return node, nil
+		}
+	}
+
+	node, err := c.Raw.GetNodeInfo(instanceId)
+	if err != nil {
+		return nil, err
+	}
+	c.cache[instanceId] = node
+	c.lastReloadTime[instanceId] = time.Now()
+	level.Debug(c.logger).Log("msg", "Get redis node info from api", "instanceId", instanceId)
+	return node, nil
+}
+
+func NewTcRedisInstanceNodeCache(repo RedisTcInstanceNodeRepository, reloadInterval time.Duration, logger log.Logger) RedisTcInstanceNodeRepository {
+	cache := &TcRedisInstanceNodeCache{
+		Raw:            repo,
+		cache:          map[string]*sdk.DescribeInstanceNodeInfoResponse{},
+		lastReloadTime: map[string]time.Time{},
+		reloadInterval: reloadInterval,
+		logger:         logger,
+	}
+	return cache
 }

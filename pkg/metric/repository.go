@@ -200,7 +200,7 @@ func (repo *TcmMetricRepositoryImpl) ListSamples(m *TcmMetric, st int64, et int6
 			}
 			samples, e := NewTcmSamples(s, points)
 			if e != nil {
-				level.Warn(repo.logger).Log(
+				level.Debug(repo.logger).Log(
 					"msg", "The instance has no metric data and may not have traffic",
 					"metric", m.Meta.MetricName,
 					"dimension", fmt.Sprintf("%v", ql))

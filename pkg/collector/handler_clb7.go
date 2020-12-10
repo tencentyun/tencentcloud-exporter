@@ -33,7 +33,7 @@ type clb7Handler struct {
 	baseProductHandler
 }
 
-func (h *clb7Handler) CheckMetricMeta(meta *metric.TcmMeta) bool {
+func (h *clb7Handler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
 	if !util.IsStrInList(meta.SupportDimensions, Clb7InstanceidKey) {
 		meta.SupportDimensions = append(meta.SupportDimensions, Clb7InstanceidKey)
 	}
@@ -45,7 +45,7 @@ func (h *clb7Handler) GetNamespace() string {
 	return Clb7Namespace
 }
 
-func (h *clb7Handler) IsIncludeMetric(m *metric.TcmMetric) bool {
+func (h *clb7Handler) IsMetricVaild(m *metric.TcmMetric) bool {
 	if util.IsStrInList(Clb7ExcludeMetrics, strings.ToLower(m.Meta.MetricName)) {
 		return false
 	}

@@ -21,7 +21,7 @@ type cdnHandler struct {
 	baseProductHandler
 }
 
-func (h *cdnHandler) CheckMetricMeta(meta *metric.TcmMeta) bool {
+func (h *cdnHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
 	return true
 }
 
@@ -29,7 +29,7 @@ func (h *cdnHandler) GetNamespace() string {
 	return CdnNamespace
 }
 
-func (h *cdnHandler) IsIncludeMetric(m *metric.TcmMetric) bool {
+func (h *cdnHandler) IsMetricVaild(m *metric.TcmMetric) bool {
 	return true
 }
 

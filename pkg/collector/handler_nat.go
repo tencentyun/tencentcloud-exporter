@@ -18,7 +18,7 @@ type natHandler struct {
 	baseProductHandler
 }
 
-func (h *natHandler) CheckMetricMeta(meta *metric.TcmMeta) bool {
+func (h *natHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
 	return true
 }
 
@@ -26,7 +26,7 @@ func (h *natHandler) GetNamespace() string {
 	return NatNamespace
 }
 
-func (h *natHandler) IsIncludeMetric(m *metric.TcmMetric) bool {
+func (h *natHandler) IsMetricVaild(m *metric.TcmMetric) bool {
 	return true
 }
 

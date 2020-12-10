@@ -3,6 +3,7 @@ package collector
 import (
 	"context"
 	"fmt"
+	"github.com/tencentyun/tencentcloud-exporter/pkg/constant"
 	"strings"
 	"sync"
 	"time"
@@ -141,8 +142,12 @@ func (c *TcProductCollector) createMetricWithProductConf(mname string, pconf con
 		return nil, err
 	}
 	// 指标元数据处理, false=跳过
-	if !c.handler.CheckMetricMeta(meta) {
+	if !c.handler.IsMetricMetaVaild(meta) {
 		return nil, fmt.Errorf("metric not support")
+	}
+	err = c.handler.ModifyMetricMeta(meta)
+	if err != nil {
+		return nil, err
 	}
 
 	m, exists := c.MetricMap[mname]
@@ -157,8 +162,12 @@ func (c *TcProductCollector) createMetricWithProductConf(mname string, pconf con
 			return nil, err
 		}
 		// 指标过滤
-		if !c.handler.IsIncludeMetric(nm) {
+		if !c.handler.IsMetricVaild(nm) {
 			return nil, fmt.Errorf("metric not support")
+		}
+		err = c.handler.ModifyMetric(nm)
+		if err != nil {
+			return nil, err
 		}
 		return nm, nil
 	}
@@ -172,8 +181,12 @@ func (c *TcProductCollector) createMetricWithMetricConf(mconf config.TencentMetr
 		return nil, err
 	}
 	// 指标元数据处理, false=跳过
-	if !c.handler.CheckMetricMeta(meta) {
+	if !c.handler.IsMetricMetaVaild(meta) {
 		return nil, fmt.Errorf("metric not support")
+	}
+	err = c.handler.ModifyMetricMeta(meta)
+	if err != nil {
+		return nil, err
 	}
 
 	m, ok := c.MetricMap[meta.MetricName]
@@ -187,8 +200,12 @@ func (c *TcProductCollector) createMetricWithMetricConf(mconf config.TencentMetr
 			return nil, err
 		}
 		// 指标过滤
-		if !c.handler.IsIncludeMetric(nm) {
+		if !c.handler.IsMetricVaild(nm) {
 			return nil, fmt.Errorf("metric not support")
+		}
+		err = c.handler.ModifyMetric(nm)
+		if err != nil {
+			return nil, err
 		}
 		return nm, nil
 	}
@@ -282,7 +299,7 @@ func NewTcProductCollector(namespace string, metricRepo metric.TcmMetricReposito
 	}
 
 	var instanceRepoCache instance.TcInstanceRepository
-	if !util.IsStrInList(instance.NotSupportInstances, namespace) {
+	if !util.IsStrInList(constant.NotSupportInstanceNamespaces, namespace) {
 		// 支持实例自动发现的产品
 		instanceRepo, err := instance.NewTcInstanceRepository(namespace, conf, logger)
 		if err != nil {

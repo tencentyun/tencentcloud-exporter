@@ -2,18 +2,13 @@ package instance
 
 import (
 	"fmt"
-	"reflect"
-
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/redis/v20180412"
+	"reflect"
 )
 
 type RedisTcInstance struct {
 	baseTcInstance
 	meta *sdk.InstanceSet
-}
-
-func (ins *RedisTcInstance) GetMeta() interface{} {
-	return ins.meta
 }
 
 func NewRedisTcInstance(instanceId string, meta *sdk.InstanceSet) (ins *RedisTcInstance, err error) {
@@ -31,4 +26,8 @@ func NewRedisTcInstance(instanceId string, meta *sdk.InstanceSet) (ins *RedisTcI
 		meta: meta,
 	}
 	return
+}
+
+func (ins *RedisTcInstance) GetMeta() interface{} {
+	return ins.meta
 }

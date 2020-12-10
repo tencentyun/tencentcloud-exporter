@@ -6,15 +6,16 @@ import (
 	"os"
 	"strings"
 
-	"github.com/tencentyun/tencentcloud-exporter/pkg/instance"
+	"github.com/tencentyun/tencentcloud-exporter/pkg/constant"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
-
 	"gopkg.in/yaml.v2"
 )
 
 const (
-	DefaultPeriodSeconds = 60
-	DefaultDelaySeconds  = 300
+	DefaultPeriodSeconds        = 60
+	DefaultDelaySeconds         = 300
+	DefaultRelodIntervalMinutes = 60
+	DefaultRateLimit            = 15
 
 	EnvAccessKey = "TENCENTCLOUD_SECRET_ID"
 	EnvSecretKey = "TENCENTCLOUD_SECRET_KEY"
@@ -29,6 +30,8 @@ var (
 		"mysql":         "QCE/CDB",
 		"cvm":           "QCE/CVM",
 		"redis":         "QCE/REDIS",
+		"redis_cluster": "QCE/REDIS",
+		"redis_mem":     "QCE/REDIS_MEM",
 		"cluster_redis": "QCE/REDIS",
 		"dc":            "QCE/DC",
 		"dcx":           "QCE/DCX",
@@ -92,7 +95,7 @@ func (p *TencentProduct) IsReloadEnable() bool {
 	if len(p.OnlyIncludeMetrics) > 0 {
 		return false
 	}
-	if util.IsStrInList(instance.NotSupportInstances, p.Namespace) {
+	if util.IsStrInList(constant.NotSupportInstanceNamespaces, p.Namespace) {
 		return false
 	}
 	return p.AllInstances
@@ -177,6 +180,9 @@ func (c *TencentConfig) check() (err error) {
 		if _, exists := Product2Namespace[strings.ToLower(pname)]; !exists {
 			return fmt.Errorf("namespace productName not support, %s", pname)
 		}
+		if len(pconf.OnlyIncludeInstances) == 0 && !pconf.AllInstances && len(pconf.CustomQueryDimensions) == 0 {
+			return fmt.Errorf("must set all_instances or only_include_instances or custom_query_dimensions")
+		}
 	}
 
 	return nil
@@ -184,11 +190,11 @@ func (c *TencentConfig) check() (err error) {
 
 func (c *TencentConfig) fillDefault() {
 	if c.RateLimit <= 0 {
-		c.RateLimit = 15
+		c.RateLimit = DefaultRateLimit
 	}
 
 	if c.RelodIntervalMinutes <= 0 {
-		c.RelodIntervalMinutes = 3
+		c.RelodIntervalMinutes = DefaultRelodIntervalMinutes
 	}
 
 	for index, metric := range c.Metrics {

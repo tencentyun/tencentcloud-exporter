@@ -25,7 +25,7 @@ type cvmHandler struct {
 	baseProductHandler
 }
 
-func (h *cvmHandler) CheckMetricMeta(meta *metric.TcmMeta) bool {
+func (h *cvmHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
 	if !util.IsStrInList(meta.SupportDimensions, CvmInstanceidKey) {
 		meta.SupportDimensions = append(meta.SupportDimensions, CvmInstanceidKey)
 	}
@@ -37,7 +37,7 @@ func (h *cvmHandler) GetNamespace() string {
 	return CvmNamespace
 }
 
-func (h *cvmHandler) IsIncludeMetric(m *metric.TcmMetric) bool {
+func (h *cvmHandler) IsMetricVaild(m *metric.TcmMetric) bool {
 	if util.IsStrInList(CvmInvalidMetricNames, strings.ToLower(m.Meta.MetricName)) {
 		return false
 	}
