@@ -2,13 +2,14 @@ package collector
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	mongodb "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/mongodb/v20190725"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/instance"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
-	"strings"
 )
 
 const (
@@ -34,80 +35,97 @@ func init() {
 }
 
 type mongoHandler struct {
-	collector *TcProductCollector
-	logger    log.Logger
-}
-
-func (h *mongoHandler) CheckMetricMeta(meta *metric.TcmMeta) bool {
-	return true
+	baseProductHandler
 }
 
 func (h *mongoHandler) GetNamespace() string {
 	return MongoNamespace
 }
 
-func (h *mongoHandler) IsIncludeMetric(m *metric.TcmMetric) bool {
-	return true
-}
-
-func (h *mongoHandler) GetSeries(m *metric.TcmMetric) (slist []*metric.TcmSeries, err error) {
+func (h *mongoHandler) ModifyMetric(m *metric.TcmMetric) error {
 	if m.Meta.MetricName == "Commands" {
 		if m.Conf.StatPeriodSeconds == 60 {
 			// 该指标不支持60统计
 			m.Conf.StatPeriodSeconds = 300
 		}
 	}
+	return nil
+}
 
-	if len(m.Conf.OnlyIncludeInstances) != 0 {
-		for _, insId := range m.Conf.OnlyIncludeInstances {
-			ins, err := h.collector.InstanceRepo.Get(insId)
-			if err != nil {
-				level.Error(h.logger).Log("msg", "Instance not found", "id", insId)
-				continue
-			}
-			sl, err := h.getSeriesByMetricType(m, ins)
-			if err != nil {
-				level.Error(h.logger).Log("msg", "Create metric series fail", "metric", m.Meta.MetricName, "instacne", insId)
-				continue
-			}
-			slist = append(slist, sl...)
+func (h *mongoHandler) GetSeries(m *metric.TcmMetric) ([]*metric.TcmSeries, error) {
+	if m.Conf.IsIncludeOnlyInstance() {
+		return h.GetSeriesByOnly(m)
+	}
+
+	if m.Conf.IsIncludeAllInstance() {
+		return h.GetSeriesByAll(m)
+	}
+
+	if m.Conf.IsCustomQueryDimensions() {
+		return h.GetSeriesByCustom(m)
+	}
+
+	return nil, fmt.Errorf("must config all_instances or only_include_instances or custom_query_dimensions")
+}
+
+func (h *mongoHandler) GetSeriesByOnly(m *metric.TcmMetric) ([]*metric.TcmSeries, error) {
+	var slist []*metric.TcmSeries
+	for _, insId := range m.Conf.OnlyIncludeInstances {
+		ins, err := h.collector.InstanceRepo.Get(insId)
+		if err != nil {
+			level.Error(h.logger).Log("msg", "Instance not found", "id", insId)
+			continue
 		}
+		sl, err := h.getSeriesByMetricType(m, ins)
+		if err != nil {
+			level.Error(h.logger).Log("msg", "Create metric series fail",
+				"metric", m.Meta.MetricName, "instacne", insId)
+			continue
+		}
+		slist = append(slist, sl...)
+	}
+	return slist, nil
+}
 
-	} else if m.Conf.AllInstances {
-		insList, err := h.collector.InstanceRepo.ListByFilters(m.Conf.InstanceFilters)
+func (h *mongoHandler) GetSeriesByAll(m *metric.TcmMetric) ([]*metric.TcmSeries, error) {
+	var slist []*metric.TcmSeries
+	insList, err := h.collector.InstanceRepo.ListByFilters(m.Conf.InstanceFilters)
+	if err != nil {
+		return nil, err
+	}
+	for _, ins := range insList {
+		if len(m.Conf.ExcludeInstances) != 0 && util.IsStrInList(m.Conf.ExcludeInstances, ins.GetInstanceId()) {
+			continue
+		}
+		sl, err := h.getSeriesByMetricType(m, ins)
+		if err != nil {
+			level.Error(h.logger).Log("msg", "Create metric series fail",
+				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+			continue
+		}
+		slist = append(slist, sl...)
+	}
+	return slist, nil
+}
+
+func (h *mongoHandler) GetSeriesByCustom(m *metric.TcmMetric) ([]*metric.TcmSeries, error) {
+	var slist []*metric.TcmSeries
+	for _, ql := range m.Conf.CustomQueryDimensions {
+		v, ok := ql[MongoInstanceidKey]
+		if !ok {
+			return nil, fmt.Errorf("not found %s in queryDimensions", MongoInstanceidKey)
+		}
+		ins, err := h.collector.InstanceRepo.Get(v)
 		if err != nil {
 			return nil, err
 		}
-		for _, ins := range insList {
-			if len(m.Conf.ExcludeInstances) != 0 && util.IsStrInList(m.Conf.ExcludeInstances, ins.GetInstanceId()) {
-				continue
-			}
-			sl, err := h.getSeriesByMetricType(m, ins)
-			if err != nil {
-				level.Error(h.logger).Log("msg", "Create metric series fail", "metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
-				continue
-			}
-			slist = append(slist, sl...)
+		s, err := metric.NewTcmSeries(m, ql, ins)
+		if err != nil {
+			return nil, err
 		}
-	} else {
-		for _, ql := range m.Conf.CustomQueryDimensions {
-			v, ok := ql[MongoInstanceidKey]
-			if !ok {
-				return nil, fmt.Errorf("not found %s in queryDimensions", MongoInstanceidKey)
-			}
-			ins, err := h.collector.InstanceRepo.Get(v)
-			if err != nil {
-				return nil, err
-			}
-			s, err := metric.NewTcmSeries(m, ql, ins)
-			if err != nil {
-				return nil, err
-			}
-			slist = append(slist, s)
-		}
+		slist = append(slist, s)
 	}
-
-	return
+	return slist, nil
 }
 
 func (h *mongoHandler) getSeriesByMetricType(m *metric.TcmMetric, ins instance.TcInstance) (slist []*metric.TcmSeries, err error) {
@@ -119,14 +137,16 @@ func (h *mongoHandler) getSeriesByMetricType(m *metric.TcmMetric, ins instance.T
 		}
 		s, err := metric.NewTcmSeries(m, ql, ins)
 		if err != nil {
-			return nil, fmt.Errorf("create metric series fail, metric=%s, instacne=%s", m.Meta.MetricName, ins.GetInstanceId())
+			return nil, fmt.Errorf("create metric series fail, metric=%s, instacne=%s",
+				m.Meta.MetricName, ins.GetInstanceId())
 		}
 		slist = append(slist, s)
 	} else if util.IsStrInList(MongoReplicaMetrics, strings.ToLower(m.Meta.MetricName)) {
 		// 副本集纬度
 		meta, ok := ins.GetMeta().(*mongodb.InstanceDetail)
 		if !ok {
-			return nil, fmt.Errorf("get instacne raw meta fail, metric=%s, instacne=%s", m.Meta.MetricName, ins.GetInstanceId())
+			return nil, fmt.Errorf("get instacne raw meta fail, metric=%s, instacne=%s",
+				m.Meta.MetricName, ins.GetInstanceId())
 		}
 		for _, rep := range meta.ReplicaSets {
 			// cmgo-6ielucen_0
@@ -135,7 +155,8 @@ func (h *mongoHandler) getSeriesByMetricType(m *metric.TcmMetric, ins instance.T
 			}
 			s, err := metric.NewTcmSeries(m, ql, ins)
 			if err != nil {
-				level.Error(h.logger).Log("msg", "Create metric series fail", "metric", m.Meta.MetricName, "instacne", *rep.ReplicaSetId)
+				level.Error(h.logger).Log("msg", "Create metric series fail",
+					"metric", m.Meta.MetricName, "instacne", *rep.ReplicaSetId)
 			} else {
 				slist = append(slist, s)
 			}
@@ -144,7 +165,8 @@ func (h *mongoHandler) getSeriesByMetricType(m *metric.TcmMetric, ins instance.T
 		// 节点纬度
 		meta, ok := ins.GetMeta().(*mongodb.InstanceDetail)
 		if !ok {
-			return nil, fmt.Errorf("get instacne raw meta fail, metric=%s, instacne=%s", m.Meta.MetricName, ins.GetInstanceId())
+			return nil, fmt.Errorf("get instacne raw meta fail, metric=%s, instacne=%s",
+				m.Meta.MetricName, ins.GetInstanceId())
 		}
 		for _, rep := range meta.ReplicaSets {
 			// cmgo-6ielucen_0-node-primary
@@ -154,7 +176,8 @@ func (h *mongoHandler) getSeriesByMetricType(m *metric.TcmMetric, ins instance.T
 			}
 			s, err := metric.NewTcmSeries(m, ql, ins)
 			if err != nil {
-				level.Error(h.logger).Log("msg", "Create metric series fail", "metric", m.Meta.MetricName, "instacne", nprimary)
+				level.Error(h.logger).Log("msg", "Create metric series fail",
+					"metric", m.Meta.MetricName, "instacne", nprimary)
 			} else {
 				slist = append(slist, s)
 			}
@@ -167,23 +190,24 @@ func (h *mongoHandler) getSeriesByMetricType(m *metric.TcmMetric, ins instance.T
 				}
 				s, err := metric.NewTcmSeries(m, ql, ins)
 				if err != nil {
-					level.Error(h.logger).Log("msg", "Create metric series fail", "metric", m.Meta.MetricName, "instacne", nslave)
+					level.Error(h.logger).Log("msg", "Create metric series fail",
+						"metric", m.Meta.MetricName, "instacne", nslave)
 				} else {
 					slist = append(slist, s)
 				}
 			}
 		}
-	} else {
-		level.Warn(h.logger).Log("msg", "not found metric type", "metric", m.Meta.MetricName)
 	}
 	return
 }
 
-func NewMongoHandler(c *TcProductCollector, logger log.Logger) (handler productHandler, err error) {
+func NewMongoHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
 	handler = &mongoHandler{
-		collector: c,
-		logger:    logger,
+		baseProductHandler: baseProductHandler{
+			monitorQueryKey: MongoInstanceidKey,
+			collector:       c,
+			logger:          logger,
+		},
 	}
 	return
-
 }

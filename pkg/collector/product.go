@@ -1,7 +1,13 @@
 package collector
 
 import (
+	"context"
 	"fmt"
+	"github.com/tencentyun/tencentcloud-exporter/pkg/constant"
+	"strings"
+	"sync"
+	"time"
+
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
@@ -9,8 +15,6 @@ import (
 	"github.com/tencentyun/tencentcloud-exporter/pkg/instance"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
-	"strings"
-	"sync"
 )
 
 // 每个产品的指标采集默认实现, 不同的逻辑通过对应的productHandler实现
@@ -22,54 +26,38 @@ type TcProductCollector struct {
 	InstanceMap  map[string]instance.TcInstance
 	Querys       metric.TcmQuerySet
 	Conf         *config.TencentConfig
-	handler      productHandler
+	ProductConf  *config.TencentProduct
+	handler      ProductHandler
 	logger       log.Logger
 	lock         sync.Mutex
 }
 
 // 指标纬度配置
-func (c *TcProductCollector) loadMetricsByMetricConf() (err error) {
+func (c *TcProductCollector) LoadMetricsByMetricConf() error {
 	if len(c.MetricMap) == 0 {
 		c.MetricMap = make(map[string]*metric.TcmMetric)
 	}
 
 	for _, mconf := range c.Conf.GetMetricConfigs(c.Namespace) {
-		meta, err := c.MetricRepo.GetMeta(c.Namespace, mconf.MetricName)
+		nm, err := c.createMetricWithMetricConf(mconf)
 		if err != nil {
-			level.Error(c.logger).Log("msg", "not found metric meta", "err", err, "Namespace", c.Namespace, "name", mconf.MetricName)
+			level.Warn(c.logger).Log("msg", "Create metric fail", "err", err,
+				"Namespace", c.Namespace, "name", mconf.MetricName)
+			continue
+		}
+		c.MetricMap[nm.Meta.MetricName] = nm
+
+		series, err := c.handler.GetSeries(nm)
+		if err != nil {
+			level.Error(c.logger).Log("msg", "create metric series err", "err", err,
+				"Namespace", c.Namespace, "name", mconf.MetricName)
 			continue
 		}
 
-		m, ok := c.MetricMap[meta.MetricName]
-		if !ok {
-			conf, err := metric.NewTcmMetricConfigWithMetricYaml(mconf, meta)
-			if err != nil {
-				level.Error(c.logger).Log("msg", "parse metric config err", "err", err, "Namespace", c.Namespace, "name", mconf.MetricName)
-				continue
-			}
-			nm, err := metric.NewTcmMetric(meta, conf)
-			if err != nil {
-				level.Error(c.logger).Log("msg", "create metric err", "err", err, "Namespace", c.Namespace, "name", mconf.MetricName)
-				continue
-			}
-			// 指标过滤
-			if !c.handler.IsIncludeMetric(nm) {
-				level.Error(c.logger).Log("msg", " Metric not support, skip", "Namespace", c.Namespace, "name", nm.Meta.MetricName)
-				continue
-			}
-			c.MetricMap[meta.MetricName] = nm
-			m = nm
-		}
-
-		series, err := c.handler.GetSeries(m)
+		err = nm.LoadSeries(series)
 		if err != nil {
-			level.Error(c.logger).Log("msg", "create metric series err", "err", err, "Namespace", c.Namespace, "name", mconf.MetricName)
-			continue
-		}
-
-		err = m.LoadSeries(series)
-		if err != nil {
-			level.Error(c.logger).Log("msg", "load metric series err", "err", err, "Namespace", c.Namespace, "name", mconf.MetricName)
+			level.Error(c.logger).Log("msg", "load metric series err", "err", err,
+				"Namespace", c.Namespace, "name", mconf.MetricName)
 			continue
 		}
 	}
@@ -77,95 +65,152 @@ func (c *TcProductCollector) loadMetricsByMetricConf() (err error) {
 }
 
 // 产品纬度配置
-func (c *TcProductCollector) loadMetricsByProductConf() (err error) {
+func (c *TcProductCollector) LoadMetricsByProductConf() error {
 	if len(c.MetricMap) == 0 {
 		c.MetricMap = make(map[string]*metric.TcmMetric)
 	}
 
-	for _, pconf := range c.Conf.GetProductConfigs(c.Namespace) {
-		var metricNames []string
+	pconf, err := c.Conf.GetProductConfig(c.Namespace)
+	if err != nil {
+		return err
+	}
+	metricNames, err := c.getMetricNames(pconf)
+	if err != nil {
+		return err
+	}
+	for _, mname := range metricNames {
+		nm, err := c.createMetricWithProductConf(mname, pconf)
+		if err != nil {
+			level.Warn(c.logger).Log("msg", "Create metric fail", "err", err, "Namespace", c.Namespace, "name", mname)
+			continue
+		}
+		c.MetricMap[nm.Meta.MetricName] = nm
 
-		if len(pconf.OnlyIncludeMetrics) != 0 {
-			// 导出指定指标列表
-			for _, mname := range pconf.OnlyIncludeMetrics {
-				meta, err := c.MetricRepo.GetMeta(c.Namespace, mname)
-				if err != nil {
-					level.Warn(c.logger).Log("msg", "not found metric meta", "Namespace", c.Namespace, "name", mname)
-				} else {
-					metricNames = append(metricNames, meta.MetricName)
-				}
-			}
-		} else {
-			// 导出该namespace下的所有指标
-			var excludeMetrics []string
-			if len(pconf.ExcludeMetrics) != 0 {
-				for _, em := range pconf.ExcludeMetrics {
-					excludeMetrics = append(excludeMetrics, strings.ToLower(em))
-				}
-			}
-			allMetas, err := c.MetricRepo.ListMetaByNamespace(c.Namespace)
+		// 获取该指标下的所有实例纬度查询或自定义纬度查询
+		series, err := c.handler.GetSeries(nm)
+		if err != nil {
+			level.Error(c.logger).Log("msg", "create metric series err", "err", err, "Namespace", c.Namespace, "name", mname)
+			continue
+		}
+		err = nm.LoadSeries(series)
+		if err != nil {
+			level.Error(c.logger).Log("msg", "load metric series err", "err", err, "Namespace", c.Namespace, "name", mname)
+			continue
+		}
+	}
+	return nil
+}
+
+func (c *TcProductCollector) getMetricNames(pconf config.TencentProduct) ([]string, error) {
+	var metricNames []string
+
+	if len(pconf.OnlyIncludeMetrics) != 0 {
+		// 导出指定指标列表
+		for _, mname := range pconf.OnlyIncludeMetrics {
+			meta, err := c.MetricRepo.GetMeta(c.Namespace, mname)
 			if err != nil {
-				return err
-			}
-
-			for _, meta := range allMetas {
-				if len(excludeMetrics) != 0 && util.IsStrInList(excludeMetrics, strings.ToLower(meta.MetricName)) {
-					continue
-				}
+				level.Warn(c.logger).Log("msg", "not found metric meta", "Namespace", c.Namespace, "name", mname)
+			} else {
 				metricNames = append(metricNames, meta.MetricName)
 			}
 		}
-
-		for _, mname := range metricNames {
-			meta, err := c.MetricRepo.GetMeta(c.Namespace, mname)
-			if err != nil {
-				level.Error(c.logger).Log("msg", "Not found metric meta", "Namespace", c.Namespace, "name", mname)
-				continue
-			}
-			// 指标元数据处理, false=跳过
-			if !c.handler.CheckMetricMeta(meta) {
-				level.Warn(c.logger).Log("msg", " Metric not support, skip", "Namespace", c.Namespace, "name", meta.MetricName)
-				continue
-			}
-
-			m, ok := c.MetricMap[mname]
-			if !ok {
-				// 创建TcmMetric模型
-				conf, err := metric.NewTcmMetricConfigWithProductYaml(pconf, meta)
-				if err != nil {
-					level.Error(c.logger).Log("msg", "parse metric config err", "err", err, "Namespace", c.Namespace, "name", mname)
-					continue
-				}
-				nm, err := metric.NewTcmMetric(meta, conf)
-				if err != nil {
-					level.Error(c.logger).Log("msg", "create metric err", "err", err, "Namespace", c.Namespace, "name", mname)
-					continue
-				}
-				// 指标过滤
-				if !c.handler.IsIncludeMetric(nm) {
-					level.Warn(c.logger).Log("msg", " Metric not support, skip", "Namespace", c.Namespace, "name", nm.Meta.MetricName)
-					continue
-				}
-				c.MetricMap[meta.MetricName] = nm
-				m = nm
-			}
-
-			// 获取该指标下的所有实例纬度查询或自定义纬度查询
-			series, err := c.handler.GetSeries(m)
-			if err != nil {
-				level.Error(c.logger).Log("msg", "create metric series err", "err", err, "Namespace", c.Namespace, "name", mname)
-				continue
-			}
-
-			err = m.LoadSeries(series)
-			if err != nil {
-				level.Error(c.logger).Log("msg", "load metric series err", "err", err, "Namespace", c.Namespace, "name", mname)
-				continue
+	} else {
+		// 导出该namespace下的所有指标
+		var excludeMetrics []string
+		if len(pconf.ExcludeMetrics) != 0 {
+			for _, em := range pconf.ExcludeMetrics {
+				excludeMetrics = append(excludeMetrics, strings.ToLower(em))
 			}
 		}
+		allMetas, err := c.MetricRepo.ListMetaByNamespace(c.Namespace)
+		if err != nil {
+			return nil, err
+		}
 
+		for _, meta := range allMetas {
+			if len(excludeMetrics) != 0 && util.IsStrInList(excludeMetrics, strings.ToLower(meta.MetricName)) {
+				continue
+			}
+			metricNames = append(metricNames, meta.MetricName)
+		}
 	}
-	return nil
+	return metricNames, nil
+}
+
+func (c *TcProductCollector) createMetricWithProductConf(mname string, pconf config.TencentProduct) (*metric.TcmMetric, error) {
+	meta, err := c.MetricRepo.GetMeta(c.Namespace, mname)
+	if err != nil {
+		return nil, err
+	}
+	// 指标元数据处理, false=跳过
+	if !c.handler.IsMetricMetaVaild(meta) {
+		return nil, fmt.Errorf("metric not support")
+	}
+	err = c.handler.ModifyMetricMeta(meta)
+	if err != nil {
+		return nil, err
+	}
+
+	m, exists := c.MetricMap[mname]
+	if !exists {
+		// 创建TcmMetric模型
+		conf, err := metric.NewTcmMetricConfigWithProductYaml(pconf, meta)
+		if err != nil {
+			return nil, err
+		}
+		nm, err := metric.NewTcmMetric(meta, conf)
+		if err != nil {
+			return nil, err
+		}
+		// 指标过滤
+		if !c.handler.IsMetricVaild(nm) {
+			return nil, fmt.Errorf("metric not support")
+		}
+		err = c.handler.ModifyMetric(nm)
+		if err != nil {
+			return nil, err
+		}
+		return nm, nil
+	}
+
+	return m, nil
+}
+
+func (c *TcProductCollector) createMetricWithMetricConf(mconf config.TencentMetric) (*metric.TcmMetric, error) {
+	meta, err := c.MetricRepo.GetMeta(c.Namespace, mconf.MetricName)
+	if err != nil {
+		return nil, err
+	}
+	// 指标元数据处理, false=跳过
+	if !c.handler.IsMetricMetaVaild(meta) {
+		return nil, fmt.Errorf("metric not support")
+	}
+	err = c.handler.ModifyMetricMeta(meta)
+	if err != nil {
+		return nil, err
+	}
+
+	m, ok := c.MetricMap[meta.MetricName]
+	if !ok {
+		conf, err := metric.NewTcmMetricConfigWithMetricYaml(mconf, meta)
+		if err != nil {
+			return nil, err
+		}
+		nm, err := metric.NewTcmMetric(meta, conf)
+		if err != nil {
+			return nil, err
+		}
+		// 指标过滤
+		if !c.handler.IsMetricVaild(nm) {
+			return nil, fmt.Errorf("metric not support")
+		}
+		err = c.handler.ModifyMetric(nm)
+		if err != nil {
+			return nil, err
+		}
+		return nm, nil
+	}
+	return m, nil
 }
 
 // 一个query管理一个metric的采集
@@ -210,22 +255,61 @@ func (c *TcProductCollector) Collect(ch chan<- prometheus.Metric) (err error) {
 	return
 }
 
+type TcProductCollectorReloader struct {
+	collector     *TcProductCollector
+	relodInterval time.Duration
+	ctx           context.Context
+	cancel        context.CancelFunc
+	logger        log.Logger
+}
+
+func (r *TcProductCollectorReloader) Run() {
+	ticker := time.NewTicker(r.relodInterval)
+	defer ticker.Stop()
+
+	// sleep when first start
+	time.Sleep(r.relodInterval)
+
+	for {
+		e := r.reloadMetricsByProductConf()
+		if e != nil {
+			level.Error(r.logger).Log("msg", "reload product error", "err", e,
+				"namespace", r.collector.Namespace)
+		}
+		select {
+		case <-r.ctx.Done():
+			return
+		case <-ticker.C:
+		}
+	}
+}
+
+func (r *TcProductCollectorReloader) Stop() {
+	r.cancel()
+}
+
+func (r *TcProductCollectorReloader) reloadMetricsByProductConf() error {
+	return r.collector.LoadMetricsByProductConf()
+}
+
 // 创建新的TcProductCollector, 每个产品一个
-func NewTcProductCollector(namespace string, metricRepo metric.TcmMetricRepository, conf *config.TencentConfig, logger log.Logger) (*TcProductCollector, error) {
+func NewTcProductCollector(namespace string, metricRepo metric.TcmMetricRepository,
+	conf *config.TencentConfig, pconf *config.TencentProduct, logger log.Logger) (*TcProductCollector, error) {
 	factory, exists := handlerFactoryMap[namespace]
 	if !exists {
 		return nil, fmt.Errorf("product handler not found, Namespace=%s ", namespace)
 	}
 
 	var instanceRepoCache instance.TcInstanceRepository
-	if !util.IsStrInList(instance.NotSupportInstances, namespace) {
+	if !util.IsStrInList(constant.NotSupportInstanceNamespaces, namespace) {
 		// 支持实例自动发现的产品
 		instanceRepo, err := instance.NewTcInstanceRepository(namespace, conf, logger)
 		if err != nil {
 			return nil, err
 		}
 		// 使用instance缓存
-		instanceRepoCache = instance.NewTcInstanceCache(instanceRepo, logger)
+		reloadInterval := time.Duration(pconf.RelodIntervalMinutes * int64(time.Minute))
+		instanceRepoCache = instance.NewTcInstanceCache(instanceRepo, reloadInterval, logger)
 	}
 
 	c := &TcProductCollector{
@@ -233,6 +317,7 @@ func NewTcProductCollector(namespace string, metricRepo metric.TcmMetricReposito
 		MetricRepo:   metricRepo,
 		InstanceRepo: instanceRepoCache,
 		Conf:         conf,
+		ProductConf:  pconf,
 		logger:       logger,
 	}
 
@@ -242,11 +327,11 @@ func NewTcProductCollector(namespace string, metricRepo metric.TcmMetricReposito
 	}
 	c.handler = handler
 
-	err = c.loadMetricsByMetricConf()
+	err = c.LoadMetricsByMetricConf()
 	if err != nil {
 		return nil, err
 	}
-	err = c.loadMetricsByProductConf()
+	err = c.LoadMetricsByProductConf()
 	if err != nil {
 		return nil, err
 	}
@@ -255,5 +340,17 @@ func NewTcProductCollector(namespace string, metricRepo metric.TcmMetricReposito
 		return nil, err
 	}
 	return c, nil
+}
 
+func NewTcProductCollectorReloader(ctx context.Context, collector *TcProductCollector,
+	relodInterval time.Duration, logger log.Logger) *TcProductCollectorReloader {
+	childCtx, cancel := context.WithCancel(ctx)
+	reloader := &TcProductCollectorReloader{
+		collector:     collector,
+		relodInterval: relodInterval,
+		ctx:           childCtx,
+		cancel:        cancel,
+		logger:        logger,
+	}
+	return reloader
 }

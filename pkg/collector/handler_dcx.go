@@ -1,10 +1,11 @@
 package collector
 
 import (
+	"strings"
+
 	"github.com/go-kit/kit/log"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
-	"strings"
 )
 
 const (
@@ -24,7 +25,7 @@ type dcxHandler struct {
 	baseProductHandler
 }
 
-func (h *dcxHandler) CheckMetricMeta(meta *metric.TcmMeta) bool {
+func (h *dcxHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
 	if util.IsStrInList(DcxInvalidMetricNames, strings.ToLower(meta.MetricName)) {
 		return false
 	}
@@ -35,11 +36,11 @@ func (h *dcxHandler) GetNamespace() string {
 	return DcxNamespace
 }
 
-func (h *dcxHandler) IsIncludeMetric(m *metric.TcmMetric) bool {
+func (h *dcxHandler) IsMetricVaild(m *metric.TcmMetric) bool {
 	return true
 }
 
-func NewDcxHandler(c *TcProductCollector, logger log.Logger) (handler productHandler, err error) {
+func NewDcxHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
 	handler = &dcxHandler{
 		baseProductHandler{
 			monitorQueryKey: DcxInstanceidKey,

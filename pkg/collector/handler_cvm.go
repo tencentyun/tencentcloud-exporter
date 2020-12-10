@@ -1,10 +1,11 @@
 package collector
 
 import (
+	"strings"
+
 	"github.com/go-kit/kit/log"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
-	"strings"
 )
 
 const (
@@ -24,7 +25,7 @@ type cvmHandler struct {
 	baseProductHandler
 }
 
-func (h *cvmHandler) CheckMetricMeta(meta *metric.TcmMeta) bool {
+func (h *cvmHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
 	if !util.IsStrInList(meta.SupportDimensions, CvmInstanceidKey) {
 		meta.SupportDimensions = append(meta.SupportDimensions, CvmInstanceidKey)
 	}
@@ -36,7 +37,7 @@ func (h *cvmHandler) GetNamespace() string {
 	return CvmNamespace
 }
 
-func (h *cvmHandler) IsIncludeMetric(m *metric.TcmMetric) bool {
+func (h *cvmHandler) IsMetricVaild(m *metric.TcmMetric) bool {
 	if util.IsStrInList(CvmInvalidMetricNames, strings.ToLower(m.Meta.MetricName)) {
 		return false
 	}
@@ -50,7 +51,7 @@ func (h *cvmHandler) GetSeries(m *metric.TcmMetric) (slist []*metric.TcmSeries, 
 	return h.baseProductHandler.GetSeries(m)
 }
 
-func NewCvmHandler(c *TcProductCollector, logger log.Logger) (handler productHandler, err error) {
+func NewCvmHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
 	handler = &cvmHandler{
 		baseProductHandler{
 			monitorQueryKey: CvmInstanceidKey,

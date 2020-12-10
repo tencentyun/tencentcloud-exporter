@@ -11,6 +11,7 @@ MongoDB |QCE/CMONGO|[指标详情](https://cloud.tencent.com/document/product/24
 CDB|QCE/CDB|[指标详情](https://cloud.tencent.com/document/product/248/45147)
 Redis标准版|QCE/REDIS|[指标详情](https://cloud.tencent.com/document/product/248/45111)
 Redis集群版|QCE/REDIS|[指标详情](https://cloud.tencent.com/document/product/248/45111)
+Redis内存版监控指标|QCE/REDIS_MEM|[指标详情](https://cloud.tencent.com/document/product/248/49729)
 CVM|QCE/CVM|[指标详情](https://cloud.tencent.com/document/product/248/6843)
 COS|QCE/COS|[指标详情](https://cloud.tencent.com/document/product/248/45140)
 CDN|QCE/CDN|[指标详情](https://cloud.tencent.com/document/product/248/45138)
@@ -90,6 +91,7 @@ products:
     range_seconds: 300                           // 可选, 选取时间范围, 开始时间=now-range_seconds, 结束时间=now
     delay_seconds: 60                            // 可选, 时间偏移量, 结束时间=now-delay_seconds
     metric_name_type: 1                          // 可选，导出指标的名字格式化类型, 1=大写转小写加下划线, 2=转小写; 默认2
+    relod_interval_minutes: 60                   // 可选, 在all_instances=true时, 周期reload实例列表, 建议频率不要太频繁
 
 
 // 单个指标纬度配置, 每个指标一个item

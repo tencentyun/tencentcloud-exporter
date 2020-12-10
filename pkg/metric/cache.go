@@ -2,10 +2,11 @@ package metric
 
 import (
 	"fmt"
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
 	"strings"
 	"time"
+
+	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/log/level"
 )
 
 // 腾讯云监控指标缓存, 在TcmMetricRepository封装一层, 指标元数据使用缓存, 转发获取数据点请求

@@ -2,15 +2,20 @@ package config
 
 import (
 	"fmt"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
 	"strings"
+
+	"github.com/tencentyun/tencentcloud-exporter/pkg/constant"
+	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
+	"gopkg.in/yaml.v2"
 )
 
 const (
-	DefaultPeriodSeconds = 60
-	DefaultDelaySeconds  = 300
+	DefaultPeriodSeconds        = 60
+	DefaultDelaySeconds         = 300
+	DefaultRelodIntervalMinutes = 60
+	DefaultRateLimit            = 15
 
 	EnvAccessKey = "TENCENTCLOUD_SECRET_ID"
 	EnvSecretKey = "TENCENTCLOUD_SECRET_KEY"
@@ -25,6 +30,8 @@ var (
 		"mysql":         "QCE/CDB",
 		"cvm":           "QCE/CVM",
 		"redis":         "QCE/REDIS",
+		"redis_cluster": "QCE/REDIS",
+		"redis_mem":     "QCE/REDIS_MEM",
 		"cluster_redis": "QCE/REDIS",
 		"dc":            "QCE/DC",
 		"dcx":           "QCE/DCX",
@@ -82,6 +89,17 @@ type TencentProduct struct {
 	RangeSeconds          int64               `yaml:"range_seconds"`
 	DelaySeconds          int64               `yaml:"delay_seconds"`
 	MetricNameType        int32               `yaml:"metric_name_type"` // 1=大写转下划线, 2=全小写
+	RelodIntervalMinutes  int64               `yaml:"relod_interval_minutes"`
+}
+
+func (p *TencentProduct) IsReloadEnable() bool {
+	if len(p.OnlyIncludeMetrics) > 0 {
+		return false
+	}
+	if util.IsStrInList(constant.NotSupportInstanceNamespaces, p.Namespace) {
+		return false
+	}
+	return p.AllInstances
 }
 
 type TencentConfig struct {
@@ -162,15 +180,17 @@ func (c *TencentConfig) check() (err error) {
 		if _, exists := Product2Namespace[strings.ToLower(pname)]; !exists {
 			return fmt.Errorf("namespace productName not support, %s", pname)
 		}
+		if len(pconf.OnlyIncludeInstances) == 0 && !pconf.AllInstances && len(pconf.CustomQueryDimensions) == 0 {
+			return fmt.Errorf("must set all_instances or only_include_instances or custom_query_dimensions")
+		}
 	}
 
 	return nil
 }
 
 func (c *TencentConfig) fillDefault() {
-
 	if c.RateLimit <= 0 {
-		c.RateLimit = 15
+		c.RateLimit = DefaultRateLimit
 	}
 
 	for index, metric := range c.Metrics {
@@ -187,6 +207,12 @@ func (c *TencentConfig) fillDefault() {
 
 		if metric.MetricReName == "" {
 			c.Metrics[index].MetricReName = c.Metrics[index].MetricName
+		}
+	}
+
+	for index, product := range c.Products {
+		if product.RelodIntervalMinutes <= 0 {
+			c.Products[index].RelodIntervalMinutes = DefaultRelodIntervalMinutes
 		}
 	}
 }
@@ -218,14 +244,14 @@ func (c *TencentConfig) GetMetricConfigs(namespace string) (mconfigs []TencentMe
 	return
 }
 
-func (c *TencentConfig) GetProductConfigs(namespace string) (pconfigs []TencentProduct) {
+func (c *TencentConfig) GetProductConfig(namespace string) (TencentProduct, error) {
 	for _, pconf := range c.Products {
 		ns := GetStandardNamespaceFromCustomNamespace(pconf.Namespace)
 		if ns == namespace {
-			pconfigs = append(pconfigs, pconf)
+			return pconf, nil
 		}
 	}
-	return
+	return TencentProduct{}, fmt.Errorf("namespace config not found")
 }
 
 func GetStandardNamespaceFromCustomNamespace(cns string) string {

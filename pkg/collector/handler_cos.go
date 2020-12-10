@@ -2,6 +2,7 @@ package collector
 
 import (
 	"fmt"
+
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
@@ -24,7 +25,7 @@ type cosHandler struct {
 	baseProductHandler
 }
 
-func (h *cosHandler) CheckMetricMeta(meta *metric.TcmMeta) bool {
+func (h *cosHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
 	return true
 }
 
@@ -32,7 +33,7 @@ func (h *cosHandler) GetNamespace() string {
 	return CosNamespace
 }
 
-func (h *cosHandler) IsIncludeMetric(m *metric.TcmMetric) bool {
+func (h *cosHandler) IsMetricVaild(m *metric.TcmMetric) bool {
 	// cos大部分指标不支持300以下的统计纬度
 	if m.Conf.StatPeriodSeconds < 300 {
 		m.Conf.StatPeriodSeconds = 300
@@ -70,7 +71,7 @@ func (h *cosHandler) checkMonitorQueryKeys(m *metric.TcmMetric, ql map[string]st
 	return true
 }
 
-func NewCosHandler(c *TcProductCollector, logger log.Logger) (handler productHandler, err error) {
+func NewCosHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
 	handler = &cosHandler{
 		baseProductHandler{
 			collector: c,

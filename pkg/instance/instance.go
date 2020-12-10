@@ -6,12 +6,6 @@ import (
 	"strconv"
 )
 
-// 不支持实例纬度自动查询的namespace
-var NotSupportInstances = []string{
-	"QCE/COS",
-	"QCE/CDN",
-}
-
 // 每个产品的实例对象, 可用于配置导出指标的额外label填充, 根据字段名获取值
 type TcInstance interface {
 	// 获取实例的id

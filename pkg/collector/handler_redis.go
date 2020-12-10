@@ -1,10 +1,11 @@
 package collector
 
 import (
+	"strings"
+
 	"github.com/go-kit/kit/log"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
-	"strings"
 )
 
 const (
@@ -35,7 +36,7 @@ type redisHandler struct {
 	baseProductHandler
 }
 
-func (h *redisHandler) CheckMetricMeta(meta *metric.TcmMeta) bool {
+func (h *redisHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
 	return true
 }
 
@@ -43,7 +44,7 @@ func (h *redisHandler) GetNamespace() string {
 	return RedisNamespace
 }
 
-func (h *redisHandler) IsIncludeMetric(m *metric.TcmMetric) bool {
+func (h *redisHandler) IsMetricVaild(m *metric.TcmMetric) bool {
 	if strings.ToLower(m.Conf.CustomProductName) == "cluster_redis" {
 		if util.IsStrInList(RedisClusterMetricNames, strings.ToLower(m.Meta.MetricName)) {
 			return true
@@ -57,7 +58,7 @@ func (h *redisHandler) IsIncludeMetric(m *metric.TcmMetric) bool {
 	return false
 }
 
-func NewRedisHandler(c *TcProductCollector, logger log.Logger) (handler productHandler, err error) {
+func NewRedisHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
 	handler = &redisHandler{
 		baseProductHandler{
 			monitorQueryKey: RedisInstanceidKey,

@@ -2,6 +2,7 @@ package instance
 
 import (
 	"fmt"
+
 	"github.com/go-kit/kit/log"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
 )

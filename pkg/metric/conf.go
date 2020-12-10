@@ -1,8 +1,9 @@
 package metric
 
 import (
-	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
 	"strings"
+
+	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
 )
 
 type TcmMetricConfig struct {
@@ -21,6 +22,27 @@ type TcmMetricConfig struct {
 	InstanceFilters       map[string]string
 	OnlyIncludeInstances  []string
 	ExcludeInstances      []string
+}
+
+func (c *TcmMetricConfig) IsIncludeOnlyInstance() bool {
+	return len(c.OnlyIncludeInstances) > 0
+}
+
+func (c *TcmMetricConfig) IsIncludeAllInstance() bool {
+	if c.IsIncludeOnlyInstance() {
+		return false
+	}
+	return c.AllInstances
+}
+
+func (c *TcmMetricConfig) IsCustomQueryDimensions() bool {
+	if c.IsIncludeOnlyInstance() {
+		return false
+	}
+	if c.IsIncludeAllInstance() {
+		return false
+	}
+	return len(c.CustomQueryDimensions) > 0
 }
 
 func NewTcmMetricConfigWithMetricYaml(c config.TencentMetric, meta *TcmMeta) (*TcmMetricConfig, error) {

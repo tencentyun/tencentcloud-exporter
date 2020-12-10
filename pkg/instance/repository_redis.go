@@ -2,20 +2,37 @@ package instance
 
 import (
 	"fmt"
+
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
+	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/redis/v20180412"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/client"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
 )
 
+//go:generate mockgen -source=./repository_redis.go -destination=./repository_redis_mock.go -package=instance
+
 func init() {
 	registerRepository("QCE/REDIS", NewRedisTcInstanceRepository)
+	registerRepository("QCE/REDIS_MEM", NewRedisTcInstanceRepository)
 }
 
 type RedisTcInstanceRepository struct {
 	client *sdk.Client
 	logger log.Logger
+}
+
+func NewRedisTcInstanceRepository(c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
+	cli, err := client.NewRedisClient(c)
+	if err != nil {
+		return
+	}
+	repo = &RedisTcInstanceRepository{
+		client: cli,
+		logger: logger,
+	}
+	return
 }
 
 func (repo *RedisTcInstanceRepository) GetInstanceKey() string {
@@ -51,6 +68,7 @@ func (repo *RedisTcInstanceRepository) ListByFilters(filters map[string]string) 
 	var total int64 = -1
 	req.Offset = &offset
 	req.Limit = &limit
+	req.Status = []*int64{common.Int64Ptr(2)}
 
 getMoreInstances:
 	resp, err := repo.client.DescribeInstances(req)
@@ -77,14 +95,29 @@ getMoreInstances:
 	return
 }
 
-func NewRedisTcInstanceRepository(c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
+type RedisTcInstanceNodeRepository interface {
+	GetNodeInfo(instanceId string) (*sdk.DescribeInstanceNodeInfoResponse, error)
+}
+
+type RedisTcInstanceNodeRepositoryImpl struct {
+	client *sdk.Client
+	logger log.Logger
+}
+
+func (repo *RedisTcInstanceNodeRepositoryImpl) GetNodeInfo(instanceId string) (*sdk.DescribeInstanceNodeInfoResponse, error) {
+	req := sdk.NewDescribeInstanceNodeInfoRequest()
+	req.InstanceId = common.StringPtr(instanceId)
+	return repo.client.DescribeInstanceNodeInfo(req)
+}
+
+func NewRedisTcInstanceNodeRepository(c *config.TencentConfig, logger log.Logger) (RedisTcInstanceNodeRepository, error) {
 	cli, err := client.NewRedisClient(c)
 	if err != nil {
-		return
+		return nil, err
 	}
-	repo = &RedisTcInstanceRepository{
+	repo := &RedisTcInstanceNodeRepositoryImpl{
 		client: cli,
 		logger: logger,
 	}
-	return
+	return repo, nil
 }

@@ -11,10 +11,6 @@ type RedisTcInstance struct {
 	meta *sdk.InstanceSet
 }
 
-func (ins *RedisTcInstance) GetMeta() interface{} {
-	return ins.meta
-}
-
 func NewRedisTcInstance(instanceId string, meta *sdk.InstanceSet) (ins *RedisTcInstance, err error) {
 	if instanceId == "" {
 		return nil, fmt.Errorf("instanceId is empty ")
@@ -30,4 +26,8 @@ func NewRedisTcInstance(instanceId string, meta *sdk.InstanceSet) (ins *RedisTcI
 		meta: meta,
 	}
 	return
+}
+
+func (ins *RedisTcInstance) GetMeta() interface{} {
+	return ins.meta
 }

@@ -2,10 +2,12 @@ package metric
 
 import (
 	"fmt"
+	"strings"
+	"sync"
+	"time"
+
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
-	"strings"
-	"time"
 )
 
 // 代表一个指标, 包含多个时间线
@@ -16,12 +18,18 @@ type TcmMetric struct {
 	Series       map[string]*TcmSeries       // 包含的多个时间线
 	StatPromDesc map[string]*prometheus.Desc // 按统计纬度的Desc, max、min、avg、last
 	Conf         *TcmMetricConfig
+	seriesLock   sync.Mutex
 }
 
 func (m *TcmMetric) LoadSeries(series []*TcmSeries) error {
+	m.seriesLock.Lock()
+	defer m.seriesLock.Unlock()
+
+	newSeries := make(map[string]*TcmSeries)
 	for _, s := range series {
-		m.Series[s.Id] = s
+		newSeries[s.Id] = s
 	}
+	m.Series = newSeries
 	return nil
 }
 
@@ -74,7 +82,7 @@ func (m *TcmMetric) GetLatestPromMetrics(repo TcmMetricRepository) (pms []promet
 	return
 }
 
-func (m TcmMetric) GetSeriesSplitByBatch(batch int) (steps [][]*TcmSeries) {
+func (m *TcmMetric) GetSeriesSplitByBatch(batch int) (steps [][]*TcmSeries) {
 	var series []*TcmSeries
 	for _, s := range m.Series {
 		series = append(series, s)
