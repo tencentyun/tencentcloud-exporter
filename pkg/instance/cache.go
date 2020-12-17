@@ -10,10 +10,6 @@ import (
 	"github.com/go-kit/kit/log/level"
 )
 
-const (
-	DefaultReloadInterval = 60 * time.Minute
-)
-
 // 可用于产品的实例的缓存, TcInstanceRepository
 type TcInstanceCache struct {
 	Raw            TcInstanceRepository

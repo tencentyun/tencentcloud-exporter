@@ -7,10 +7,11 @@ import (
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
+	"golang.org/x/time/rate"
+
 	monitor "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/monitor/v20180724"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/client"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
-	"golang.org/x/time/rate"
 )
 
 var (
@@ -33,7 +34,10 @@ type TcmMetricRepositoryImpl struct {
 	monitorClient *monitor.Client
 	limiter       *rate.Limiter // 限速
 	ctx           context.Context
-	logger        log.Logger
+
+	queryMetricBatchSize int
+
+	logger log.Logger
 }
 
 func (repo *TcmMetricRepositoryImpl) GetMeta(namespace string, name string) (meta *TcmMeta, err error) {
@@ -136,83 +140,111 @@ func (repo *TcmMetricRepositoryImpl) GetSamples(s *TcmSeries, st int64, et int64
 	return
 }
 
-func (repo *TcmMetricRepositoryImpl) ListSamples(m *TcmMetric, st int64, et int64) (samplesList []*TcmSamples, err error) {
-	for _, seriesList := range m.GetSeriesSplitByBatch(10) {
-		ctx, cancel := context.WithCancel(repo.ctx)
-		err = repo.limiter.Wait(ctx)
+func (repo *TcmMetricRepositoryImpl) ListSamples(m *TcmMetric, st int64, et int64) ([]*TcmSamples, error) {
+	var samplesList []*TcmSamples
+	for _, seriesList := range m.GetSeriesSplitByBatch(repo.queryMetricBatchSize) {
+		sl, err := repo.listSampleByBatch(m, seriesList, st, et)
 		if err != nil {
-			return
+			level.Error(repo.logger).Log("msg", err.Error())
+			continue
 		}
-
-		request := monitor.NewGetMonitorDataRequest()
-		request.Namespace = &m.Meta.Namespace
-		request.MetricName = &m.Meta.MetricName
-
-		period := uint64(m.Conf.StatPeriodSeconds)
-		request.Period = &period
-
-		for _, series := range seriesList {
-			ifilters := &monitor.Instance{
-				Dimensions: []*monitor.Dimension{},
-			}
-			for k, v := range series.QueryLabels {
-				tk := k
-				tv := v
-				ifilters.Dimensions = append(ifilters.Dimensions, &monitor.Dimension{Name: &tk, Value: &tv})
-			}
-			request.Instances = append(request.Instances, ifilters)
-		}
-
-		stStr := time.Unix(st, 0).Format(timeStampFormat)
-		request.StartTime = &stStr
-		if et != 0 {
-			etStr := time.Unix(et, 0).Format(timeStampFormat)
-			request.StartTime = &etStr
-		}
-
-		response, err := repo.monitorClient.GetMonitorData(request)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, points := range response.Response.DataPoints {
-			ql := map[string]string{}
-			for _, dimension := range points.Dimensions {
-				if *dimension.Value != "" {
-					ql[*dimension.Name] = *dimension.Value
-				}
-			}
-			sid, e := GetTcmSeriesId(m, ql)
-			if e != nil {
-				level.Warn(repo.logger).Log(
-					"msg", "Get series id fail",
-					"metric", m.Meta.MetricName,
-					"dimension", fmt.Sprintf("%v", ql))
-				continue
-			}
-			s, ok := m.Series[sid]
-			if !ok {
-				level.Warn(repo.logger).Log(
-					"msg", "Response data point not match series",
-					"metric", m.Meta.MetricName,
-					"dimension", fmt.Sprintf("%v", ql))
-				continue
-			}
-			samples, e := NewTcmSamples(s, points)
-			if e != nil {
-				level.Debug(repo.logger).Log(
-					"msg", "The instance has no metric data and may not have traffic",
-					"metric", m.Meta.MetricName,
-					"dimension", fmt.Sprintf("%v", ql))
-			} else {
-				samplesList = append(samplesList, samples)
-			}
-
-		}
-
-		cancel()
+		samplesList = append(samplesList, sl...)
 	}
-	return
+	return samplesList, nil
+}
+
+func (repo *TcmMetricRepositoryImpl) listSampleByBatch(
+	m *TcmMetric,
+	seriesList []*TcmSeries,
+	st int64,
+	et int64,
+) ([]*TcmSamples, error) {
+	var samplesList []*TcmSamples
+
+	ctx, cancel := context.WithCancel(repo.ctx)
+	defer cancel()
+
+	err := repo.limiter.Wait(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	request := repo.buildGetMonitorDataRequest(m, seriesList, st, et)
+	response, err := repo.monitorClient.GetMonitorData(request)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, points := range response.Response.DataPoints {
+		samples, ql, e := repo.buildSamples(m, points)
+		if e != nil {
+			level.Debug(repo.logger).Log(
+				"msg", e.Error(),
+				"metric", m.Meta.MetricName,
+				"dimension", fmt.Sprintf("%v", ql))
+			continue
+		}
+		samplesList = append(samplesList, samples)
+	}
+	return samplesList, nil
+}
+
+func (repo *TcmMetricRepositoryImpl) buildGetMonitorDataRequest(
+	m *TcmMetric,
+	seriesList []*TcmSeries,
+	st int64, et int64,
+) *monitor.GetMonitorDataRequest {
+	request := monitor.NewGetMonitorDataRequest()
+	request.Namespace = &m.Meta.Namespace
+	request.MetricName = &m.Meta.MetricName
+
+	period := uint64(m.Conf.StatPeriodSeconds)
+	request.Period = &period
+
+	for _, series := range seriesList {
+		ifilters := &monitor.Instance{
+			Dimensions: []*monitor.Dimension{},
+		}
+		for k, v := range series.QueryLabels {
+			tk := k
+			tv := v
+			ifilters.Dimensions = append(ifilters.Dimensions, &monitor.Dimension{Name: &tk, Value: &tv})
+		}
+		request.Instances = append(request.Instances, ifilters)
+	}
+
+	stStr := time.Unix(st, 0).Format(timeStampFormat)
+	request.StartTime = &stStr
+	if et != 0 {
+		etStr := time.Unix(et, 0).Format(timeStampFormat)
+		request.StartTime = &etStr
+	}
+	return request
+}
+
+func (repo *TcmMetricRepositoryImpl) buildSamples(
+	m *TcmMetric,
+	points *monitor.DataPoint,
+) (*TcmSamples, map[string]string, error) {
+	ql := map[string]string{}
+	for _, dimension := range points.Dimensions {
+		if *dimension.Value != "" {
+			ql[*dimension.Name] = *dimension.Value
+		}
+	}
+	sid, e := GetTcmSeriesId(m, ql)
+	if e != nil {
+		return nil, ql, fmt.Errorf("get series id fail")
+	}
+	s, ok := m.Series[sid]
+	if !ok {
+		return nil, ql, fmt.Errorf("response data point not match series")
+	}
+	samples, e := NewTcmSamples(s, points)
+	if e != nil {
+		return nil, ql, fmt.Errorf("this instance may not have metric data")
+	}
+	return samples, ql, nil
 }
 
 func NewTcmMetricRepository(conf *config.TencentConfig, logger log.Logger) (repo TcmMetricRepository, err error) {
@@ -222,10 +254,11 @@ func NewTcmMetricRepository(conf *config.TencentConfig, logger log.Logger) (repo
 	}
 
 	repo = &TcmMetricRepositoryImpl{
-		monitorClient: monitorClient,
-		limiter:       rate.NewLimiter(rate.Limit(conf.RateLimit), 1),
-		ctx:           context.Background(),
-		logger:        logger,
+		monitorClient:        monitorClient,
+		limiter:              rate.NewLimiter(rate.Limit(conf.RateLimit), 1),
+		ctx:                  context.Background(),
+		queryMetricBatchSize: conf.MetricQueryBatchSize,
+		logger:               logger,
 	}
 
 	return
