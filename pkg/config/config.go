@@ -16,6 +16,7 @@ const (
 	DefaultDelaySeconds         = 300
 	DefaultRelodIntervalMinutes = 60
 	DefaultRateLimit            = 15
+	DefaultQueryMetricBatchSize = 50
 
 	EnvAccessKey = "TENCENTCLOUD_SECRET_ID"
 	EnvSecretKey = "TENCENTCLOUD_SECRET_KEY"
@@ -103,11 +104,12 @@ func (p *TencentProduct) IsReloadEnable() bool {
 }
 
 type TencentConfig struct {
-	Credential TencentCredential `yaml:"credential"`
-	Metrics    []TencentMetric   `yaml:"metrics"`
-	Products   []TencentProduct  `yaml:"products"`
-	RateLimit  float64           `yaml:"rate_limit"`
-	Filename   string            `yaml:"filename"`
+	Credential           TencentCredential `yaml:"credential"`
+	Metrics              []TencentMetric   `yaml:"metrics"`
+	Products             []TencentProduct  `yaml:"products"`
+	RateLimit            float64           `yaml:"rate_limit"`
+	MetricQueryBatchSize int               `yaml:"metric_query_batch_size"`
+	Filename             string            `yaml:"filename"`
 }
 
 func NewConfig() *TencentConfig {
@@ -191,6 +193,10 @@ func (c *TencentConfig) check() (err error) {
 func (c *TencentConfig) fillDefault() {
 	if c.RateLimit <= 0 {
 		c.RateLimit = DefaultRateLimit
+	}
+
+	if c.MetricQueryBatchSize <= 0 || c.MetricQueryBatchSize > 100 {
+		c.MetricQueryBatchSize = DefaultQueryMetricBatchSize
 	}
 
 	for index, metric := range c.Metrics {
