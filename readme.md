@@ -10,7 +10,7 @@
 MongoDB |QCE/CMONGO|[指标详情](https://cloud.tencent.com/document/product/248/45104)
 CDB|QCE/CDB|[指标详情](https://cloud.tencent.com/document/product/248/45147)
 Redis标准版|QCE/REDIS|[指标详情](https://cloud.tencent.com/document/product/248/45111)
-Redis集群版|QCE/REDIS|[指标详情](https://cloud.tencent.com/document/product/248/45111)
+Redis集群版|QCE/REDIS_CLUSTER|[指标详情](https://cloud.tencent.com/document/product/248/45111)
 Redis内存版监控指标|QCE/REDIS_MEM|[指标详情](https://cloud.tencent.com/document/product/248/49729)
 CVM|QCE/CVM|[指标详情](https://cloud.tencent.com/document/product/248/6843)
 COS|QCE/COS|[指标详情](https://cloud.tencent.com/document/product/248/45140)
@@ -20,6 +20,7 @@ CLB(7层)|QCE/LOADBALANCE|[指标详情](https://cloud.tencent.com/document/prod
 NAT|QCE/NAT_GATEWAY|[指标详情](https://cloud.tencent.com/document/product/248/45069)
 物理专线|QCE/DC|[指标详情](https://cloud.tencent.com/document/product/248/45102)
 专用通道|QCE/DCX|[指标详情](https://cloud.tencent.com/document/product/248/45101)
+云硬盘|QCE/BLOCK_STORAGE|[指标详情](https://cloud.tencent.com/document/product/248/45411)
 
 `后续会有更多的产品支持`
 
@@ -126,6 +127,8 @@ export TENCENTCLOUD_SECRET_KEY="YOUR_ACCESS_SECRET"
 export TENCENTCLOUD_REGION="REGION"
 ```
 
+5. **region**  
+   地域可选值参考[地域可选值](https://cloud.tencent.com/document/api/248/30346#.E5.9C.B0.E5.9F.9F.E5.88.97.E8.A1.A8)
 ## 四、qcloud_exporter支持的命令行参数说明
 
 命令行参数|说明|默认值
