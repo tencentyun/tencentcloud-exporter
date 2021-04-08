@@ -1,6 +1,7 @@
 package client
 
 import (
+	cbs "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cbs/v20170312"
 	cdb "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cdb/v20170320"
 	clb "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/clb/v20180317"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
@@ -11,6 +12,7 @@ import (
 	monitor "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/monitor/v20180724"
 	redis "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/redis/v20180412"
 	vpc "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/vpc/v20170312"
+
 	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
 )
 
@@ -32,7 +34,6 @@ func NewMongodbClient(conf *config.TencentConfig) (*mongodb.Client, error) {
 	cpf := profile.NewClientProfile()
 	cpf.HttpProfile.Endpoint = "mongodb.tencentcloudapi.com"
 	return mongodb.NewClient(credential, conf.Credential.Region, cpf)
-
 }
 
 func NewCdbClient(conf *config.TencentConfig) (*cdb.Client, error) {
@@ -43,7 +44,6 @@ func NewCdbClient(conf *config.TencentConfig) (*cdb.Client, error) {
 	cpf := profile.NewClientProfile()
 	cpf.HttpProfile.Endpoint = "cdb.tencentcloudapi.com"
 	return cdb.NewClient(credential, conf.Credential.Region, cpf)
-
 }
 
 func NewCvmClient(conf *config.TencentConfig) (*cvm.Client, error) {
@@ -54,7 +54,6 @@ func NewCvmClient(conf *config.TencentConfig) (*cvm.Client, error) {
 	cpf := profile.NewClientProfile()
 	cpf.HttpProfile.Endpoint = "cvm.tencentcloudapi.com"
 	return cvm.NewClient(credential, conf.Credential.Region, cpf)
-
 }
 
 func NewRedisClient(conf *config.TencentConfig) (*redis.Client, error) {
@@ -75,7 +74,6 @@ func NewDcClient(conf *config.TencentConfig) (*dc.Client, error) {
 	cpf := profile.NewClientProfile()
 	cpf.HttpProfile.Endpoint = "dc.tencentcloudapi.com"
 	return dc.NewClient(credential, conf.Credential.Region, cpf)
-
 }
 
 func NewClbClient(conf *config.TencentConfig) (*clb.Client, error) {
@@ -86,7 +84,6 @@ func NewClbClient(conf *config.TencentConfig) (*clb.Client, error) {
 	cpf := profile.NewClientProfile()
 	cpf.HttpProfile.Endpoint = "clb.tencentcloudapi.com"
 	return clb.NewClient(credential, conf.Credential.Region, cpf)
-
 }
 
 func NewVpvClient(conf *config.TencentConfig) (*vpc.Client, error) {
@@ -97,5 +94,14 @@ func NewVpvClient(conf *config.TencentConfig) (*vpc.Client, error) {
 	cpf := profile.NewClientProfile()
 	cpf.HttpProfile.Endpoint = "vpc.tencentcloudapi.com"
 	return vpc.NewClient(credential, conf.Credential.Region, cpf)
+}
 
+func NewCbsClient(conf *config.TencentConfig) (*cbs.Client, error) {
+	credential := common.NewCredential(
+		conf.Credential.AccessKey,
+		conf.Credential.SecretKey,
+	)
+	cpf := profile.NewClientProfile()
+	cpf.HttpProfile.Endpoint = "cbs.tencentcloudapi.com"
+	return cbs.NewClient(credential, conf.Credential.Region, cpf)
 }

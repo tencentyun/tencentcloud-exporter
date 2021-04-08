@@ -44,6 +44,7 @@ var (
 		"nat":           "QCE/NAT_GATEWAY",
 		"cos":           "QCE/COS",
 		"cdn":           "QCE/CDN",
+		"cbs":           "QCE/BLOCK_STORAGE",
 	}
 
 	SupportStatisticsTypes = map[string]bool{
