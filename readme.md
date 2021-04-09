@@ -20,7 +20,7 @@ CLB(7层)|QCE/LOADBALANCE|[指标详情](https://cloud.tencent.com/document/prod
 NAT|QCE/NAT_GATEWAY|[指标详情](https://cloud.tencent.com/document/product/248/45069)
 物理专线|QCE/DC|[指标详情](https://cloud.tencent.com/document/product/248/45102)
 专用通道|QCE/DCX|[指标详情](https://cloud.tencent.com/document/product/248/45101)
-云硬盘|QCE/BLOCK_STORAGE|[指标详情](https://cloud.tencent.com/document/product/248/45411)
+云硬盘|QCE/CBS|[指标详情](https://cloud.tencent.com/document/product/248/45411)
 
 `后续会有更多的产品支持`
 
