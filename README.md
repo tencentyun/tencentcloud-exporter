@@ -21,7 +21,7 @@ NAT|QCE/NAT_GATEWAY|[指标详情](https://cloud.tencent.com/document/product/24
 物理专线|QCE/DC|[指标详情](https://cloud.tencent.com/document/product/248/45102)
 专用通道|QCE/DCX|[指标详情](https://cloud.tencent.com/document/product/248/45101)
 云硬盘|QCE/CBS|[指标详情](https://cloud.tencent.com/document/product/248/45411)
-
+SqlServer|QCE/SQLSERVER|[指标详情](https://cloud.tencent.com/document/product/248/45146)
 `后续会有更多的产品支持`
 
 ## 二、快速开始

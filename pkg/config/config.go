@@ -45,6 +45,7 @@ var (
 		"cos":           "QCE/COS",
 		"cdn":           "QCE/CDN",
 		"cbs":           "QCE/BLOCK_STORAGE",
+		"sqlserver":     "QCE/SQLSERVER",
 	}
 
 	SupportStatisticsTypes = map[string]bool{

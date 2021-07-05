@@ -11,6 +11,7 @@ import (
 	mongodb "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/mongodb/v20190725"
 	monitor "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/monitor/v20180724"
 	redis "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/redis/v20180412"
+	sqlserver "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/sqlserver/v20180328"
 	vpc "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/vpc/v20170312"
 
 	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
@@ -104,4 +105,14 @@ func NewCbsClient(conf *config.TencentConfig) (*cbs.Client, error) {
 	cpf := profile.NewClientProfile()
 	cpf.HttpProfile.Endpoint = "cbs.tencentcloudapi.com"
 	return cbs.NewClient(credential, conf.Credential.Region, cpf)
+}
+
+func NewSqlServerClient(conf *config.TencentConfig) (*sqlserver.Client, error) {
+	credential := common.NewCredential(
+		conf.Credential.AccessKey,
+		conf.Credential.SecretKey,
+	)
+	cpf := profile.NewClientProfile()
+	cpf.HttpProfile.Endpoint = "sqlserver.tencentcloudapi.com"
+	return sqlserver.NewClient(credential, conf.Credential.Region, cpf)
 }
