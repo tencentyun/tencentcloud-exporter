@@ -40,12 +40,10 @@ func (meta *TcmMeta) GetPeriod(confPeriod int64) (int64, error) {
 	}
 
 	idx := sort.SearchInts(allowPeriods, int(period))
-	if idx < len(allowPeriods) {
-		return period, nil
-	} else {
-		return int64(allowPeriods[0]), nil
+	if idx<0 || idx>=len(allowPeriods){
+		return 0,errors.New("not support stats period")
 	}
-
+	return int64(allowPeriods[idx]), nil
 }
 
 func (meta *TcmMeta) GetStatType(period int64) (string, error) {

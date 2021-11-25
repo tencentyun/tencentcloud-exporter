@@ -29,7 +29,7 @@ type ProductHandler interface {
 }
 
 // 将对应的产品handler注册到Factory中
-func registerHandler(namespace string, isDefaultEnabled bool, factory func(*TcProductCollector, log.Logger) (ProductHandler, error)) {
+func registerHandler(namespace string, _ bool, factory func(*TcProductCollector, log.Logger) (ProductHandler, error)) {
 	handlerFactoryMap[namespace] = factory
 }
 
@@ -48,6 +48,13 @@ func (h *baseProductHandler) ModifyMetricMeta(meta *metric.TcmMeta) error {
 }
 
 func (h *baseProductHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+	p, err := m.Meta.GetPeriod(m.Conf.StatPeriodSeconds)
+	if err != nil {
+		return false
+	}
+	if p != m.Conf.StatPeriodSeconds {
+		return false
+	}
 	return true
 }
 
