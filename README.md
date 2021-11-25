@@ -22,6 +22,15 @@ NAT|QCE/NAT_GATEWAY|[指标详情](https://cloud.tencent.com/document/product/24
 专用通道|QCE/DCX|[指标详情](https://cloud.tencent.com/document/product/248/45101)
 云硬盘|QCE/CBS|[指标详情](https://cloud.tencent.com/document/product/248/45411)
 SqlServer|QCE/SQLSERVER|[指标详情](https://cloud.tencent.com/document/product/248/45146)
+MariaDB|QCE/MARIADB|[指标详情](https://cloud.tencent.com/document/product/248/54397)
+Elasticsearch|QCE/CES|[指标详情](https://cloud.tencent.com/document/product/248/45129)
+CMQ 队列服务|QCE/CMQ|[指标详情](https://cloud.tencent.com/document/product/248/45114)
+CMQ 主题订阅|QCE/CMQTOPIC|[指标详情](https://cloud.tencent.com/document/product/248/45113)
+PostgreSQL|QCE/POSTGRES|[指标详情](https://cloud.tencent.com/document/product/248/45105)
+CKafka 实例|QCE/CKAFKA|[指标详情](https://cloud.tencent.com/document/product/248/45121)
+Memcached |QCE/MEMCACHED|指标详情说明文档(待上线)
+Lighthouse |QCE/LIGHTHOUSE|指标详情说明文档(待上线)
+
 `后续会有更多的产品支持`
 
 ## 二、快速开始

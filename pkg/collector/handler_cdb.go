@@ -10,8 +10,17 @@ const (
 	CdbInstanceidKey = "InstanceId"
 )
 
+var excludeMetricName map[string]string
+
 func init() {
 	registerHandler(CdbNamespace, defaultHandlerEnabled, NewCdbHandler)
+	excludeMetricName = map[string]string{
+		"LogVolume":           "LogVolume",
+		"CurrentBackupVolume": "CurrentBackupVolume",
+		"DataVolume":          "DataVolume",
+		"FreeBackupVolume":    "FreeBackupVolume",
+		"BillingBackupVolume": "BillingBackupVolume",
+	}
 }
 
 type cdbHandler struct {
@@ -27,6 +36,17 @@ func (h *cdbHandler) GetNamespace() string {
 }
 
 func (h *cdbHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+	_, ok := excludeMetricName[m.Meta.MetricName]
+	if ok {
+		return false
+	}
+	p, err := m.Meta.GetPeriod(m.Conf.StatPeriodSeconds)
+	if err != nil {
+		return false
+	}
+	if p != m.Conf.StatPeriodSeconds {
+		return false
+	}
 	return true
 }
 

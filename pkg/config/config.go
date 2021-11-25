@@ -46,6 +46,14 @@ var (
 		"cdn":           "QCE/CDN",
 		"cbs":           "QCE/BLOCK_STORAGE",
 		"sqlserver":     "QCE/SQLSERVER",
+		"mariadb":       "QCE/MARIADB",
+		"ces":           "QCE/CES",
+		"cmq":           "QCE/CMQ",
+		"cmqtopic":      "QCE/CMQTOPIC",
+		"postgres":      "QCE/POSTGRES",
+		"memcached":     "QCE/MEMCACHED",
+		"lighthouse":    "QCE/LIGHTHOUSE",
+		"ckafka":         "QCE/CKAFKA",
 	}
 
 	SupportStatisticsTypes = map[string]bool{
