@@ -1,2 +1,4 @@
 .scannerwork
 /.idea
+build/*
+qcloud.yml
