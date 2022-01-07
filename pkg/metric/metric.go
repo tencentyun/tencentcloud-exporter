@@ -34,9 +34,17 @@ func (m *TcmMetric) LoadSeries(series []*TcmSeries) error {
 }
 
 func (m *TcmMetric) GetLatestPromMetrics(repo TcmMetricRepository) (pms []prometheus.Metric, err error) {
-	st := time.Now().Unix() - m.Conf.StatNumSamples*m.Conf.StatPeriodSeconds
+	var st int64
+	et := int64(0)
+	now := time.Now().Unix()
+	if m.Conf.StatDelaySeconds > 0 {
+		st = now - m.Conf.StatPeriodSeconds - m.Conf.StatDelaySeconds
+		et = now - m.Conf.StatDelaySeconds
+	} else {
+		st = now - m.Conf.StatNumSamples*m.Conf.StatPeriodSeconds
+	}
 
-	samplesList, err := repo.ListSamples(m, st, 0)
+	samplesList, err := repo.ListSamples(m, st, et)
 	if err != nil {
 		return nil, err
 	}
@@ -69,12 +77,22 @@ func (m *TcmMetric) GetLatestPromMetrics(repo TcmMetricRepository) (pms []promet
 			if err != nil {
 				return nil, err
 			}
-			pm := prometheus.MustNewConstMetric(
-				desc,
-				prometheus.GaugeValue,
-				point.Value,
-				values...,
-			)
+			var pm prometheus.Metric
+			if m.Conf.StatDelaySeconds > 0 {
+				pm = prometheus.NewMetricWithTimestamp(time.Unix(int64(point.Timestamp), 0), prometheus.MustNewConstMetric(
+					desc,
+					prometheus.GaugeValue,
+					point.Value,
+					values...,
+				))
+			} else {
+				pm = prometheus.MustNewConstMetric(
+					desc,
+					prometheus.GaugeValue,
+					point.Value,
+					values...,
+				)
+			}
 			pms = append(pms, pm)
 		}
 	}

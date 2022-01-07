@@ -12,3 +12,7 @@ lint:
 		curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s $(GOLANGCI_LINT_VERSION); \
 	fi; \
 	./bin/golangci-lint run ./...
+
+deploy:
+	env GOOS=linux GOARCH=amd64 go build -o "build/qcloud_exporter" ./cmd/qcloud-exporter/
+
