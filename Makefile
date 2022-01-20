@@ -16,3 +16,6 @@ lint:
 deploy:
 	env GOOS=linux GOARCH=amd64 go build -o "build/qcloud_exporter" ./cmd/qcloud-exporter/
 
+deps:  ## Update vendor.
+	go mod verify
+	go mod tidy -v
