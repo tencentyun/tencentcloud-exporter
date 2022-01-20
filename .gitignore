@@ -2,3 +2,4 @@
 /.idea
 build/*
 qcloud.yml
+.DS_Store
