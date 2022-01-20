@@ -10,6 +10,7 @@ import (
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/profile"
 	cvm "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cvm/v20170312"
 	dc "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/dc/v20180410"
+	dcdb "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/dcdb/v20180411"
 	es "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/es/v20180416"
 	lh "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/lighthouse/v20200324"
 	mariadb "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/mariadb/v20170312"
@@ -185,4 +186,13 @@ func NewKafkaClient(conf *config.TencentConfig) (*kafka.Client, error) {
 	)
 	cpf := profile.NewClientProfile()
 	return kafka.NewClient(credential, conf.Credential.Region, cpf)
+}
+
+func NewDCDBClient(conf *config.TencentConfig) (*dcdb.Client, error) {
+	credential := common.NewCredential(
+		conf.Credential.AccessKey,
+		conf.Credential.SecretKey,
+	)
+	cpf := profile.NewClientProfile()
+	return dcdb.NewClient(credential, conf.Credential.Region, cpf)
 }
