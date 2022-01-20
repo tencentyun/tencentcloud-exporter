@@ -1,0 +1,17 @@
+credential:
+  access_key: "access_key"
+  secret_key: "secret_key"
+  region: "region"
+
+rate_limit: 15                #云监控拉数据接口最大限制, 20/秒, 1200/分钟, https://cloud.tencent.com/document/product/248/31014
+
+products:
+  - namespace: QCE/LB        #指标详情: https://cloud.tencent.com/document/product/248/45099
+    all_metrics: true
+    only_include_instances: ['eip-xxxx']
+    extra_labels: [AddressName]
+    #all_instances: true
+    #only_include_metrics: []
+    #statistics_types: [last]
+    #period_seconds: 60
+    #metric_name_type: 2

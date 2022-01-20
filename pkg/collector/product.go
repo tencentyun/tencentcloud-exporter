@@ -84,6 +84,10 @@ func (c *TcProductCollector) LoadMetricsByProductConf() error {
 			level.Warn(c.logger).Log("msg", "Create metric fail", "err", err, "Namespace", c.Namespace, "name", mname)
 			continue
 		}
+		if nm == nil {
+			// maybe some metric not support
+			continue
+		}
 		c.MetricMap[nm.Meta.MetricName] = nm
 
 		// 获取该指标下的所有实例纬度查询或自定义纬度查询
@@ -164,7 +168,8 @@ func (c *TcProductCollector) createMetricWithProductConf(mname string, pconf con
 		}
 		// 指标过滤
 		if !c.handler.IsMetricVaild(nm) {
-			return nil, fmt.Errorf("metric not support")
+			// ignore invalid metric
+			return nil, nil
 		}
 		err = c.handler.ModifyMetric(nm)
 		if err != nil {

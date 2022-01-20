@@ -53,7 +53,9 @@ var (
 		"postgres":      "QCE/POSTGRES",
 		"memcached":     "QCE/MEMCACHED",
 		"lighthouse":    "QCE/LIGHTHOUSE",
-		"ckafka":         "QCE/CKAFKA",
+		"ckafka":        "QCE/CKAFKA",
+		"tdmysql":       "QCE/TDMYSQL",
+		"lb":            "QCE/LB", // for eip
 	}
 
 	SupportStatisticsTypes = map[string]bool{
