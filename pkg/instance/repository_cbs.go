@@ -2,7 +2,6 @@ package instance
 
 import (
 	"fmt"
-
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cbs/v20170312"
@@ -15,6 +14,7 @@ func init() {
 }
 
 type CbsTcInstanceRepository struct {
+	c      *config.TencentConfig
 	client *sdk.Client
 	logger log.Logger
 }
@@ -84,6 +84,7 @@ func NewCbsTcInstanceRepository(c *config.TencentConfig, logger log.Logger) (rep
 		return
 	}
 	repo = &CbsTcInstanceRepository{
+		c:      c,
 		client: cli,
 		logger: logger,
 	}

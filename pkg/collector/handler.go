@@ -2,6 +2,7 @@ package collector
 
 import (
 	"fmt"
+	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
@@ -107,6 +108,9 @@ func (h *baseProductHandler) GetSeriesByAll(m *metric.TcmMetric) ([]*metric.TcmS
 		return nil, err
 	}
 	for _, ins := range insList {
+		if len(m.Conf.ExcludeInstances) != 0 && util.IsStrInList(m.Conf.ExcludeInstances, ins.GetInstanceId()) {
+			continue
+		}
 		ql := map[string]string{
 			h.monitorQueryKey: ins.GetMonitorQueryKey(),
 		}

@@ -6,6 +6,7 @@ import (
 	"github.com/go-kit/kit/log/level"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/instance"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
+	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
 	"strings"
 	"time"
 )
@@ -93,6 +94,9 @@ func (h *redisMemHandler) GetSeriesByAll(m *metric.TcmMetric) ([]*metric.TcmSeri
 		return nil, err
 	}
 	for _, ins := range insList {
+		if len(m.Conf.ExcludeInstances) != 0 && util.IsStrInList(m.Conf.ExcludeInstances, ins.GetInstanceId()) {
+			continue
+		}
 		sl, err := h.getSeriesByMetricType(m, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
