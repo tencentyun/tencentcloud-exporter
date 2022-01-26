@@ -3,7 +3,6 @@ package instance
 import (
 	"fmt"
 	"reflect"
-	"strconv"
 )
 
 // 每个产品的实例对象, 可用于配置导出指标的额外label填充, 根据字段名获取值
@@ -39,12 +38,5 @@ func (ins *baseTcInstance) GetFieldValueByName(name string) (string, error) {
 	if v.Kind() == reflect.Ptr {
 		v = reflect.Indirect(v)
 	}
-	switch k := v.Kind(); k {
-	case reflect.Uint64:
-		return strconv.FormatUint(v.Uint(), 10), nil
-	case reflect.String:
-		return v.String(), nil
-	default:
-		return "", fmt.Errorf("value type not support, type=%s", k)
-	}
+	return fmt.Sprintf("%v", v.Interface()), nil
 }

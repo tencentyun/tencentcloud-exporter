@@ -5,6 +5,7 @@ import (
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
+	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
 )
 
 const (
@@ -75,6 +76,9 @@ func (h *cmqHandler) GetSeriesByAll(m *metric.TcmMetric) ([]*metric.TcmSeries, e
 		return nil, err
 	}
 	for _, ins := range insList {
+		if len(m.Conf.ExcludeInstances) != 0 && util.IsStrInList(m.Conf.ExcludeInstances, ins.GetInstanceId()) {
+			continue
+		}
 		queueName,err:=ins.GetFieldValueByName("QueueName")
 		if err!=nil{
 			level.Error(h.logger).Log("msg", "queue name not found")

@@ -131,7 +131,6 @@ func (h *mongoHandler) GetSeriesByCustom(m *metric.TcmMetric) ([]*metric.TcmSeri
 func (h *mongoHandler) getSeriesByMetricType(m *metric.TcmMetric, ins instance.TcInstance) (slist []*metric.TcmSeries, err error) {
 	if util.IsStrInList(MongoClusterMetrics, strings.ToLower(m.Meta.MetricName)) {
 		// 集群纬度
-		// cmgo-6ielucen
 		ql := map[string]string{
 			MongoInstanceidKey: ins.GetInstanceId(),
 		}
