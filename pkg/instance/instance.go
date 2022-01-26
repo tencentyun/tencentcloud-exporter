@@ -33,7 +33,12 @@ func (ins *baseTcInstance) GetMonitorQueryKey() string {
 	return ins.instanceId
 }
 
-func (ins *baseTcInstance) GetFieldValueByName(name string) (string, error) {
+func (ins *baseTcInstance) GetFieldValueByName(name string) (val string, err error) {
+	defer func() {
+		if err := recover(); err != nil {
+			//nothing ignore err
+		}
+	}()
 	v := ins.value.FieldByName(name)
 	if v.Kind() == reflect.Ptr {
 		v = reflect.Indirect(v)
