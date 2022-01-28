@@ -96,6 +96,7 @@ func (c *TcProductCollector) LoadMetricsByProductConf() error {
 			level.Error(c.logger).Log("msg", "create metric series err", "err", err, "Namespace", c.Namespace, "name", mname)
 			continue
 		}
+		level.Info(c.logger).Log("msg", "found instances", "count", len(series), "Namespace", c.Namespace, "name", mname)
 		err = nm.LoadSeries(series)
 		if err != nil {
 			level.Error(c.logger).Log("msg", "load metric series err", "err", err, "Namespace", c.Namespace, "name", mname)
@@ -227,7 +228,7 @@ func (c *TcProductCollector) initQuerys() (err error) {
 			return e
 		}
 		c.Querys = append(c.Querys, q)
-		numSeries += len(q.Metric.Series)
+		numSeries += len(q.Metric.SeriesCache.Series)
 	}
 	level.Info(c.logger).Log("msg", "Init all query ok", "Namespace", c.Namespace, "numMetric", len(c.Querys), "numSeries", numSeries)
 	return
@@ -276,11 +277,13 @@ func (r *TcProductCollectorReloader) Run() {
 	time.Sleep(r.relodInterval)
 
 	for {
+		level.Info(r.logger).Log("msg", "start reload product metadata", "Namespace", r.collector.Namespace)
 		e := r.reloadMetricsByProductConf()
 		if e != nil {
 			level.Error(r.logger).Log("msg", "reload product error", "err", e,
 				"namespace", r.collector.Namespace)
 		}
+		level.Info(r.logger).Log("msg", "complete reload product metadata", "Namespace", r.collector.Namespace)
 		select {
 		case <-r.ctx.Done():
 			return

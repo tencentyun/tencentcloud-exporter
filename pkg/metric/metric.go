@@ -10,13 +10,31 @@ import (
 	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
 )
 
+type SeriesCache struct {
+	Series map[string]*TcmSeries // 包含的多个时间线
+	// need cache it, because some cases DescribeBaseMetrics/GetMonitorData dims not match
+	LabelNames map[string]struct{}
+}
+
+func newCache() *SeriesCache {
+	return &SeriesCache{
+		Series:     make(map[string]*TcmSeries),
+		LabelNames: make(map[string]struct{}),
+	}
+}
+
+type Desc struct {
+	FQName string
+	Help   string
+}
+
 // 代表一个指标, 包含多个时间线
 type TcmMetric struct {
 	Id           string
-	Meta         *TcmMeta                    // 指标元数据
-	Labels       *TcmLabels                  // 指标labels
-	Series       map[string]*TcmSeries       // 包含的多个时间线
-	StatPromDesc map[string]*prometheus.Desc // 按统计纬度的Desc, max、min、avg、last
+	Meta         *TcmMeta   // 指标元数据
+	Labels       *TcmLabels // 指标labels
+	SeriesCache  *SeriesCache
+	StatPromDesc map[string]Desc // 按统计纬度的Desc, max、min、avg、last
 	Conf         *TcmMetricConfig
 	seriesLock   sync.Mutex
 }
@@ -25,11 +43,16 @@ func (m *TcmMetric) LoadSeries(series []*TcmSeries) error {
 	m.seriesLock.Lock()
 	defer m.seriesLock.Unlock()
 
-	newSeries := make(map[string]*TcmSeries)
+	newSeriesCache := newCache()
+
 	for _, s := range series {
-		newSeries[s.Id] = s
+		newSeriesCache.Series[s.Id] = s
+		// add label names
+		for key, _ := range s.QueryLabels {
+			newSeriesCache.LabelNames[key] = struct{}{}
+		}
 	}
-	m.Series = newSeries
+	m.SeriesCache = newSeriesCache
 	return nil
 }
 
@@ -73,21 +96,34 @@ func (m *TcmMetric) GetLatestPromMetrics(repo TcmMetricRepository) (pms []promet
 					return nil, err
 				}
 			}
-			values, err := m.Labels.GetValues(samples.Series.QueryLabels, samples.Series.Instance)
-			if err != nil {
-				return nil, err
+			labels := m.Labels.GetValues(samples.Series.QueryLabels, samples.Series.Instance)
+			// add all dimensions from cloud monitor into prom labels
+			for _, dim := range point.Dimensions {
+				labels[*dim.Name] = *dim.Value
 			}
+			var names []string
+			var values []string
+			for k, v := range labels {
+				names = append(names, util.ToUnderlineLower(k))
+				values = append(values, v)
+			}
+			newDesc := prometheus.NewDesc(
+				desc.FQName,
+				desc.Help,
+				names,
+				nil,
+			)
 			var pm prometheus.Metric
 			if m.Conf.StatDelaySeconds > 0 {
 				pm = prometheus.NewMetricWithTimestamp(time.Unix(int64(point.Timestamp), 0), prometheus.MustNewConstMetric(
-					desc,
+					newDesc,
 					prometheus.GaugeValue,
 					point.Value,
 					values...,
 				))
 			} else {
 				pm = prometheus.MustNewConstMetric(
-					desc,
+					newDesc,
 					prometheus.GaugeValue,
 					point.Value,
 					values...,
@@ -102,7 +138,7 @@ func (m *TcmMetric) GetLatestPromMetrics(repo TcmMetricRepository) (pms []promet
 
 func (m *TcmMetric) GetSeriesSplitByBatch(batch int) (steps [][]*TcmSeries) {
 	var series []*TcmSeries
-	for _, s := range m.Series {
+	for _, s := range m.SeriesCache.Series {
 		series = append(series, s)
 	}
 
@@ -130,7 +166,7 @@ func NewTcmMetric(meta *TcmMeta, conf *TcmMetricConfig) (*TcmMetric, error) {
 		return nil, err
 	}
 
-	statDescs := make(map[string]*prometheus.Desc)
+	statDescs := make(map[string]Desc)
 	statType, err := meta.GetStatType(conf.StatPeriodSeconds)
 	if err != nil {
 		return nil, err
@@ -142,10 +178,6 @@ func NewTcmMetric(meta *TcmMeta, conf *TcmMetricConfig) (*TcmMetric, error) {
 		statType,
 		*meta.m.Meaning.Zh,
 	)
-	var lnames []string
-	for _, name := range labels.Names {
-		lnames = append(lnames, util.ToUnderlineLower(name))
-	}
 	for _, s := range conf.StatTypes {
 		var st string
 		if s == "last" {
@@ -176,20 +208,18 @@ func NewTcmMetric(meta *TcmMeta, conf *TcmMetricConfig) (*TcmMetric, error) {
 			st,
 		)
 		fqName = strings.ToLower(fqName)
-		desc := prometheus.NewDesc(
-			fqName,
-			help,
-			lnames,
-			nil,
-		)
-		statDescs[strings.ToLower(s)] = desc
+		statDescs[strings.ToLower(s)] = Desc{
+			FQName: fqName,
+			Help:   help,
+		}
 	}
 
 	m := &TcmMetric{
-		Id:           id,
-		Meta:         meta,
-		Labels:       labels,
-		Series:       map[string]*TcmSeries{},
+		Id:          id,
+		Meta:        meta,
+		Labels:      labels,
+		SeriesCache: newCache(),
+
 		StatPromDesc: statDescs,
 		Conf:         conf,
 	}
