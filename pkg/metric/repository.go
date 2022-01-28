@@ -228,15 +228,22 @@ func (repo *TcmMetricRepositoryImpl) buildSamples(
 ) (*TcmSamples, map[string]string, error) {
 	ql := map[string]string{}
 	for _, dimension := range points.Dimensions {
+		name := *dimension.Name
 		if *dimension.Value != "" {
-			ql[*dimension.Name] = *dimension.Value
+			_, ok := m.SeriesCache.LabelNames[name]
+			if !ok {
+				// if not in query label names, need ignore it
+				// because series id = query labels md5
+				continue
+			}
+			ql[name] = *dimension.Value
 		}
 	}
 	sid, e := GetTcmSeriesId(m, ql)
 	if e != nil {
 		return nil, ql, fmt.Errorf("get series id fail")
 	}
-	s, ok := m.Series[sid]
+	s, ok := m.SeriesCache.Series[sid]
 	if !ok {
 		return nil, ql, fmt.Errorf("response data point not match series")
 	}

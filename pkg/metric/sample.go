@@ -8,8 +8,9 @@ import (
 
 // 代表一个数据点
 type TcmSample struct {
-	Timestamp float64
-	Value     float64
+	Timestamp  float64
+	Value      float64
+	Dimensions []*monitor.Dimension
 }
 
 // 代表一个时间线的多个数据点
@@ -57,8 +58,9 @@ func (s *TcmSamples) GetAvgPoint() (point *TcmSample, err error) {
 	}
 	avg := sum / float64(len(s.Samples))
 	sample := &TcmSample{
-		Timestamp: s.Samples[len(s.Samples)-1].Timestamp,
-		Value:     avg,
+		Timestamp:  s.Samples[len(s.Samples)-1].Timestamp,
+		Value:      avg,
+		Dimensions: s.Samples[len(s.Samples)-1].Dimensions,
 	}
 	return sample, nil
 }
@@ -78,7 +80,11 @@ func NewTcmSamples(series *TcmSeries, p *monitor.DataPoint) (s *TcmSamples, err 
 	}
 
 	for i := 0; i < len(p.Timestamps); i++ {
-		s.Samples = append(s.Samples, &TcmSample{*p.Timestamps[i], *p.Values[i]})
+		s.Samples = append(s.Samples, &TcmSample{
+			Timestamp:  *p.Timestamps[i],
+			Value:      *p.Values[i],
+			Dimensions: p.Dimensions,
+		})
 	}
 	return
 }

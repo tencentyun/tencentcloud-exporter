@@ -30,7 +30,7 @@ type TcmLabels struct {
 }
 
 // 根据标签名, 获取所有标签的值
-func (l *TcmLabels) GetValues(filters map[string]string, ins instance.TcInstance) (values []string, err error) {
+func (l *TcmLabels) GetValues(filters map[string]string, ins instance.TcInstance) map[string]string {
 	lowerKeyFilters := map[string]string{}
 	for k, v := range filters {
 		lowerKeyFilters[strings.ToLower(k)] = v
@@ -41,25 +41,18 @@ func (l *TcmLabels) GetValues(filters map[string]string, ins instance.TcInstance
 		v, ok := lowerKeyFilters[strings.ToLower(name)]
 		if ok {
 			nameValues[name] = v
-		} else {
-			nameValues[name] = ""
 		}
 	}
 	for _, name := range l.instanceLabelNames {
 		v, e := ins.GetFieldValueByName(name)
-		if e != nil {
-			nameValues[name] = ""
-		} else {
+		if e == nil && v != "" {
 			nameValues[name] = v
 		}
 	}
 	for name, value := range l.constLabels {
 		nameValues[name] = value
 	}
-	for _, name := range l.Names {
-		values = append(values, nameValues[name])
-	}
-	return
+	return nameValues
 }
 
 func NewTcmLabels(qln []string, iln []string, cl Labels) (*TcmLabels, error) {

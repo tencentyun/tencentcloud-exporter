@@ -106,13 +106,10 @@ type TencentProduct struct {
 }
 
 func (p *TencentProduct) IsReloadEnable() bool {
-	if len(p.OnlyIncludeMetrics) > 0 {
-		return false
-	}
 	if util.IsStrInList(constant.NotSupportInstanceNamespaces, p.Namespace) {
 		return false
 	}
-	return p.AllInstances
+	return true
 }
 
 type TencentConfig struct {
