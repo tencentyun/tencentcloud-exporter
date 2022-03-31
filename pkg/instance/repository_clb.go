@@ -17,6 +17,8 @@ func init() {
 	registerRepository("QCE/LOADBALANCE", NewClbTcInstanceRepository)
 }
 
+var open = "OPEN"
+
 type ClbTcInstanceRepository struct {
 	client *sdk.Client
 	logger log.Logger
@@ -36,6 +38,7 @@ func (repo *ClbTcInstanceRepository) Get(id string) (instance TcInstance, err er
 	} else {
 		req.LoadBalancerIds = []*string{&id}
 	}
+	req.LoadBalancerType = &open
 
 	resp, err := repo.client.DescribeLoadBalancers(req)
 	if err != nil {
@@ -67,6 +70,7 @@ func (repo *ClbTcInstanceRepository) ListByFilters(filters map[string]string) (i
 
 	req.Offset = &offset
 	req.Limit = &limit
+	req.LoadBalancerType = &open
 
 getMoreInstances:
 	resp, err := repo.client.DescribeLoadBalancers(req)
