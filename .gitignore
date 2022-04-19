@@ -3,3 +3,4 @@
 build/*
 qcloud.yml
 .DS_Store
+*mock.go
