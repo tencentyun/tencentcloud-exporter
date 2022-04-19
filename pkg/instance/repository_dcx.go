@@ -3,6 +3,8 @@ package instance
 import (
 	"fmt"
 
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
+
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/dc/v20180410"
@@ -15,8 +17,9 @@ func init() {
 }
 
 type DcxTcInstanceRepository struct {
-	client *sdk.Client
-	logger log.Logger
+	credential common.CredentialIface
+	client     *sdk.Client
+	logger     log.Logger
 }
 
 func (repo *DcxTcInstanceRepository) GetInstanceKey() string {
@@ -26,6 +29,7 @@ func (repo *DcxTcInstanceRepository) GetInstanceKey() string {
 func (repo *DcxTcInstanceRepository) Get(id string) (instance TcInstance, err error) {
 	req := sdk.NewDescribeDirectConnectTunnelsRequest()
 	req.DirectConnectTunnelIds = []*string{&id}
+	repo.credential.Refresh()
 	resp, err := repo.client.DescribeDirectConnectTunnels(req)
 	if err != nil {
 		return
@@ -54,6 +58,7 @@ func (repo *DcxTcInstanceRepository) ListByFilters(filters map[string]string) (i
 	req.Limit = &limit
 
 getMoreInstances:
+	repo.credential.Refresh()
 	resp, err := repo.client.DescribeDirectConnectTunnels(req)
 	if err != nil {
 		return
@@ -78,14 +83,15 @@ getMoreInstances:
 	return
 }
 
-func NewDcxTcInstanceRepository(c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
-	cli, err := client.NewDcClient(c)
+func NewDcxTcInstanceRepository(cred common.CredentialIface, c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
+	cli, err := client.NewDcClient(cred, c)
 	if err != nil {
 		return
 	}
 	repo = &DcxTcInstanceRepository{
-		client: cli,
-		logger: logger,
+		credential: cred,
+		client:     cli,
+		logger:     logger,
 	}
 	return
 }

@@ -3,6 +3,8 @@ package instance
 import (
 	"fmt"
 
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
+
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/lighthouse/v20200324"
@@ -15,8 +17,9 @@ func init() {
 }
 
 type LighthouseTcInstanceRepository struct {
-	client *sdk.Client
-	logger log.Logger
+	credential common.CredentialIface
+	client     *sdk.Client
+	logger     log.Logger
 }
 
 func (repo *LighthouseTcInstanceRepository) GetInstanceKey() string {
@@ -26,6 +29,7 @@ func (repo *LighthouseTcInstanceRepository) GetInstanceKey() string {
 func (repo *LighthouseTcInstanceRepository) Get(id string) (instance TcInstance, err error) {
 	req := sdk.NewDescribeInstancesRequest()
 	req.InstanceIds = []*string{&id}
+	repo.credential.Refresh()
 	resp, err := repo.client.DescribeInstances(req)
 	if err != nil {
 		return
@@ -55,6 +59,7 @@ func (repo *LighthouseTcInstanceRepository) ListByFilters(filters map[string]str
 	req.Limit = &limit
 
 getMoreInstances:
+	repo.credential.Refresh()
 	resp, err := repo.client.DescribeInstances(req)
 	if err != nil {
 		return
@@ -78,14 +83,15 @@ getMoreInstances:
 	return
 }
 
-func NewLighthouseTcInstanceRepository(c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
-	cli, err := client.NewLighthouseClient(c)
+func NewLighthouseTcInstanceRepository(cred common.CredentialIface, c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
+	cli, err := client.NewLighthouseClient(cred, c)
 	if err != nil {
 		return
 	}
 	repo = &LighthouseTcInstanceRepository{
-		client: cli,
-		logger: logger,
+		credential: cred,
+		client:     cli,
+		logger:     logger,
 	}
 	return
 }

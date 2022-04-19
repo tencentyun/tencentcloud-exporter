@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
+
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/mongodb/v20190725"
@@ -16,8 +18,9 @@ func init() {
 }
 
 type MongoTcInstanceRepository struct {
-	client *sdk.Client
-	logger log.Logger
+	credential common.CredentialIface
+	client     *sdk.Client
+	logger     log.Logger
 }
 
 func (repo *MongoTcInstanceRepository) GetInstanceKey() string {
@@ -27,6 +30,7 @@ func (repo *MongoTcInstanceRepository) GetInstanceKey() string {
 func (repo *MongoTcInstanceRepository) Get(id string) (instance TcInstance, err error) {
 	req := sdk.NewDescribeDBInstancesRequest()
 	req.InstanceIds = []*string{&id}
+	repo.credential.Refresh()
 	resp, err := repo.client.DescribeDBInstances(req)
 	if err != nil {
 		return
@@ -67,6 +71,7 @@ func (repo *MongoTcInstanceRepository) ListByFilters(filters map[string]string) 
 	}
 
 getMoreInstances:
+	repo.credential.Refresh()
 	resp, err := repo.client.DescribeDBInstances(req)
 	if err != nil {
 		return
@@ -91,14 +96,15 @@ getMoreInstances:
 	return
 }
 
-func NewMongoTcInstanceRepository(c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
-	cli, err := client.NewMongodbClient(c)
+func NewMongoTcInstanceRepository(cred common.CredentialIface, c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
+	cli, err := client.NewMongodbClient(cred, c)
 	if err != nil {
 		return
 	}
 	repo = &MongoTcInstanceRepository{
-		client: cli,
-		logger: logger,
+		credential: cred,
+		client:     cli,
+		logger:     logger,
 	}
 	return
 }

@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/go-kit/kit/log"
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
 )
@@ -58,7 +59,7 @@ func (h *redisHandler) IsMetricVaild(m *metric.TcmMetric) bool {
 	return false
 }
 
-func NewRedisHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
+func NewRedisHandler(cred common.CredentialIface, c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
 	handler = &redisHandler{
 		baseProductHandler{
 			monitorQueryKey: RedisInstanceidKey,

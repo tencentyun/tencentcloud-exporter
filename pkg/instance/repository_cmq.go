@@ -3,6 +3,8 @@ package instance
 import (
 	"fmt"
 
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
+
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cmq/v20190304"
@@ -15,8 +17,9 @@ func init() {
 }
 
 type CMQTcInstanceRepository struct {
-	client *sdk.Client
-	logger log.Logger
+	credential common.CredentialIface
+	client     *sdk.Client
+	logger     log.Logger
 }
 
 func (repo *CMQTcInstanceRepository) GetInstanceKey() string {
@@ -26,6 +29,7 @@ func (repo *CMQTcInstanceRepository) GetInstanceKey() string {
 func (repo *CMQTcInstanceRepository) Get(id string) (instance TcInstance, err error) {
 	req := sdk.NewDescribeQueueDetailRequest()
 	req.QueueName = &id
+	repo.credential.Refresh()
 	resp, err := repo.client.DescribeQueueDetail(req)
 	if err != nil {
 		return
@@ -55,6 +59,7 @@ func (repo *CMQTcInstanceRepository) ListByFilters(filters map[string]string) (i
 	req.Limit = &limit
 
 getMoreInstances:
+	repo.credential.Refresh()
 	resp, err := repo.client.DescribeQueueDetail(req)
 	if err != nil {
 		return
@@ -78,14 +83,15 @@ getMoreInstances:
 	return
 }
 
-func NewCMQTcInstanceRepository(c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
-	cli, err := client.NewCMQClient(c)
+func NewCMQTcInstanceRepository(cred common.CredentialIface, c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
+	cli, err := client.NewCMQClient(cred, c)
 	if err != nil {
 		return
 	}
 	repo = &CMQTcInstanceRepository{
-		client: cli,
-		logger: logger,
+		credential: cred,
+		client:     cli,
+		logger:     logger,
 	}
 	return
 }

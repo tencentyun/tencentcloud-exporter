@@ -3,6 +3,8 @@ package instance
 import (
 	"fmt"
 
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
+
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/postgres/v20170312"
@@ -10,15 +12,16 @@ import (
 	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
 )
 
-var  idKey = "db-instance-id"
+var idKey = "db-instance-id"
 
 func init() {
 	registerRepository("QCE/POSTGRES", NewPGTcInstanceRepository)
 }
 
 type PGTcInstanceRepository struct {
-	client *sdk.Client
-	logger log.Logger
+	credential common.CredentialIface
+	client     *sdk.Client
+	logger     log.Logger
 }
 
 func (repo *PGTcInstanceRepository) GetInstanceKey() string {
@@ -27,10 +30,11 @@ func (repo *PGTcInstanceRepository) GetInstanceKey() string {
 
 func (repo *PGTcInstanceRepository) Get(id string) (instance TcInstance, err error) {
 	req := sdk.NewDescribeDBInstancesRequest()
-	req.Filters =[]*sdk.Filter{{
-		Name:  &idKey,
+	req.Filters = []*sdk.Filter{{
+		Name:   &idKey,
 		Values: []*string{&id},
 	}}
+	repo.credential.Refresh()
 	resp, err := repo.client.DescribeDBInstances(req)
 	if err != nil {
 		return
@@ -60,6 +64,7 @@ func (repo *PGTcInstanceRepository) ListByFilters(filters map[string]string) (in
 	req.Limit = &limit
 
 getMoreInstances:
+	repo.credential.Refresh()
 	resp, err := repo.client.DescribeDBInstances(req)
 	if err != nil {
 		return
@@ -67,7 +72,7 @@ getMoreInstances:
 	if total == 0 {
 		total = *resp.Response.TotalCount
 	}
-	for _, meta := range resp.Response.DBInstanceSet{
+	for _, meta := range resp.Response.DBInstanceSet {
 		ins, e := NewPGTcInstance(*meta.DBInstanceId, meta)
 		if e != nil {
 			level.Error(repo.logger).Log("msg", "Create pg instance fail", "id", *meta.DBInstanceId)
@@ -83,14 +88,15 @@ getMoreInstances:
 	return
 }
 
-func NewPGTcInstanceRepository(c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
-	cli, err := client.NewPGClient(c)
+func NewPGTcInstanceRepository(cred common.CredentialIface, c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
+	cli, err := client.NewPGClient(cred, c)
 	if err != nil {
 		return
 	}
 	repo = &PGTcInstanceRepository{
-		client: cli,
-		logger: logger,
+		credential: cred,
+		client:     cli,
+		logger:     logger,
 	}
 	return
 }

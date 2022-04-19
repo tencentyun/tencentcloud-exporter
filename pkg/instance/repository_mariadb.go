@@ -3,6 +3,8 @@ package instance
 import (
 	"fmt"
 
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
+
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/mariadb/v20170312"
@@ -15,8 +17,9 @@ func init() {
 }
 
 type MariaDBTcInstanceRepository struct {
-	client *sdk.Client
-	logger log.Logger
+	credential common.CredentialIface
+	client     *sdk.Client
+	logger     log.Logger
 }
 
 func (repo *MariaDBTcInstanceRepository) GetInstanceKey() string {
@@ -26,6 +29,7 @@ func (repo *MariaDBTcInstanceRepository) GetInstanceKey() string {
 func (repo *MariaDBTcInstanceRepository) Get(id string) (instance TcInstance, err error) {
 	req := sdk.NewDescribeDBInstancesRequest()
 	req.InstanceIds = []*string{&id}
+	repo.credential.Refresh()
 	resp, err := repo.client.DescribeDBInstances(req)
 	if err != nil {
 		return
@@ -55,6 +59,7 @@ func (repo *MariaDBTcInstanceRepository) ListByFilters(filters map[string]string
 	req.Limit = &limit
 
 getMoreInstances:
+	repo.credential.Refresh()
 	resp, err := repo.client.DescribeDBInstances(req)
 	if err != nil {
 		return
@@ -62,7 +67,7 @@ getMoreInstances:
 	if total == 0 {
 		total = int64(*resp.Response.TotalCount)
 	}
-	for _, meta := range resp.Response.Instances{
+	for _, meta := range resp.Response.Instances {
 		ins, e := NewMariaDBTcInstance(*meta.InstanceId, meta)
 		if e != nil {
 			level.Error(repo.logger).Log("msg", "Create mariadb instance fail", "id", *meta.InstanceId)
@@ -78,14 +83,15 @@ getMoreInstances:
 	return
 }
 
-func NewMariaDBTcInstanceRepository(c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
-	cli, err := client.NewMariaDBClient(c)
+func NewMariaDBTcInstanceRepository(cred common.CredentialIface, c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
+	cli, err := client.NewMariaDBClient(cred, c)
 	if err != nil {
 		return
 	}
 	repo = &MariaDBTcInstanceRepository{
-		client: cli,
-		logger: logger,
+		credential: cred,
+		client:     cli,
+		logger:     logger,
 	}
 	return
 }

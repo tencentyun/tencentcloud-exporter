@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net"
 
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
+
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/clb/v20180317"
@@ -20,8 +22,9 @@ func init() {
 var open = "OPEN"
 
 type ClbTcInstanceRepository struct {
-	client *sdk.Client
-	logger log.Logger
+	credential common.CredentialIface
+	client     *sdk.Client
+	logger     log.Logger
 }
 
 func (repo *ClbTcInstanceRepository) GetInstanceKey() string {
@@ -39,7 +42,7 @@ func (repo *ClbTcInstanceRepository) Get(id string) (instance TcInstance, err er
 		req.LoadBalancerIds = []*string{&id}
 	}
 	req.LoadBalancerType = &open
-
+	repo.credential.Refresh()
 	resp, err := repo.client.DescribeLoadBalancers(req)
 	if err != nil {
 		return
@@ -73,6 +76,7 @@ func (repo *ClbTcInstanceRepository) ListByFilters(filters map[string]string) (i
 	req.LoadBalancerType = &open
 
 getMoreInstances:
+	repo.credential.Refresh()
 	resp, err := repo.client.DescribeLoadBalancers(req)
 	if err != nil {
 		return
@@ -97,14 +101,15 @@ getMoreInstances:
 	return
 }
 
-func NewClbTcInstanceRepository(c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
-	cli, err := client.NewClbClient(c)
+func NewClbTcInstanceRepository(cred common.CredentialIface, c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
+	cli, err := client.NewClbClient(cred, c)
 	if err != nil {
 		return
 	}
 	repo = &ClbTcInstanceRepository{
-		client: cli,
-		logger: logger,
+		credential: cred,
+		client:     cli,
+		logger:     logger,
 	}
 	return
 }

@@ -2,6 +2,7 @@ package collector
 
 import (
 	"github.com/go-kit/kit/log"
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
 )
 
 const (
@@ -21,7 +22,7 @@ func (h *esHandler) GetNamespace() string {
 	return ESNamespace
 }
 
-func NewESHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
+func NewESHandler(cred common.CredentialIface, c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
 	handler = &esHandler{
 		baseProductHandler{
 			monitorQueryKey: ESInstanceIDKey,

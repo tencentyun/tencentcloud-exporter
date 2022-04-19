@@ -3,6 +3,8 @@ package instance
 import (
 	"fmt"
 
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
+
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/dcdb/v20180411"
@@ -15,8 +17,9 @@ func init() {
 }
 
 type DcdbTcInstanceRepository struct {
-	client *sdk.Client
-	logger log.Logger
+	credential common.CredentialIface
+	client     *sdk.Client
+	logger     log.Logger
 }
 
 func (repo *DcdbTcInstanceRepository) GetInstanceKey() string {
@@ -26,6 +29,7 @@ func (repo *DcdbTcInstanceRepository) GetInstanceKey() string {
 func (repo *DcdbTcInstanceRepository) Get(id string) (instance TcInstance, err error) {
 	req := sdk.NewDescribeDCDBInstancesRequest()
 	req.InstanceIds = []*string{&id}
+	repo.credential.Refresh()
 	resp, err := repo.client.DescribeDCDBInstances(req)
 	if err != nil {
 		return
@@ -55,6 +59,7 @@ func (repo *DcdbTcInstanceRepository) ListByFilters(filters map[string]string) (
 	req.Limit = &limit
 
 getMoreInstances:
+	repo.credential.Refresh()
 	resp, err := repo.client.DescribeDCDBInstances(req)
 	if err != nil {
 		return
@@ -79,14 +84,15 @@ getMoreInstances:
 	return
 }
 
-func NewDcdbTcInstanceRepository(c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
-	cli, err := client.NewDCDBClient(c)
+func NewDcdbTcInstanceRepository(cred common.CredentialIface, c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
+	cli, err := client.NewDCDBClient(cred, c)
 	if err != nil {
 		return
 	}
 	repo = &DcdbTcInstanceRepository{
-		client: cli,
-		logger: logger,
+		credential: cred,
+		client:     cli,
+		logger:     logger,
 	}
 	return
 }

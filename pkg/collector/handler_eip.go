@@ -2,6 +2,7 @@ package collector
 
 import (
 	"github.com/go-kit/kit/log"
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
 )
 
@@ -28,7 +29,7 @@ func (h *eipHandler) IsMetricVaild(m *metric.TcmMetric) bool {
 	}
 	return true
 }
-func NewEIPHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
+func NewEIPHandler(cred common.CredentialIface, c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
 	handler = &eipHandler{
 		baseProductHandler{
 			monitorQueryKey: EIPInstanceidKey,

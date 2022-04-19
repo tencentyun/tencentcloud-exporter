@@ -6,6 +6,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
+
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
@@ -86,11 +88,11 @@ func collect(name string, c *TcProductCollector, ch chan<- prometheus.Metric, lo
 	ch <- prometheus.MustNewConstMetric(scrapeSuccessDesc, prometheus.GaugeValue, success, name)
 }
 
-func NewTcMonitorCollector(conf *config.TencentConfig, logger log.Logger) (*TcMonitorCollector, error) {
+func NewTcMonitorCollector(cred common.CredentialIface, conf *config.TencentConfig, logger log.Logger) (*TcMonitorCollector, error) {
 	collectors := make(map[string]*TcProductCollector)
 	reloaders := make(map[string]*TcProductCollectorReloader)
 
-	metricRepo, err := metric.NewTcmMetricRepository(conf, logger)
+	metricRepo, err := metric.NewTcmMetricRepository(cred, conf, logger)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +110,7 @@ func NewTcMonitorCollector(conf *config.TencentConfig, logger log.Logger) (*TcMo
 			return nil, err
 		}
 
-		collector, err := NewTcProductCollector(namespace, metricRepoCache, conf, &pconf, logger)
+		collector, err := NewTcProductCollector(namespace, metricRepoCache, cred, conf, &pconf, logger)
 		if err != nil {
 			panic(fmt.Sprintf("Create product collecter fail, err=%s, Namespace=%s", err, namespace))
 		}

@@ -3,6 +3,8 @@ package instance
 import (
 	"fmt"
 
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
+
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/es/v20180416"
@@ -15,8 +17,9 @@ func init() {
 }
 
 type ESTcInstanceRepository struct {
-	client *sdk.Client
-	logger log.Logger
+	credential common.CredentialIface
+	client     *sdk.Client
+	logger     log.Logger
 }
 
 func (repo *ESTcInstanceRepository) GetInstanceKey() string {
@@ -26,6 +29,7 @@ func (repo *ESTcInstanceRepository) GetInstanceKey() string {
 func (repo *ESTcInstanceRepository) Get(id string) (instance TcInstance, err error) {
 	req := sdk.NewDescribeInstancesRequest()
 	req.InstanceIds = []*string{&id}
+	repo.credential.Refresh()
 	resp, err := repo.client.DescribeInstances(req)
 	if err != nil {
 		return
@@ -55,6 +59,7 @@ func (repo *ESTcInstanceRepository) ListByFilters(filters map[string]string) (in
 	req.Limit = &limit
 
 getMoreInstances:
+	repo.credential.Refresh()
 	resp, err := repo.client.DescribeInstances(req)
 	if err != nil {
 		return
@@ -62,7 +67,7 @@ getMoreInstances:
 	if total == 0 {
 		total = *resp.Response.TotalCount
 	}
-	for _, meta := range resp.Response.InstanceList{
+	for _, meta := range resp.Response.InstanceList {
 		ins, e := NewESTcInstance(*meta.InstanceId, meta)
 		if e != nil {
 			level.Error(repo.logger).Log("msg", "Create es instance fail", "id", *meta.InstanceId)
@@ -78,14 +83,15 @@ getMoreInstances:
 	return
 }
 
-func NewESTcInstanceRepository(c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
-	cli, err := client.NewESClient(c)
+func NewESTcInstanceRepository(cred common.CredentialIface, c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
+	cli, err := client.NewESClient(cred, c)
 	if err != nil {
 		return
 	}
 	repo = &ESTcInstanceRepository{
-		client: cli,
-		logger: logger,
+		credential: cred,
+		client:     cli,
+		logger:     logger,
 	}
 	return
 }

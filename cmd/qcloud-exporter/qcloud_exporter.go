@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
+
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
@@ -17,7 +19,9 @@ import (
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
-func newHandler(c *config.TencentConfig, includeExporterMetrics bool, maxRequests int, logger log.Logger) (*http.Handler, error) {
+func newHandler(cred common.CredentialIface, c *config.TencentConfig,
+	includeExporterMetrics bool, maxRequests int, logger log.Logger) (*http.Handler, error) {
+
 	exporterMetricsRegistry := prometheus.NewRegistry()
 	if includeExporterMetrics {
 		exporterMetricsRegistry.MustRegister(
@@ -26,7 +30,7 @@ func newHandler(c *config.TencentConfig, includeExporterMetrics bool, maxRequest
 		)
 	}
 
-	nc, err := collector.NewTcMonitorCollector(c, logger)
+	nc, err := collector.NewTcMonitorCollector(cred, c, logger)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create collector: %s", err)
 	}
@@ -94,7 +98,9 @@ func main() {
 		level.Info(logger).Log("msg", "Load config ok")
 	}
 
-	handler, err := newHandler(tencentConfig, *enableExporterMetrics, *maxRequests, logger)
+	cred := common.NewCredential(tencentConfig.Credential.Role)
+
+	handler, err := newHandler(cred, tencentConfig, *enableExporterMetrics, *maxRequests, logger)
 	if err != nil {
 		level.Error(logger).Log("msg", "Create handler fail", "err", err)
 		os.Exit(1)

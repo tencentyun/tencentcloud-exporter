@@ -3,6 +3,8 @@ package instance
 import (
 	"fmt"
 
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
+
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/memcached/v20190318"
@@ -15,8 +17,9 @@ func init() {
 }
 
 type MemcachedTcInstanceRepository struct {
-	client *sdk.Client
-	logger log.Logger
+	credential common.CredentialIface
+	client     *sdk.Client
+	logger     log.Logger
 }
 
 func (repo *MemcachedTcInstanceRepository) GetInstanceKey() string {
@@ -26,6 +29,7 @@ func (repo *MemcachedTcInstanceRepository) GetInstanceKey() string {
 func (repo *MemcachedTcInstanceRepository) Get(id string) (instance TcInstance, err error) {
 	req := sdk.NewDescribeInstancesRequest()
 	req.InstanceIds = []*string{&id}
+	repo.credential.Refresh()
 	resp, err := repo.client.DescribeInstances(req)
 	if err != nil {
 		return
@@ -55,6 +59,7 @@ func (repo *MemcachedTcInstanceRepository) ListByFilters(filters map[string]stri
 	req.Limit = &limit
 
 getMoreInstances:
+	repo.credential.Refresh()
 	resp, err := repo.client.DescribeInstances(req)
 	if err != nil {
 		return
@@ -78,14 +83,15 @@ getMoreInstances:
 	return
 }
 
-func NewMemcachedTcInstanceRepository(c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
-	cli, err := client.NewMemcacheClient(c)
+func NewMemcachedTcInstanceRepository(cred common.CredentialIface, c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
+	cli, err := client.NewMemcacheClient(cred, c)
 	if err != nil {
 		return
 	}
 	repo = &MemcachedTcInstanceRepository{
-		client: cli,
-		logger: logger,
+		credential: cred,
+		client:     cli,
+		logger:     logger,
 	}
 	return
 }

@@ -3,6 +3,8 @@ package instance
 import (
 	"fmt"
 
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
+
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/ckafka/v20190819"
@@ -15,8 +17,9 @@ func init() {
 }
 
 type KafkaTcInstanceRepository struct {
-	client *sdk.Client
-	logger log.Logger
+	credential common.CredentialIface
+	client     *sdk.Client
+	logger     log.Logger
 }
 
 func (repo *KafkaTcInstanceRepository) GetInstanceKey() string {
@@ -26,6 +29,7 @@ func (repo *KafkaTcInstanceRepository) GetInstanceKey() string {
 func (repo *KafkaTcInstanceRepository) Get(id string) (instance TcInstance, err error) {
 	req := sdk.NewDescribeInstancesRequest()
 	req.InstanceId = &id
+	repo.credential.Refresh()
 	resp, err := repo.client.DescribeInstances(req)
 	if err != nil {
 		return
@@ -55,6 +59,7 @@ func (repo *KafkaTcInstanceRepository) ListByFilters(filters map[string]string) 
 	req.Limit = &limit
 
 getMoreInstances:
+	repo.credential.Refresh()
 	resp, err := repo.client.DescribeInstances(req)
 	if err != nil {
 		return
@@ -62,7 +67,7 @@ getMoreInstances:
 	if total == 0 {
 		total = *resp.Response.Result.TotalCount
 	}
-	for _, meta := range resp.Response.Result.InstanceList{
+	for _, meta := range resp.Response.Result.InstanceList {
 		ins, e := NewKafkaTcInstance(*meta.InstanceId, meta)
 		if e != nil {
 			level.Error(repo.logger).Log("msg", "Create kafka instance fail", "id", *meta.InstanceId)
@@ -78,14 +83,15 @@ getMoreInstances:
 	return
 }
 
-func NewKafkaTcInstanceRepository(c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
-	cli, err := client.NewKafkaClient(c)
+func NewKafkaTcInstanceRepository(cred common.CredentialIface, c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
+	cli, err := client.NewKafkaClient(cred, c)
 	if err != nil {
 		return
 	}
 	repo = &KafkaTcInstanceRepository{
-		client: cli,
-		logger: logger,
+		credential: cred,
+		client:     cli,
+		logger:     logger,
 	}
 	return
 }

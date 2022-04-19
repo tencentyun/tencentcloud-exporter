@@ -67,9 +67,12 @@ var (
 )
 
 type TencentCredential struct {
-	AccessKey string `yaml:"access_key"`
-	SecretKey string `yaml:"secret_key"`
-	Region    string `yaml:"region"`
+	AccessKey   string `yaml:"access_key"`
+	SecretKey   string `yaml:"secret_key"`
+	Role        string `yaml:"role"`
+	Region      string `yaml:"region"`
+	Token       string `yaml:"token"`
+	ExpiredTime int64  `yaml:"expired_time"`
 }
 
 type TencentMetric struct {
@@ -105,6 +108,14 @@ type TencentProduct struct {
 	RelodIntervalMinutes  int64               `yaml:"relod_interval_minutes"`
 }
 
+type metadataResponse struct {
+	TmpSecretId  string
+	TmpSecretKey string
+	Token        string
+	ExpiredTime  int64
+	Code         string
+}
+
 func (p *TencentProduct) IsReloadEnable() bool {
 	if util.IsStrInList(constant.NotSupportInstanceNamespaces, p.Namespace) {
 		return false
@@ -133,7 +144,6 @@ func (c *TencentConfig) LoadFile(filename string) error {
 	}
 	if err = yaml.UnmarshalStrict(content, c); err != nil {
 		return err
-
 	}
 	if err = c.check(); err != nil {
 		return err
@@ -143,16 +153,18 @@ func (c *TencentConfig) LoadFile(filename string) error {
 }
 
 func (c *TencentConfig) check() (err error) {
-	if c.Credential.AccessKey == "" {
-		c.Credential.AccessKey = os.Getenv(EnvAccessKey)
+	if c.Credential.Role == "" {
 		if c.Credential.AccessKey == "" {
-			return fmt.Errorf("credential.access_key is empty, must be set")
+			c.Credential.AccessKey = os.Getenv(EnvAccessKey)
+			if c.Credential.AccessKey == "" {
+				return fmt.Errorf("credential.access_key is empty, must be set")
+			}
 		}
-	}
-	if c.Credential.SecretKey == "" {
-		c.Credential.SecretKey = os.Getenv(EnvSecretKey)
 		if c.Credential.SecretKey == "" {
-			return fmt.Errorf("credential.secret_key is empty, must be set")
+			c.Credential.SecretKey = os.Getenv(EnvSecretKey)
+			if c.Credential.SecretKey == "" {
+				return fmt.Errorf("credential.secret_key is empty, must be set")
+			}
 		}
 	}
 	if c.Credential.Region == "" {

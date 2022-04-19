@@ -2,6 +2,7 @@ package collector
 
 import (
 	"github.com/go-kit/kit/log"
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
 )
 
@@ -30,7 +31,7 @@ func (h *cbsHandler) IsMetricVaild(m *metric.TcmMetric) bool {
 	return true
 }
 
-func NewCbsHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
+func NewCbsHandler(cred common.CredentialIface, c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
 	handler = &cbsHandler{
 		baseProductHandler{
 			monitorQueryKey: CbsInstanceidKey,
