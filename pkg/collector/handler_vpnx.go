@@ -6,27 +6,27 @@ import (
 )
 
 const (
-	TdmqNamespace     = "QCE/TDMQ"
-	TdmqInstanceidKey = "InstanceId"
+	VpnxNamespace     = "QCE/VPNX"
+	VpnxInstanceidKey = "InstanceId"
 )
 
 func init() {
-	registerHandler(TdmqNamespace, defaultHandlerEnabled, NewTdmqHandler)
+	registerHandler(VpnxNamespace, defaultHandlerEnabled, NewVpnxHandler)
 }
 
-type tdmqHandler struct {
+type VpnxHandler struct {
 	baseProductHandler
 }
 
-func (h *tdmqHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *VpnxHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
 	return true
 }
 
-func (h *tdmqHandler) GetNamespace() string {
-	return TdmqNamespace
+func (h *VpnxHandler) GetNamespace() string {
+	return ZookeeperNamespace
 }
 
-func (h *tdmqHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *VpnxHandler) IsMetricVaild(m *metric.TcmMetric) bool {
 	_, ok := excludeMetricName[m.Meta.MetricName]
 	if ok {
 		return false
@@ -41,10 +41,10 @@ func (h *tdmqHandler) IsMetricVaild(m *metric.TcmMetric) bool {
 	return true
 }
 
-func NewTdmqHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
+func NewVpnxHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
 	handler = &tdmqHandler{
 		baseProductHandler{
-			monitorQueryKey: TdmqInstanceidKey,
+			monitorQueryKey: VpnxInstanceidKey,
 			collector:       c,
 			logger:          logger,
 		},

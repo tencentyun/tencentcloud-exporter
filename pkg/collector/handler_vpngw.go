@@ -6,27 +6,27 @@ import (
 )
 
 const (
-	TdmqNamespace     = "QCE/TDMQ"
-	TdmqInstanceidKey = "InstanceId"
+	VpngwNamespace     = "QCE/VPNGW"
+	VpngwInstanceidKey = "InstanceId"
 )
 
 func init() {
-	registerHandler(TdmqNamespace, defaultHandlerEnabled, NewTdmqHandler)
+	registerHandler(VpngwNamespace, defaultHandlerEnabled, NewVpngwHandler)
 }
 
-type tdmqHandler struct {
+type VpngwHandler struct {
 	baseProductHandler
 }
 
-func (h *tdmqHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *VpngwHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
 	return true
 }
 
-func (h *tdmqHandler) GetNamespace() string {
-	return TdmqNamespace
+func (h *VpngwHandler) GetNamespace() string {
+	return ZookeeperNamespace
 }
 
-func (h *tdmqHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *VpngwHandler) IsMetricVaild(m *metric.TcmMetric) bool {
 	_, ok := excludeMetricName[m.Meta.MetricName]
 	if ok {
 		return false
@@ -41,10 +41,10 @@ func (h *tdmqHandler) IsMetricVaild(m *metric.TcmMetric) bool {
 	return true
 }
 
-func NewTdmqHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
+func NewVpngwHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
 	handler = &tdmqHandler{
 		baseProductHandler{
-			monitorQueryKey: TdmqInstanceidKey,
+			monitorQueryKey: VpngwInstanceidKey,
 			collector:       c,
 			logger:          logger,
 		},

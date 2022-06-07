@@ -223,22 +223,3 @@ func NewTseClient(conf *config.TencentConfig) (*tse.Client, error) {
 	return tse.NewClient(credential, conf.Credential.Region, cpf)
 }
 
-func NewVpnGWClient(conf *config.TencentConfig) (*tdmq.Client, error) {
-	credential := common.NewCredential(
-		conf.Credential.AccessKey,
-		conf.Credential.SecretKey,
-	)
-	cpf := profile.NewClientProfile()
-	cpf.HttpProfile.Endpoint = "tdmq.tencentcloudapi.com"
-	return tdmq.NewClient(credential, conf.Credential.Region, cpf)
-}
-
-func NewVpnxClient(conf *config.TencentConfig) (*tdmq.Client, error) {
-	credential := common.NewCredential(
-		conf.Credential.AccessKey,
-		conf.Credential.SecretKey,
-	)
-	cpf := profile.NewClientProfile()
-	cpf.HttpProfile.Endpoint = "tdmq.tencentcloudapi.com"
-	return tdmq.NewClient(credential, conf.Credential.Region, cpf)
-}

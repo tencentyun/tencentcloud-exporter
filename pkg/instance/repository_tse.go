@@ -12,19 +12,21 @@ import (
 )
 
 func init() {
-	registerRepository("TSE/ZOOKEEPER", NewZookeeperTcInstanceRepository)
+	registerRepository("TSE/ZOOKEEPER", NewTseTcInstanceRepository)
+	registerRepository("TSE/POLARIS", NewTseTcInstanceRepository)
+	registerRepository("TSE/NACOS", NewTseTcInstanceRepository)
 }
 
-type ZookeeperTcInstanceRepository struct {
+type TseTcInstanceRepository struct {
 	client *sdk.Client
 	logger log.Logger
 }
 
-func (repo *ZookeeperTcInstanceRepository) GetInstanceKey() string {
+func (repo *TseTcInstanceRepository) GetInstanceKey() string {
 	return "InstanceId"
 }
 
-func (repo *ZookeeperTcInstanceRepository) Get(id string) (instance TcInstance, err error) {
+func (repo *TseTcInstanceRepository) Get(id string) (instance TcInstance, err error) {
 	req := sdk.NewDescribeSREInstancesRequest()
 	// req.Filters.Name = []*string{&id}
 	resp, err := repo.client.DescribeSREInstances(req)
@@ -35,18 +37,18 @@ func (repo *ZookeeperTcInstanceRepository) Get(id string) (instance TcInstance, 
 		return nil, fmt.Errorf("Response instanceDetails size != 1, id=%s ", id)
 	}
 	meta := resp.Response.Content[0]
-	instance, err = NewZookeeperTcInstance(id, meta)
+	instance, err = NewTseTcInstance(id, meta)
 	if err != nil {
 		return
 	}
 	return
 }
 
-func (repo *ZookeeperTcInstanceRepository) ListByIds(id []string) (instances []TcInstance, err error) {
+func (repo *TseTcInstanceRepository) ListByIds(id []string) (instances []TcInstance, err error) {
 	return
 }
 
-func (repo *ZookeeperTcInstanceRepository) ListByFilters(filters map[string]string) (instances []TcInstance, err error) {
+func (repo *TseTcInstanceRepository) ListByFilters(filters map[string]string) (instances []TcInstance, err error) {
 	req := sdk.NewDescribeSREInstancesRequest()
 	var offset int64 = 0
 	var limit int64 = 100
@@ -64,9 +66,9 @@ getMoreInstances:
 		total = int64(*resp.Response.TotalCount)
 	}
 	for _, meta := range resp.Response.Content {
-		ins, e := NewZookeeperTcInstance(*meta.InstanceId, meta)
+		ins, e := NewTseTcInstance(*meta.InstanceId, meta)
 		if e != nil {
-			level.Error(repo.logger).Log("msg", "Create tdmq instance fail", "id", *meta.InstanceId)
+			level.Error(repo.logger).Log("msg", "Create tse instance fail", "id", *meta.InstanceId)
 			continue
 		}
 		instances = append(instances, ins)
@@ -80,12 +82,12 @@ getMoreInstances:
 	return
 }
 
-func NewZookeeperTcInstanceRepository(c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
+func NewTseTcInstanceRepository(c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
 	cli, err := client.NewTseClient(c)
 	if err != nil {
 		return
 	}
-	repo = &ZookeeperTcInstanceRepository{
+	repo = &TseTcInstanceRepository{
 		client: cli,
 		logger: logger,
 	}

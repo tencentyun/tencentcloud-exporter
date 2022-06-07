@@ -2,6 +2,7 @@ package collector
 
 import (
 	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/log/level"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
 )
 
@@ -11,14 +12,7 @@ const (
 )
 
 func init() {
-	registerHandler(ZookeeperNamespace, defaultHandlerEnabled, NewTdmqHandler)
-	excludeMetricName = map[string]string{
-		"LogVolume":           "LogVolume",
-		"CurrentBackupVolume": "CurrentBackupVolume",
-		"DataVolume":          "DataVolume",
-		"FreeBackupVolume":    "FreeBackupVolume",
-		"BillingBackupVolume": "BillingBackupVolume",
-	}
+	registerHandler(ZookeeperNamespace, defaultHandlerEnabled, NewZookeeperHandler)
 }
 
 type ZookeeperHandler struct {
@@ -30,7 +24,7 @@ func (h *ZookeeperHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
 }
 
 func (h *ZookeeperHandler) GetNamespace() string {
-	return TdmqNamespace
+	return ZookeeperNamespace
 }
 
 func (h *ZookeeperHandler) IsMetricVaild(m *metric.TcmMetric) bool {
@@ -49,13 +43,13 @@ func (h *ZookeeperHandler) IsMetricVaild(m *metric.TcmMetric) bool {
 }
 
 func NewZookeeperHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
-	handler = &tdmqHandler{
+	handler = &ZookeeperHandler{
 		baseProductHandler{
 			monitorQueryKey: ZookeeperInstanceidKey,
 			collector:       c,
 			logger:          logger,
 		},
 	}
+	level.Warn(c.logger).Log("msg", "NewZookeeperHandler")
 	return
-
 }
