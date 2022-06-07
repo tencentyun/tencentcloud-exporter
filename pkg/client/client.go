@@ -20,6 +20,8 @@ import (
 	pg "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/postgres/v20170312"
 	redis "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/redis/v20180412"
 	sqlserver "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/sqlserver/v20180328"
+	tdmq "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tdmq/v20200217"
+	tse "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tse/v20201207"
 	vpc "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/vpc/v20170312"
 
 	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
@@ -51,7 +53,11 @@ func NewCdbClient(conf *config.TencentConfig) (*cdb.Client, error) {
 		conf.Credential.SecretKey,
 	)
 	cpf := profile.NewClientProfile()
-	cpf.HttpProfile.Endpoint = "cdb.tencentcloudapi.com"
+	if conf.Credential.IsInternal == true {
+		cpf.HttpProfile.Endpoint = "cdb.tencentcloudapi.com"
+	} else {
+		cpf.HttpProfile.Endpoint = "cdb.internal.tencentcloudapi.com"
+	}
 	return cdb.NewClient(credential, conf.Credential.Region, cpf)
 }
 
@@ -195,4 +201,44 @@ func NewDCDBClient(conf *config.TencentConfig) (*dcdb.Client, error) {
 	)
 	cpf := profile.NewClientProfile()
 	return dcdb.NewClient(credential, conf.Credential.Region, cpf)
+}
+
+func NewTDMQClient(conf *config.TencentConfig) (*tdmq.Client, error) {
+	credential := common.NewCredential(
+		conf.Credential.AccessKey,
+		conf.Credential.SecretKey,
+	)
+	cpf := profile.NewClientProfile()
+	cpf.HttpProfile.Endpoint = "tdmq.tencentcloudapi.com"
+	return tdmq.NewClient(credential, conf.Credential.Region, cpf)
+}
+
+func NewTseClient(conf *config.TencentConfig) (*tse.Client, error) {
+	credential := common.NewCredential(
+		conf.Credential.AccessKey,
+		conf.Credential.SecretKey,
+	)
+	cpf := profile.NewClientProfile()
+	cpf.HttpProfile.Endpoint = "tse.tencentcloudapi.com"
+	return tse.NewClient(credential, conf.Credential.Region, cpf)
+}
+
+func NewVpnGWClient(conf *config.TencentConfig) (*tdmq.Client, error) {
+	credential := common.NewCredential(
+		conf.Credential.AccessKey,
+		conf.Credential.SecretKey,
+	)
+	cpf := profile.NewClientProfile()
+	cpf.HttpProfile.Endpoint = "tdmq.tencentcloudapi.com"
+	return tdmq.NewClient(credential, conf.Credential.Region, cpf)
+}
+
+func NewVpnxClient(conf *config.TencentConfig) (*tdmq.Client, error) {
+	credential := common.NewCredential(
+		conf.Credential.AccessKey,
+		conf.Credential.SecretKey,
+	)
+	cpf := profile.NewClientProfile()
+	cpf.HttpProfile.Endpoint = "tdmq.tencentcloudapi.com"
+	return tdmq.NewClient(credential, conf.Credential.Region, cpf)
 }
