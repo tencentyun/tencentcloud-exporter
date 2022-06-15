@@ -7,7 +7,7 @@ import (
 
 const (
 	VpnxNamespace     = "QCE/VPNX"
-	VpnxInstanceidKey = "InstanceId"
+	VpnxInstanceidKey = "vpnConnId"
 )
 
 func init() {
@@ -43,7 +43,7 @@ func (h *VpnxHandler) IsMetricVaild(m *metric.TcmMetric) bool {
 
 func NewVpnxHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
 	handler = &tdmqHandler{
-		baseProductHandler{
+		baseProductHandler: baseProductHandler{
 			monitorQueryKey: VpnxInstanceidKey,
 			collector:       c,
 			logger:          logger,

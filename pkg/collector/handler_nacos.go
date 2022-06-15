@@ -7,7 +7,7 @@ import (
 
 const (
 	NacosNamespace     = "TSE/NACOS"
-	NacosInstanceidKey = "InstanceId"
+	NacosInstanceidKey = "NacosInstanceId"
 )
 
 func init() {

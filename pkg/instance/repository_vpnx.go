@@ -64,9 +64,9 @@ getMoreInstances:
 		total = int64(*resp.Response.TotalCount)
 	}
 	for _, meta := range resp.Response.VpnConnectionSet {
-		ins, e := NewVpnxTcInstance(*meta.VpnGatewayId, meta)
+		ins, e := NewVpnxTcInstance(*meta.VpnConnectionId, meta)
 		if e != nil {
-			level.Error(repo.logger).Log("msg", "Create vpnx instance fail", "id", *meta.VpnGatewayId)
+			level.Error(repo.logger).Log("msg", "Create vpnx instance fail", "id", *meta.VpnConnectionId)
 			continue
 		}
 		instances = append(instances, ins)

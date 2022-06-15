@@ -7,7 +7,7 @@ import (
 
 const (
 	VpngwNamespace     = "QCE/VPNGW"
-	VpngwInstanceidKey = "InstanceId"
+	VpngwInstanceidKey = "vpnGwId"
 )
 
 func init() {
@@ -43,7 +43,7 @@ func (h *VpngwHandler) IsMetricVaild(m *metric.TcmMetric) bool {
 
 func NewVpngwHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
 	handler = &tdmqHandler{
-		baseProductHandler{
+		baseProductHandler: baseProductHandler{
 			monitorQueryKey: VpngwInstanceidKey,
 			collector:       c,
 			logger:          logger,

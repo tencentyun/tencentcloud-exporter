@@ -2,7 +2,6 @@ package collector
 
 import (
 	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
 )
 
@@ -50,6 +49,5 @@ func NewZookeeperHandler(c *TcProductCollector, logger log.Logger) (handler Prod
 			logger:          logger,
 		},
 	}
-	level.Warn(c.logger).Log("msg", "NewZookeeperHandler")
 	return
 }

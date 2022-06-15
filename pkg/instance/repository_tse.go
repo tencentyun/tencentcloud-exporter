@@ -2,7 +2,6 @@ package instance
 
 import (
 	"fmt"
-
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tse/v20201207"
@@ -13,7 +12,6 @@ import (
 
 func init() {
 	registerRepository("TSE/ZOOKEEPER", NewTseTcInstanceRepository)
-	registerRepository("TSE/POLARIS", NewTseTcInstanceRepository)
 	registerRepository("TSE/NACOS", NewTseTcInstanceRepository)
 }
 
@@ -81,6 +79,36 @@ getMoreInstances:
 
 	return
 }
+
+// type TseTcInstanceZookeeperRepository interface {
+// 	GetZookeeperPodInfo(instanceId string) (*sdk.DescribeZookeeperReplicasResponse, error)
+// }
+//
+// type RedisTcInstanceZookeeperRepositoryImpl struct {
+// 	client *sdk.Client
+// 	logger log.Logger
+// }
+//
+// func (repo *RedisTcInstanceZookeeperRepositoryImpl) GetZookeeperPodInfo(instanceId string) (*sdk.DescribeZookeeperReplicasResponse, error) {
+// 	req := sdk.NewDescribeZookeeperReplicasRequest()
+// 	req.InstanceId = common.StringPtr(instanceId)
+// 	return repo.client.DescribeZookeeperReplicas(req)
+// }
+//
+// type TseTcInstanceNacosRepository interface {
+// 	GetZookeeperPodInfo(instanceId string) (*sdk.DescribeNacosReplicasResponse, error)
+// }
+//
+// type RedisTcInstanceNacosRepositoryImpl struct {
+// 	client *sdk.Client
+// 	logger log.Logger
+// }
+//
+// func (repo *RedisTcInstanceNacosRepositoryImpl) GetNacosPodInfo(instanceId string) (*sdk.DescribeNacosReplicasResponse, error) {
+// 	req := sdk.NewDescribeNacosReplicasRequest()
+// 	req.InstanceId = common.StringPtr(instanceId)
+// 	return repo.client.DescribeNacosReplicas(req)
+// }
 
 func NewTseTcInstanceRepository(c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
 	cli, err := client.NewTseClient(c)

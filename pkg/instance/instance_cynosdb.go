@@ -4,26 +4,26 @@ import (
 	"fmt"
 	"reflect"
 
-	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tdmq/v20200217"
+	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cynosdb/v20190107"
 )
 
-type TdmqTcInstance struct {
+type CynosdbTcInstance struct {
 	baseTcInstance
-	meta *sdk.RocketMQClusterDetail
+	meta *sdk.CynosdbInstance
 }
 
-func (ins *TdmqTcInstance) GetMeta() interface{} {
+func (ins *CynosdbTcInstance) GetMeta() interface{} {
 	return ins.meta
 }
 
-func NewTdmqTcInstance(instanceId string, meta *sdk.RocketMQClusterDetail) (ins *TdmqTcInstance, err error) {
+func NewCynosdbTcInstance(instanceId string, meta *sdk.CynosdbInstance) (ins *CynosdbTcInstance, err error) {
 	if instanceId == "" {
 		return nil, fmt.Errorf("instanceId is empty ")
 	}
 	if meta == nil {
 		return nil, fmt.Errorf("meta is empty ")
 	}
-	ins = &TdmqTcInstance{
+	ins = &CynosdbTcInstance{
 		baseTcInstance: baseTcInstance{
 			instanceId: instanceId,
 			value:      reflect.ValueOf(*meta),
