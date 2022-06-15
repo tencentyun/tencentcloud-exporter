@@ -125,7 +125,6 @@ func (repo *TcmMetricRepositoryImpl) GetSamples(s *TcmSeries, st int64, et int64
 	}
 
 	response, err := repo.monitorClient.GetMonitorData(request)
-	level.Info(repo.logger).Log("requestId",response.Response.RequestId)
 	if err != nil {
 		return
 	}
@@ -172,7 +171,6 @@ func (repo *TcmMetricRepositoryImpl) listSampleByBatch(
 
 	request := repo.buildGetMonitorDataRequest(m, seriesList, st, et)
 	response, err := repo.monitorClient.GetMonitorData(request)
-	level.Info(repo.logger).Log("requestId",response.Response.RequestId)
 	if err != nil {
 		return nil, err
 	}
