@@ -6,7 +6,7 @@ credential:
 rate_limit: 15                #云监控拉数据接口最大限制, 20/秒, 1200/分钟, https://cloud.tencent.com/document/product/248/31014
 
 products:
-  - namespace: QCE/TDMQ    #指标详情: https://cloud.tencent.com/document/product/248/45411
+  - namespace: QCE/TDMQ    #指标详情: https://cloud.tencent.com/document/product/248/51450#tdmq-rocketmq-.E7.89.88
     all_metrics: true
     all_instances: true
     only_include_metrics: ["MsgAverageSize","MsgRateIn","MsgThroughputIn","InMessagesTotal","StorageSize","TenantInMessagesTotal","TenantMsgAverageSize","TenantRateIn","TenantRateOut","TenantStorageSize"]
