@@ -2,7 +2,6 @@ package instance
 
 import (
 	"fmt"
-
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cynosdb/v20190107"
@@ -88,6 +87,7 @@ getMoreInstances:
 
 	return
 }
+
 
 func NewCynosdbTcInstanceRepository(c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
 	cli, err := client.NewCynosdbClient(c)
