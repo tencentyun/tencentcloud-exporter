@@ -63,9 +63,9 @@ func NewCdbClient(conf *config.TencentConfig) (*cdb.Client, error) {
 	)
 	cpf := profile.NewClientProfile()
 	if conf.Credential.IsInternal == true {
-		cpf.HttpProfile.Endpoint = "cdb.tencentcloudapi.com"
-	} else {
 		cpf.HttpProfile.Endpoint = "cdb.internal.tencentcloudapi.com"
+	} else {
+		cpf.HttpProfile.Endpoint = "cdb.tencentcloudapi.com"
 	}
 	return cdb.NewClient(credential, conf.Credential.Region, cpf)
 }
