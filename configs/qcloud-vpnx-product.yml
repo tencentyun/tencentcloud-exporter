@@ -1,0 +1,11 @@
+credential:
+  access_key: "access_key"
+  secret_key: "secret_key"
+  region: "region"
+
+rate_limit: 15                #云监控拉数据接口最大限制, 20/秒, 1200/分钟, https://cloud.tencent.com/document/product/248/31014
+
+products:
+  - namespace: QCE/VPNX    #指标详情: https://cloud.tencent.com/document/product/248/45071
+    all_metrics: true
+    all_instances: true

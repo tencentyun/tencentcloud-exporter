@@ -55,7 +55,13 @@ var (
 		"lighthouse":    "QCE/LIGHTHOUSE",
 		"ckafka":        "QCE/CKAFKA",
 		"tdmysql":       "QCE/TDMYSQL",
-		"lb":            "QCE/LB", // for eip
+		"lb":            "QCE/LB",            // for eip
+		"tdmq":          "QCE/TDMQ",          // for tdmq
+		// "zookeeper":     "TSE/ZOOKEEPER",     // for zookeeper
+		// "nacos":         "TSE/NACOS",         // for nacos
+		"vpngw":         "QCE/VPNGW",         // for vpngw
+		"vpnx":          "QCE/VPNX",          // for vpnx
+		"cynosdb_mysql": "QCE/CYNOSDB_MYSQL", // for cynosdb_mysql
 	}
 
 	SupportStatisticsTypes = map[string]bool{
@@ -67,9 +73,10 @@ var (
 )
 
 type TencentCredential struct {
-	AccessKey string `yaml:"access_key"`
-	SecretKey string `yaml:"secret_key"`
-	Region    string `yaml:"region"`
+	AccessKey  string `yaml:"access_key"`
+	SecretKey  string `yaml:"secret_key"`
+	Region     string `yaml:"region"`
+	IsInternal bool   `yaml:"is_internal"`
 }
 
 type TencentMetric struct {

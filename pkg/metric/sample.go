@@ -23,7 +23,7 @@ func (s *TcmSamples) GetLatestPoint() (point *TcmSample, err error) {
 	if len(s.Samples) == 1 {
 		return s.Samples[0], nil
 	} else {
-		return s.Samples[len(s.Samples)-2], nil
+		return s.Samples[len(s.Samples)-1], nil
 	}
 }
 
