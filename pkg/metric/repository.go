@@ -55,7 +55,6 @@ func (repo *TcmMetricRepositoryImpl) GetMeta(namespace string, name string) (met
 	request := monitor.NewDescribeBaseMetricsRequest()
 	request.Namespace = &namespace
 	request.MetricName = &name
-	repo.credential.Refresh()
 	response, err := repo.monitorClient.DescribeBaseMetrics(request)
 	if err != nil {
 		return
@@ -82,7 +81,6 @@ func (repo *TcmMetricRepositoryImpl) ListMetaByNamespace(namespace string) (meta
 
 	request := monitor.NewDescribeBaseMetricsRequest()
 	request.Namespace = &namespace
-	repo.credential.Refresh()
 	response, err := repo.monitorClient.DescribeBaseMetrics(request)
 	if err != nil {
 		return
@@ -130,7 +128,6 @@ func (repo *TcmMetricRepositoryImpl) GetSamples(s *TcmSeries, st int64, et int64
 		request.StartTime = &etStr
 	}
 
-	repo.credential.Refresh()
 	response, err := repo.monitorClient.GetMonitorData(request)
 	if err != nil {
 		return
@@ -177,7 +174,6 @@ func (repo *TcmMetricRepositoryImpl) listSampleByBatch(
 	}
 
 	request := repo.buildGetMonitorDataRequest(m, seriesList, st, et)
-	repo.credential.Refresh()
 	response, err := repo.monitorClient.GetMonitorData(request)
 	if err != nil {
 		return nil, err

@@ -29,7 +29,6 @@ func (repo *MemcachedTcInstanceRepository) GetInstanceKey() string {
 func (repo *MemcachedTcInstanceRepository) Get(id string) (instance TcInstance, err error) {
 	req := sdk.NewDescribeInstancesRequest()
 	req.InstanceIds = []*string{&id}
-	repo.credential.Refresh()
 	resp, err := repo.client.DescribeInstances(req)
 	if err != nil {
 		return
@@ -59,7 +58,6 @@ func (repo *MemcachedTcInstanceRepository) ListByFilters(filters map[string]stri
 	req.Limit = &limit
 
 getMoreInstances:
-	repo.credential.Refresh()
 	resp, err := repo.client.DescribeInstances(req)
 	if err != nil {
 		return

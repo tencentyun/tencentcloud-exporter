@@ -29,7 +29,6 @@ func (repo *CMQTcInstanceRepository) GetInstanceKey() string {
 func (repo *CMQTcInstanceRepository) Get(id string) (instance TcInstance, err error) {
 	req := sdk.NewDescribeQueueDetailRequest()
 	req.QueueName = &id
-	repo.credential.Refresh()
 	resp, err := repo.client.DescribeQueueDetail(req)
 	if err != nil {
 		return
@@ -59,7 +58,6 @@ func (repo *CMQTcInstanceRepository) ListByFilters(filters map[string]string) (i
 	req.Limit = &limit
 
 getMoreInstances:
-	repo.credential.Refresh()
 	resp, err := repo.client.DescribeQueueDetail(req)
 	if err != nil {
 		return

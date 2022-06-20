@@ -29,7 +29,6 @@ func (repo *NatTcInstanceRepository) GetInstanceKey() string {
 func (repo *NatTcInstanceRepository) Get(id string) (instance TcInstance, err error) {
 	req := sdk.NewDescribeNatGatewaysRequest()
 	req.NatGatewayIds = []*string{&id}
-	repo.credential.Refresh()
 	resp, err := repo.client.DescribeNatGateways(req)
 	if err != nil {
 		return
@@ -58,7 +57,6 @@ func (repo *NatTcInstanceRepository) ListByFilters(filters map[string]string) (i
 	req.Limit = &limit
 
 getMoreInstances:
-	repo.credential.Refresh()
 	resp, err := repo.client.DescribeNatGateways(req)
 	if err != nil {
 		return

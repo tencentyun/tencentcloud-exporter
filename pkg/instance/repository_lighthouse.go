@@ -29,7 +29,6 @@ func (repo *LighthouseTcInstanceRepository) GetInstanceKey() string {
 func (repo *LighthouseTcInstanceRepository) Get(id string) (instance TcInstance, err error) {
 	req := sdk.NewDescribeInstancesRequest()
 	req.InstanceIds = []*string{&id}
-	repo.credential.Refresh()
 	resp, err := repo.client.DescribeInstances(req)
 	if err != nil {
 		return
@@ -59,7 +58,6 @@ func (repo *LighthouseTcInstanceRepository) ListByFilters(filters map[string]str
 	req.Limit = &limit
 
 getMoreInstances:
-	repo.credential.Refresh()
 	resp, err := repo.client.DescribeInstances(req)
 	if err != nil {
 		return

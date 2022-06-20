@@ -98,7 +98,18 @@ func main() {
 		level.Info(logger).Log("msg", "Load config ok")
 	}
 
-	cred := common.NewCredential(tencentConfig.Credential.Role)
+	cred, err := common.NewCredential(tencentConfig.Credential.Role)
+	if err != nil {
+		level.Error(logger).Log("msg", "init cred error", "err", err)
+		panic(err)
+	}
+	go func() {
+		err := cred.Refresh()
+		if err != nil {
+			level.Error(logger).Log("msg", "cred refresh error", "err", err)
+			panic(err)
+		}
+	}()
 
 	handler, err := newHandler(cred, tencentConfig, *enableExporterMetrics, *maxRequests, logger)
 	if err != nil {

@@ -30,7 +30,6 @@ func (repo *SqlServerTcInstanceRepository) GetInstanceKey() string {
 func (repo *SqlServerTcInstanceRepository) Get(id string) (instance TcInstance, err error) {
 	req := sdk.NewDescribeDBInstancesRequest()
 	req.InstanceIdSet = []*string{&id}
-	repo.credential.Refresh()
 	resp, err := repo.client.DescribeDBInstances(req)
 	if err != nil {
 		return
@@ -60,7 +59,6 @@ func (repo *SqlServerTcInstanceRepository) ListByFilters(filters map[string]stri
 	req.Limit = &limit
 
 getMoreInstances:
-	repo.credential.Refresh()
 	resp, err := repo.client.DescribeDBInstances(req)
 	if err != nil {
 		return

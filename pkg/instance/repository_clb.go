@@ -42,7 +42,6 @@ func (repo *ClbTcInstanceRepository) Get(id string) (instance TcInstance, err er
 		req.LoadBalancerIds = []*string{&id}
 	}
 	req.LoadBalancerType = &open
-	repo.credential.Refresh()
 	resp, err := repo.client.DescribeLoadBalancers(req)
 	if err != nil {
 		return
@@ -76,7 +75,6 @@ func (repo *ClbTcInstanceRepository) ListByFilters(filters map[string]string) (i
 	req.LoadBalancerType = &open
 
 getMoreInstances:
-	repo.credential.Refresh()
 	resp, err := repo.client.DescribeLoadBalancers(req)
 	if err != nil {
 		return

@@ -46,7 +46,6 @@ func (repo *RedisTcInstanceRepository) GetInstanceKey() string {
 func (repo *RedisTcInstanceRepository) Get(id string) (instance TcInstance, err error) {
 	req := sdk.NewDescribeInstancesRequest()
 	req.InstanceId = &id
-	repo.credential.Refresh()
 	resp, err := repo.client.DescribeInstances(req)
 	if err != nil {
 		return
@@ -76,7 +75,6 @@ func (repo *RedisTcInstanceRepository) ListByFilters(filters map[string]string) 
 	req.Status = []*int64{common.Int64Ptr(2)}
 
 getMoreInstances:
-	repo.credential.Refresh()
 	resp, err := repo.client.DescribeInstances(req)
 	if err != nil {
 		return
@@ -114,7 +112,6 @@ type RedisTcInstanceNodeRepositoryImpl struct {
 func (repo *RedisTcInstanceNodeRepositoryImpl) GetNodeInfo(instanceId string) (*sdk.DescribeInstanceNodeInfoResponse, error) {
 	req := sdk.NewDescribeInstanceNodeInfoRequest()
 	req.InstanceId = common.StringPtr(instanceId)
-	repo.credential.Refresh()
 	return repo.client.DescribeInstanceNodeInfo(req)
 }
 

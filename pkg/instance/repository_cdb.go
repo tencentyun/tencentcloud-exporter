@@ -29,7 +29,6 @@ func (repo *CdbTcInstanceRepository) GetInstanceKey() string {
 func (repo *CdbTcInstanceRepository) Get(id string) (instance TcInstance, err error) {
 	req := sdk.NewDescribeDBInstancesRequest()
 	req.InstanceIds = []*string{&id}
-	repo.credential.Refresh()
 	resp, err := repo.client.DescribeDBInstances(req)
 	if err != nil {
 		return
@@ -59,7 +58,6 @@ func (repo *CdbTcInstanceRepository) ListByFilters(filters map[string]string) (i
 	req.Limit = &limit
 
 getMoreInstances:
-	repo.credential.Refresh()
 	resp, err := repo.client.DescribeDBInstances(req)
 	if err != nil {
 		return

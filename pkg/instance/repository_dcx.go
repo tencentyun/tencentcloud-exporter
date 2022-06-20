@@ -29,7 +29,6 @@ func (repo *DcxTcInstanceRepository) GetInstanceKey() string {
 func (repo *DcxTcInstanceRepository) Get(id string) (instance TcInstance, err error) {
 	req := sdk.NewDescribeDirectConnectTunnelsRequest()
 	req.DirectConnectTunnelIds = []*string{&id}
-	repo.credential.Refresh()
 	resp, err := repo.client.DescribeDirectConnectTunnels(req)
 	if err != nil {
 		return
@@ -58,7 +57,6 @@ func (repo *DcxTcInstanceRepository) ListByFilters(filters map[string]string) (i
 	req.Limit = &limit
 
 getMoreInstances:
-	repo.credential.Refresh()
 	resp, err := repo.client.DescribeDirectConnectTunnels(req)
 	if err != nil {
 		return

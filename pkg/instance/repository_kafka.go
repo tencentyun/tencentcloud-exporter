@@ -29,7 +29,6 @@ func (repo *KafkaTcInstanceRepository) GetInstanceKey() string {
 func (repo *KafkaTcInstanceRepository) Get(id string) (instance TcInstance, err error) {
 	req := sdk.NewDescribeInstancesRequest()
 	req.InstanceId = &id
-	repo.credential.Refresh()
 	resp, err := repo.client.DescribeInstances(req)
 	if err != nil {
 		return
@@ -59,7 +58,6 @@ func (repo *KafkaTcInstanceRepository) ListByFilters(filters map[string]string) 
 	req.Limit = &limit
 
 getMoreInstances:
-	repo.credential.Refresh()
 	resp, err := repo.client.DescribeInstances(req)
 	if err != nil {
 		return

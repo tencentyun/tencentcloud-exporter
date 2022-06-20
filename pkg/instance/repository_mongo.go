@@ -30,7 +30,6 @@ func (repo *MongoTcInstanceRepository) GetInstanceKey() string {
 func (repo *MongoTcInstanceRepository) Get(id string) (instance TcInstance, err error) {
 	req := sdk.NewDescribeDBInstancesRequest()
 	req.InstanceIds = []*string{&id}
-	repo.credential.Refresh()
 	resp, err := repo.client.DescribeDBInstances(req)
 	if err != nil {
 		return
@@ -71,7 +70,6 @@ func (repo *MongoTcInstanceRepository) ListByFilters(filters map[string]string) 
 	}
 
 getMoreInstances:
-	repo.credential.Refresh()
 	resp, err := repo.client.DescribeDBInstances(req)
 	if err != nil {
 		return

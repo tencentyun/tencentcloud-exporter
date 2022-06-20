@@ -34,7 +34,6 @@ func (repo *PGTcInstanceRepository) Get(id string) (instance TcInstance, err err
 		Name:   &idKey,
 		Values: []*string{&id},
 	}}
-	repo.credential.Refresh()
 	resp, err := repo.client.DescribeDBInstances(req)
 	if err != nil {
 		return
@@ -64,7 +63,6 @@ func (repo *PGTcInstanceRepository) ListByFilters(filters map[string]string) (in
 	req.Limit = &limit
 
 getMoreInstances:
-	repo.credential.Refresh()
 	resp, err := repo.client.DescribeDBInstances(req)
 	if err != nil {
 		return

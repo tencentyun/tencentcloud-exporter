@@ -29,7 +29,6 @@ func (repo *CMQTopicTcInstanceRepository) GetInstanceKey() string {
 func (repo *CMQTopicTcInstanceRepository) Get(id string) (instance TcInstance, err error) {
 	req := sdk.NewDescribeTopicDetailRequest()
 	req.TopicName = &id
-	repo.credential.Refresh()
 	resp, err := repo.client.DescribeTopicDetail(req)
 	if err != nil {
 		return
@@ -59,7 +58,6 @@ func (repo *CMQTopicTcInstanceRepository) ListByFilters(filters map[string]strin
 	req.Limit = &limit
 
 getMoreInstances:
-	repo.credential.Refresh()
 	resp, err := repo.client.DescribeTopicDetail(req)
 	if err != nil {
 		return

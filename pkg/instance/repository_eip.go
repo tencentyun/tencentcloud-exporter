@@ -29,7 +29,6 @@ func (repo *EIPTcInstanceRepository) GetInstanceKey() string {
 func (repo *EIPTcInstanceRepository) Get(id string) (instance TcInstance, err error) {
 	req := sdk.NewDescribeAddressesRequest()
 	req.AddressIds = []*string{&id}
-	repo.credential.Refresh()
 	resp, err := repo.client.DescribeAddresses(req)
 	if err != nil {
 		return
@@ -59,7 +58,6 @@ func (repo *EIPTcInstanceRepository) ListByFilters(filters map[string]string) (i
 	req.Limit = &limit
 
 getMoreInstances:
-	repo.credential.Refresh()
 	resp, err := repo.client.DescribeAddresses(req)
 	if err != nil {
 		return

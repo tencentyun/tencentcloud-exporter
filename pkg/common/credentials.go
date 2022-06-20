@@ -34,15 +34,18 @@ type metadataResponse struct {
 }
 
 func (c *Credential) Refresh() error {
-	c.Lock()
-	defer c.Unlock()
-
-	if time.Now().Unix() > c.ExpiredTime-60 {
-		if err := c.refresh(); err != nil {
-			return err
+	tick := time.NewTicker(10 * time.Minute)
+	defer tick.Stop()
+	for {
+		select {
+		case <-tick.C:
+			if time.Now().Unix() > c.ExpiredTime-720 {
+				if err := c.refresh(); err != nil {
+					return err
+				}
+			}
 		}
 	}
-	return nil
 }
 
 func (c *Credential) refresh() error {
@@ -85,10 +88,12 @@ func (c *Credential) refresh() error {
 	return nil
 }
 
-func NewCredential(role string) *Credential {
-	return &Credential{
+func NewCredential(role string) (*Credential, error) {
+	c := &Credential{
 		Role: role,
 	}
+	err := c.refresh()
+	return c, err
 }
 
 func NewTokenCredential(secretId, secretKey, token string) *Credential {

@@ -29,7 +29,6 @@ func (repo *CbsTcInstanceRepository) GetInstanceKey() string {
 func (repo *CbsTcInstanceRepository) Get(id string) (instance TcInstance, err error) {
 	req := sdk.NewDescribeDisksRequest()
 	req.DiskIds = []*string{&id}
-	repo.credential.Refresh()
 	resp, err := repo.client.DescribeDisks(req)
 	if err != nil {
 		return
@@ -59,7 +58,6 @@ func (repo *CbsTcInstanceRepository) ListByFilters(filters map[string]string) (i
 	req.Limit = &limit
 
 getMoreInstances:
-	repo.credential.Refresh()
 	resp, err := repo.client.DescribeDisks(req)
 	if err != nil {
 		return
