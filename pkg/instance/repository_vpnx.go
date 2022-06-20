@@ -8,6 +8,7 @@ import (
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/vpc/v20170312"
 
 	"github.com/tencentyun/tencentcloud-exporter/pkg/client"
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
 )
 
@@ -80,8 +81,8 @@ getMoreInstances:
 	return
 }
 
-func NewVpnxTcInstanceRepository(c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
-	cli, err := client.NewVpvClient(c)
+func NewVpnxTcInstanceRepository(cred common.CredentialIface, c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
+	cli, err := client.NewVpvClient(cred, c)
 	if err != nil {
 		return
 	}

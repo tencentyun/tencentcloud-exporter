@@ -2,6 +2,7 @@ package collector
 
 import (
 	"github.com/go-kit/kit/log"
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
 )
 
@@ -41,7 +42,7 @@ func (h *VpngwHandler) IsMetricVaild(m *metric.TcmMetric) bool {
 	return true
 }
 
-func NewVpngwHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
+func NewVpngwHandler(cred common.CredentialIface, c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
 	handler = &tdmqHandler{
 		baseProductHandler: baseProductHandler{
 			monitorQueryKey: VpngwInstanceidKey,

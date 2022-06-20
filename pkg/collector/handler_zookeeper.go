@@ -2,6 +2,7 @@ package collector
 
 import (
 	"github.com/go-kit/kit/log"
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
 )
 
@@ -41,7 +42,7 @@ func (h *ZookeeperHandler) IsMetricVaild(m *metric.TcmMetric) bool {
 	return true
 }
 
-func NewZookeeperHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
+func NewZookeeperHandler(cred common.CredentialIface, c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
 	handler = &ZookeeperHandler{
 		baseProductHandler{
 			monitorQueryKey: ZookeeperInstanceidKey,

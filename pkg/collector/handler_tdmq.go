@@ -2,12 +2,14 @@ package collector
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/instance"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
-	"time"
 )
 
 const (
@@ -185,15 +187,15 @@ func (h *tdmqHandler) getNamespaceSeries(m *metric.TcmMetric, ins instance.TcIns
 	return series, nil
 }
 
-func NewTdmqHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
-	namespaceRepo, err := instance.NewTdmqTcInstanceRocketMQNameSpacesRepository(c.Conf, logger)
+func NewTdmqHandler(cred common.CredentialIface, c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
+	namespaceRepo, err := instance.NewTdmqTcInstanceRocketMQNameSpacesRepository(cred, c.Conf, logger)
 	if err != nil {
 		return nil, err
 	}
 	relodInterval := time.Duration(c.ProductConf.RelodIntervalMinutes * int64(time.Minute))
 	namespaceRepoCahe := instance.NewTcTdmqInstanceNamespaceCache(namespaceRepo, relodInterval, logger)
 
-	topicRepo, err := instance.NewTdmqTcInstanceRocketMQTopicsRepository(c.Conf, logger)
+	topicRepo, err := instance.NewTdmqTcInstanceRocketMQTopicsRepository(cred, c.Conf, logger)
 	if err != nil {
 		return nil, err
 	}
