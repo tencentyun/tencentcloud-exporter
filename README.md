@@ -29,9 +29,13 @@ CMQ 主题订阅|QCE/CMQTOPIC|[指标详情](https://cloud.tencent.com/document/
 PostgreSQL|QCE/POSTGRES|[指标详情](https://cloud.tencent.com/document/product/248/45105)
 CKafka 实例|QCE/CKAFKA|[指标详情](https://cloud.tencent.com/document/product/248/45121)
 Memcached |QCE/MEMCACHED|指标详情说明文档(待上线)
-Lighthouse |QCE/LIGHTHOUSE|指标详情说明文档(待上线)
+Lighthouse |QCE/LIGHTHOUSE|[指标详情](https://cloud.tencent.com/document/product/248/60127)
 分布式数据库 TDSQL MySQL 实例|QCE/TDMYSQL|[指标详情](https://cloud.tencent.com/document/product/248/54401)
 弹性公网 IP|QCE/LB|[指标详情](https://cloud.tencent.com/document/product/248/45099)
+TDMQ RocketMQ 版|QCE/TDMQ|[指标详情](https://cloud.tencent.com/document/product/248/51450#tdmq-rocketmq-.E7.89.88)
+VPN 网关|QCE/VPNGW|[指标详情](https://cloud.tencent.com/document/product/248/45070)
+VPN 通道|QCE/VPNX|[指标详情](https://cloud.tencent.com/document/product/248/45071)
+CYNOSDB_MYSQL|QCE/CYNOSDB_MYSQL|[指标详情](https://cloud.tencent.com/document/product/248/45106)
 
 `后续会有更多的产品支持`
 

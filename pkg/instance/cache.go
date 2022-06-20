@@ -1,10 +1,12 @@
 package instance
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/redis/v20180412"
+	tdmq "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tdmq/v20200217"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
@@ -148,6 +150,88 @@ func NewTcRedisInstanceNodeCache(repo RedisTcInstanceNodeRepository, reloadInter
 	cache := &TcRedisInstanceNodeCache{
 		Raw:            repo,
 		cache:          map[string]*sdk.DescribeInstanceNodeInfoResponse{},
+		lastReloadTime: map[string]time.Time{},
+		reloadInterval: reloadInterval,
+		logger:         logger,
+	}
+	return cache
+}
+
+// tdmq
+type TcTdmqInstanceNamespaceCache struct {
+	Raw            TdmqTcInstanceRocketMQNameSpacesRepository
+	cache          map[string]*tdmq.DescribeRocketMQNamespacesResponse
+	lastReloadTime map[string]time.Time
+	reloadInterval time.Duration
+	mu             sync.Mutex
+
+	logger log.Logger
+}
+
+func (c *TcTdmqInstanceNamespaceCache) GetRocketMQNamespacesInfo(instanceId string) (*tdmq.DescribeRocketMQNamespacesResponse, error) {
+	lrtime, exists := c.lastReloadTime[instanceId]
+	if exists && time.Now().Sub(lrtime) < c.reloadInterval {
+		namespace, ok := c.cache[instanceId]
+		if ok {
+			return namespace, nil
+		}
+	}
+
+	namespace, err := c.Raw.GetRocketMQNamespacesInfo(instanceId)
+	if err != nil {
+		return nil, err
+	}
+	c.cache[instanceId] = namespace
+	c.lastReloadTime[instanceId] = time.Now()
+	level.Debug(c.logger).Log("msg", "Get RocketMQ Namespaces info from api", "instanceId", instanceId)
+	return namespace, nil
+}
+
+func NewTcTdmqInstanceNamespaceCache(repo TdmqTcInstanceRocketMQNameSpacesRepository, reloadInterval time.Duration, logger log.Logger) TdmqTcInstanceRocketMQNameSpacesRepository {
+	cache := &TcTdmqInstanceNamespaceCache{
+		Raw:            repo,
+		cache:          map[string]*tdmq.DescribeRocketMQNamespacesResponse{},
+		lastReloadTime: map[string]time.Time{},
+		reloadInterval: reloadInterval,
+		logger:         logger,
+	}
+	return cache
+}
+
+type TcTdmqInstanceTopicsCache struct {
+	Raw            TdmqTcInstanceRocketMQTopicsRepository
+	cache          map[string]*tdmq.DescribeRocketMQTopicsResponse
+	lastReloadTime map[string]time.Time
+	reloadInterval time.Duration
+	mu             sync.Mutex
+
+	logger log.Logger
+}
+
+func (c *TcTdmqInstanceTopicsCache) GetRocketMQTopicsInfo(instanceId string, namespaceId string) (*tdmq.DescribeRocketMQTopicsResponse, error) {
+	lrtime, exists := c.lastReloadTime[instanceId]
+	if exists && time.Now().Sub(lrtime) < c.reloadInterval {
+		topic, ok := c.cache[instanceId]
+		if ok {
+			return topic, nil
+		}
+	}
+
+	topic, err := c.Raw.GetRocketMQTopicsInfo(instanceId, namespaceId)
+	if err != nil {
+		return nil, err
+	}
+	instanceIdNamspace := fmt.Sprintf("%v-%v", instanceId, namespaceId)
+	c.cache[instanceIdNamspace] = topic
+	c.lastReloadTime[instanceId] = time.Now()
+	level.Debug(c.logger).Log("msg", "Get RocketMQ Namespaces info from api", "instanceId", instanceId)
+	return topic, nil
+}
+
+func NewTcTdmqInstanceTopicsCache(repo TdmqTcInstanceRocketMQTopicsRepository, reloadInterval time.Duration, logger log.Logger) TdmqTcInstanceRocketMQTopicsRepository {
+	cache := &TcTdmqInstanceTopicsCache{
+		Raw:            repo,
+		cache:          map[string]*tdmq.DescribeRocketMQTopicsResponse{},
 		lastReloadTime: map[string]time.Time{},
 		reloadInterval: reloadInterval,
 		logger:         logger,
