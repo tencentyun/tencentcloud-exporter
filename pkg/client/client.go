@@ -3,6 +3,7 @@ package client
 import (
 	cbs "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cbs/v20170312"
 	cdb "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cdb/v20170320"
+	cdn "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cdn/v20180606"
 	kafka "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/ckafka/v20190819"
 	clb "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/clb/v20180317"
 	cmq "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cmq/v20190304"
@@ -24,6 +25,10 @@ import (
 	tdmq "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tdmq/v20200217"
 	tse "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tse/v20201207"
 	vpc "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/vpc/v20170312"
+	"net/http"
+	"net/url"
+
+	cos "github.com/tencentyun/cos-go-sdk-v5"
 
 	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
 )
@@ -320,4 +325,31 @@ func NewCynosdbClient(conf *config.TencentConfig) (*cynosdb.Client, error) {
 		cpf.HttpProfile.Endpoint = "cynosdb.tencentcloudapi.com"
 	}
 	return cynosdb.NewClient(credential, conf.Credential.Region, cpf)
+}
+
+func NewCdnClient(conf *config.TencentConfig) (*cdn.Client, error) {
+	credential := common.NewCredential(
+		conf.Credential.AccessKey,
+		conf.Credential.SecretKey,
+	)
+	cpf := profile.NewClientProfile()
+	if conf.Credential.IsInternal == true {
+		cpf.HttpProfile.Endpoint = "cdn.internal.tencentcloudapi.com"
+	} else {
+		cpf.HttpProfile.Endpoint = "cdn.tencentcloudapi.com"
+	}
+	return cdn.NewClient(credential, "", cpf)
+}
+
+func NewCosClient(conf *config.TencentConfig) (*cos.Client, error) {
+	// 用于Get Service 查询, service域名暂时只支持外网
+	su, _ := url.Parse("http://cos." + conf.Credential.Region + ".tencentcos.cn")
+	b := &cos.BaseURL{BucketURL: nil, ServiceURL: su}
+	client := cos.NewClient(b, &http.Client{
+		Transport: &cos.AuthorizationTransport{
+			SecretID:  conf.Credential.AccessKey,
+			SecretKey: conf.Credential.SecretKey,
+		},
+	})
+	return client, nil
 }

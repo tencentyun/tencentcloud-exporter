@@ -57,8 +57,8 @@ var (
 		"tdmysql":       "QCE/TDMYSQL",
 		"lb":            "QCE/LB",            // for eip
 		"tdmq":          "QCE/TDMQ",          // for tdmq
-		// "zookeeper":     "TSE/ZOOKEEPER",     // for zookeeper
-		// "nacos":         "TSE/NACOS",         // for nacos
+		"zookeeper":     "TSE/ZOOKEEPER",     // for zookeeper
+		"nacos":         "TSE/NACOS",         // for nacos
 		"vpngw":         "QCE/VPNGW",         // for vpngw
 		"vpnx":          "QCE/VPNX",          // for vpnx
 		"cynosdb_mysql": "QCE/CYNOSDB_MYSQL", // for cynosdb_mysql
