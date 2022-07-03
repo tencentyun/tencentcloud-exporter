@@ -7,8 +7,8 @@ import (
 
 	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
 
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	"golang.org/x/time/rate"
 
 	monitor "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/monitor/v20180724"

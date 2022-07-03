@@ -8,8 +8,8 @@ import (
 
 	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
 
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
@@ -55,9 +55,6 @@ func (n *TcMonitorCollector) Describe(ch chan<- *prometheus.Desc) {
 }
 
 func (n *TcMonitorCollector) Collect(ch chan<- prometheus.Metric) {
-	n.lock.Lock()
-	defer n.lock.Unlock()
-
 	wg := sync.WaitGroup{}
 	wg.Add(len(n.Collectors))
 	for name, c := range n.Collectors {

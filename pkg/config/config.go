@@ -17,6 +17,7 @@ const (
 	DefaultRelodIntervalMinutes = 60
 	DefaultRateLimit            = 15
 	DefaultQueryMetricBatchSize = 50
+	DefaultCacheInterval        = 60
 
 	EnvAccessKey = "TENCENTCLOUD_SECRET_ID"
 	EnvSecretKey = "TENCENTCLOUD_SECRET_KEY"
@@ -137,6 +138,7 @@ type TencentConfig struct {
 	RateLimit            float64           `yaml:"rate_limit"`
 	MetricQueryBatchSize int               `yaml:"metric_query_batch_size"`
 	Filename             string            `yaml:"filename"`
+	CacheInterval        int64             `yaml:"cache_interval"` // 单位 s
 }
 
 func NewConfig() *TencentConfig {
@@ -249,6 +251,10 @@ func (c *TencentConfig) fillDefault() {
 			c.Products[index].RelodIntervalMinutes = DefaultRelodIntervalMinutes
 		}
 	}
+
+	if c.CacheInterval == 0 {
+		c.CacheInterval = DefaultCacheInterval
+	}
 }
 
 func (c *TencentConfig) GetNamespaces() (nps []string) {
@@ -300,5 +306,4 @@ func GetStandardNamespaceFromCustomNamespace(cns string) string {
 	} else {
 		panic(fmt.Sprintf("Product not support, namespace=%s, product=%s", cns, pname))
 	}
-
 }

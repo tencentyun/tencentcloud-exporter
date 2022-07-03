@@ -6,8 +6,8 @@ import (
 
 	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
 
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/clb/v20180317"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/client"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
@@ -86,6 +86,10 @@ getMoreInstances:
 		ins, e := NewClbTcInstance(*meta.LoadBalancerId, meta)
 		if e != nil {
 			level.Error(repo.logger).Log("msg", "Create clb instance fail", "id", *meta.LoadBalancerId)
+			continue
+		}
+		if meta.LoadBalancerVips == nil || len(meta.LoadBalancerVips) == 0 {
+			level.Warn(repo.logger).Log("msg", "clb instance no include vip", "id", *meta.LoadBalancerId)
 			continue
 		}
 		instances = append(instances, ins)

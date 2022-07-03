@@ -4,11 +4,14 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
+
+	"github.com/tencentyun/tencentcloud-exporter/pkg/cachedtransactiongather"
 
 	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
 
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/common/promlog"
@@ -40,8 +43,11 @@ func newHandler(cred common.CredentialIface, c *config.TencentConfig,
 		return nil, fmt.Errorf("couldn't register tencent cloud monitor collector: %s", err)
 	}
 
-	handler := promhttp.HandlerFor(
-		prometheus.Gatherers{exporterMetricsRegistry, r},
+	handler := promhttp.HandlerForTransactional(
+		cachedtransactiongather.NewCachedTransactionGather(
+			prometheus.ToTransactionalGatherer(prometheus.Gatherers{exporterMetricsRegistry, r}),
+			time.Duration(c.CacheInterval)*time.Second, logger,
+		),
 		promhttp.HandlerOpts{
 			ErrorHandling:       promhttp.ContinueOnError,
 			MaxRequestsInFlight: maxRequests,

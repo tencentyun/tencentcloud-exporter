@@ -5,7 +5,7 @@ import (
 
 	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
 
-	"github.com/go-kit/kit/log"
+	"github.com/go-kit/log"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
 )
 
