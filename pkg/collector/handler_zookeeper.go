@@ -135,7 +135,7 @@ func (h *ZookeeperHandler) getSeriesByMetricType(m *metric.TcmMetric, ins instan
 	for _, v := range m.Meta.SupportDimensions {
 		dimensions = append(dimensions, v)
 	}
-	if util.IsStrInList(dimensions, "interface") {
+	if util.IsStrInList(dimensions, "Interface") {
 		return h.getInterfaceSeries(m, ins)
 	} else {
 		return h.getPodSeries(m, ins)
