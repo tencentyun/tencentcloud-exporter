@@ -23,7 +23,7 @@ func (h *VpngwHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
 }
 
 func (h *VpngwHandler) GetNamespace() string {
-	return ZookeeperNamespace
+	return VpngwNamespace
 }
 
 func (h *VpngwHandler) IsMetricVaild(m *metric.TcmMetric) bool {
