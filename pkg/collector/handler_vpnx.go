@@ -24,7 +24,7 @@ func (h *VpnxHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
 }
 
 func (h *VpnxHandler) GetNamespace() string {
-	return ZookeeperNamespace
+	return VpnxNamespace
 }
 
 func (h *VpnxHandler) IsMetricVaild(m *metric.TcmMetric) bool {

@@ -7,6 +7,7 @@ import (
 
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/redis/v20180412"
 	tdmq "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tdmq/v20200217"
+	tse "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tse/v20201207"
 
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
@@ -232,6 +233,168 @@ func NewTcTdmqInstanceTopicsCache(repo TdmqTcInstanceRocketMQTopicsRepository, r
 	cache := &TcTdmqInstanceTopicsCache{
 		Raw:            repo,
 		cache:          map[string]*tdmq.DescribeRocketMQTopicsResponse{},
+		lastReloadTime: map[string]time.Time{},
+		reloadInterval: reloadInterval,
+		logger:         logger,
+	}
+	return cache
+}
+
+// zookeeper
+type TcZookeeperInstancePodCache struct {
+	Raw            ZookeeperTcInstancePodRepository
+	cache          map[string]*tse.DescribeZookeeperReplicasResponse
+	lastReloadTime map[string]time.Time
+	reloadInterval time.Duration
+	mu             sync.Mutex
+
+	logger log.Logger
+}
+
+func (c *TcZookeeperInstancePodCache) GetZookeeperPodInfo(instanceId string) (*tse.DescribeZookeeperReplicasResponse, error) {
+	lrtime, exists := c.lastReloadTime[instanceId]
+	if exists && time.Now().Sub(lrtime) < c.reloadInterval {
+		namespace, ok := c.cache[instanceId]
+		if ok {
+			return namespace, nil
+		}
+	}
+
+	pod, err := c.Raw.GetZookeeperPodInfo(instanceId)
+	if err != nil {
+		return nil, err
+	}
+	c.cache[instanceId] = pod
+	c.lastReloadTime[instanceId] = time.Now()
+	level.Debug(c.logger).Log("msg", "Get RocketMQ Namespaces info from api", "instanceId", instanceId)
+	return pod, nil
+}
+
+func NewTcZookeeperInstancePodCache(repo ZookeeperTcInstancePodRepository, reloadInterval time.Duration, logger log.Logger) ZookeeperTcInstancePodRepository {
+	cache := &TcZookeeperInstancePodCache{
+		Raw:            repo,
+		cache:          map[string]*tse.DescribeZookeeperReplicasResponse{},
+		lastReloadTime: map[string]time.Time{},
+		reloadInterval: reloadInterval,
+		logger:         logger,
+	}
+	return cache
+}
+
+type TcZookeeperInstanceInterfaceCache struct {
+	Raw            ZookeeperTcInstanceInterfaceRepository
+	cache          map[string]*tse.DescribeZookeeperServerInterfacesResponse
+	lastReloadTime map[string]time.Time
+	reloadInterval time.Duration
+	mu             sync.Mutex
+
+	logger log.Logger
+}
+
+func (c *TcZookeeperInstanceInterfaceCache) GetZookeeperInterfaceInfo(instanceId string) (*tse.DescribeZookeeperServerInterfacesResponse, error) {
+	lrtime, exists := c.lastReloadTime[instanceId]
+	if exists && time.Now().Sub(lrtime) < c.reloadInterval {
+		topic, ok := c.cache[instanceId]
+		if ok {
+			return topic, nil
+		}
+	}
+
+	interfaceInfo, err := c.Raw.GetZookeeperInterfaceInfo(instanceId)
+	if err != nil {
+		return nil, err
+	}
+	c.cache[instanceId] = interfaceInfo
+	c.lastReloadTime[instanceId] = time.Now()
+	level.Debug(c.logger).Log("msg", "Get RocketMQ Namespaces info from api", "instanceId", instanceId)
+	return interfaceInfo, nil
+}
+
+func NewTcZookeeperInstanceInterfaceCache(repo ZookeeperTcInstanceInterfaceRepository, reloadInterval time.Duration, logger log.Logger) ZookeeperTcInstanceInterfaceRepository {
+	cache := &TcZookeeperInstanceInterfaceCache{
+		Raw:            repo,
+		cache:          map[string]*tse.DescribeZookeeperServerInterfacesResponse{},
+		lastReloadTime: map[string]time.Time{},
+		reloadInterval: reloadInterval,
+		logger:         logger,
+	}
+	return cache
+}
+
+// nacos
+type TcNacosInstancePodCache struct {
+	Raw            NacosTcInstancePodRepository
+	cache          map[string]*tse.DescribeNacosReplicasResponse
+	lastReloadTime map[string]time.Time
+	reloadInterval time.Duration
+	mu             sync.Mutex
+
+	logger log.Logger
+}
+
+func (c *TcNacosInstancePodCache) GetNacosPodInfo(instanceId string) (*tse.DescribeNacosReplicasResponse, error) {
+	lrtime, exists := c.lastReloadTime[instanceId]
+	if exists && time.Now().Sub(lrtime) < c.reloadInterval {
+		namespace, ok := c.cache[instanceId]
+		if ok {
+			return namespace, nil
+		}
+	}
+
+	pod, err := c.Raw.GetNacosPodInfo(instanceId)
+	if err != nil {
+		return nil, err
+	}
+	c.cache[instanceId] = pod
+	c.lastReloadTime[instanceId] = time.Now()
+	level.Debug(c.logger).Log("msg", "Get RocketMQ Namespaces info from api", "instanceId", instanceId)
+	return pod, nil
+}
+
+func NewTcNacosInstancePodCache(repo NacosTcInstancePodRepository, reloadInterval time.Duration, logger log.Logger) NacosTcInstancePodRepository {
+	cache := &TcNacosInstancePodCache{
+		Raw:            repo,
+		cache:          map[string]*tse.DescribeNacosReplicasResponse{},
+		lastReloadTime: map[string]time.Time{},
+		reloadInterval: reloadInterval,
+		logger:         logger,
+	}
+	return cache
+}
+
+type TcNacosInstanceInterfaceCache struct {
+	Raw            NacosTcInstanceInterfaceRepository
+	cache          map[string]*tse.DescribeNacosServerInterfacesResponse
+	lastReloadTime map[string]time.Time
+	reloadInterval time.Duration
+	mu             sync.Mutex
+
+	logger log.Logger
+}
+
+func (c *TcNacosInstanceInterfaceCache) GetNacosInterfaceInfo(instanceId string) (*tse.DescribeNacosServerInterfacesResponse, error) {
+	lrtime, exists := c.lastReloadTime[instanceId]
+	if exists && time.Now().Sub(lrtime) < c.reloadInterval {
+		topic, ok := c.cache[instanceId]
+		if ok {
+			return topic, nil
+		}
+	}
+
+	interfaceInfo, err := c.Raw.GetNacosInterfaceInfo(instanceId)
+	if err != nil {
+		return nil, err
+	}
+	c.cache[instanceId] = interfaceInfo
+	c.lastReloadTime[instanceId] = time.Now()
+	level.Debug(c.logger).Log("msg", "Get RocketMQ Namespaces info from api", "instanceId", instanceId)
+	return interfaceInfo, nil
+}
+
+func NewTcNacosInstanceInterfaceCache(repo NacosTcInstanceInterfaceRepository, reloadInterval time.Duration, logger log.Logger) NacosTcInstanceInterfaceRepository {
+	cache := &TcNacosInstanceInterfaceCache{
+		Raw:            repo,
+		cache:          map[string]*tse.DescribeNacosServerInterfacesResponse{},
 		lastReloadTime: map[string]time.Time{},
 		reloadInterval: reloadInterval,
 		logger:         logger,

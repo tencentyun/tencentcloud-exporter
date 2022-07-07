@@ -41,8 +41,52 @@ func (h *cosHandler) IsMetricVaild(m *metric.TcmMetric) bool {
 	}
 	return true
 }
-
 func (h *cosHandler) GetSeries(m *metric.TcmMetric) (slist []*metric.TcmSeries, err error) {
+	if m.Conf.IsIncludeOnlyInstance() {
+		return h.GetSeriesByOnly(m)
+	}
+
+	if m.Conf.IsIncludeAllInstance() {
+		return h.GetSeriesByAll(m)
+	}
+
+	if m.Conf.IsCustomQueryDimensions() {
+		return h.GetSeriesByCustom(m)
+	}
+
+	return nil, fmt.Errorf("must config all_instances or only_include_instances or custom_query_dimensions")
+}
+
+func (h *cosHandler) GetSeriesByAll(m *metric.TcmMetric) ([]*metric.TcmSeries, error) {
+	var slist []*metric.TcmSeries
+	insList, err := h.collector.InstanceRepo.ListByFilters(m.Conf.InstanceFilters)
+	if err != nil {
+		return nil, err
+	}
+	for _, ins := range insList {
+		if len(m.Conf.ExcludeInstances) != 0 && util.IsStrInList(m.Conf.ExcludeInstances, ins.GetInstanceId()) {
+			continue
+		}
+		bucket, err := ins.GetFieldValueByName("Name")
+		if err != nil {
+			level.Error(h.logger).Log("msg", "projectId not found")
+			continue
+		}
+		ql := map[string]string{
+			"bucket": bucket,
+		}
+		s, err := metric.NewTcmSeries(m, ql, ins)
+		if err != nil {
+			level.Error(h.logger).Log("msg", "Create metric series fail",
+				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+			continue
+		}
+		slist = append(slist, s)
+	}
+	return slist, nil
+}
+
+func (h *cosHandler) GetSeriesByCustom(m *metric.TcmMetric) (slist []*metric.TcmSeries, err error) {
 	for _, ql := range m.Conf.CustomQueryDimensions {
 		if !h.checkMonitorQueryKeys(m, ql) {
 			continue
