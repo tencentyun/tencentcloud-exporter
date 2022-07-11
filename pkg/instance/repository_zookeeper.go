@@ -100,8 +100,8 @@ func (repo *ZookeeperTcInstancePodRepositoryImpl) GetZookeeperPodInfo(instanceId
 	req.InstanceId = common.StringPtr(instanceId)
 	return repo.client.DescribeZookeeperReplicas(req)
 }
-func NewZookeeperTcInstancePodRepository(c *config.TencentConfig, logger log.Logger) (ZookeeperTcInstancePodRepository, error) {
-	cli, err := client.NewTseClient(c)
+func NewZookeeperTcInstancePodRepository(cred pkgcommon.CredentialIface, c *config.TencentConfig, logger log.Logger) (ZookeeperTcInstancePodRepository, error) {
+	cli, err := client.NewTseClient(cred, c)
 	if err != nil {
 		return nil, err
 	}

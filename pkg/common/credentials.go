@@ -14,6 +14,7 @@ type CredentialIface interface {
 	GetToken() string
 	GetSecretKey() string
 	Refresh() error
+	GetRole() string
 }
 
 type Credential struct {
@@ -114,4 +115,8 @@ func (c *Credential) GetSecretId() string {
 
 func (c *Credential) GetToken() string {
 	return c.Token
+}
+
+func (c *Credential) GetRole() string {
+	return c.Role
 }

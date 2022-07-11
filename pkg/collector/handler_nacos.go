@@ -1,18 +1,15 @@
 package collector
 
 import (
-<<<<<<< HEAD
-	"github.com/go-kit/log"
-	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
-=======
 	"fmt"
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
+	"time"
+
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/instance"
->>>>>>> master
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
-	"time"
 )
 
 const (
@@ -57,9 +54,6 @@ func (h *NacosHandler) GetSeries(m *metric.TcmMetric) ([]*metric.TcmSeries, erro
 		return h.GetSeriesByOnly(m)
 	}
 
-<<<<<<< HEAD
-func NewNacosHandler(cred common.CredentialIface, c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
-=======
 	if m.Conf.IsIncludeAllInstance() {
 		return h.GetSeriesByAll(m)
 	}
@@ -200,20 +194,19 @@ func (h *NacosHandler) getInterfaceSeries(m *metric.TcmMetric, ins instance.TcIn
 	}
 	return series, nil
 }
-func NewNacosHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
-	podRepo, err := instance.NewNacosTcInstancePodRepository(c.Conf, logger)
+func NewNacosHandler(cred common.CredentialIface, c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
+	podRepo, err := instance.NewNacosTcInstancePodRepository(cred, c.Conf, logger)
 	if err != nil {
 		return nil, err
 	}
 	relodInterval := time.Duration(c.ProductConf.RelodIntervalMinutes * int64(time.Minute))
 	podRepoCahe := instance.NewTcNacosInstancePodCache(podRepo, relodInterval, logger)
 
-	interfaceRepo, err := instance.NewNacosTcInstanceInterfaceRepository(c.Conf, logger)
+	interfaceRepo, err := instance.NewNacosTcInstanceInterfaceRepository(cred, c.Conf, logger)
 	if err != nil {
 		return nil, err
 	}
 	interfaceRepoCahe := instance.NewTcNacosInstanceInterfaceCache(interfaceRepo, relodInterval, logger)
->>>>>>> master
 	handler = &NacosHandler{
 		baseProductHandler: baseProductHandler{
 			monitorQueryKey: NacosInstanceidKey,

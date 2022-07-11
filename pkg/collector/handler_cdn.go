@@ -2,15 +2,10 @@ package collector
 
 import (
 	"fmt"
-<<<<<<< HEAD
 
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
-=======
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
->>>>>>> master
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
 )

@@ -1,18 +1,16 @@
 package collector
 
 import (
-<<<<<<< HEAD
 	"github.com/go-kit/log"
-	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
-=======
+	"github.com/go-kit/log/level"
+
 	"fmt"
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
+	"time"
+
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/instance"
->>>>>>> master
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
-	"time"
 )
 
 const (
@@ -197,24 +195,20 @@ func (h *ZookeeperHandler) getInterfaceSeries(m *metric.TcmMetric, ins instance.
 	return series, nil
 }
 
-<<<<<<< HEAD
 func NewZookeeperHandler(cred common.CredentialIface, c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
-=======
-func NewZookeeperHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
-	podRepo, err := instance.NewZookeeperTcInstancePodRepository(c.Conf, logger)
+	podRepo, err := instance.NewZookeeperTcInstancePodRepository(cred, c.Conf, logger)
 	if err != nil {
 		return nil, err
 	}
 	relodInterval := time.Duration(c.ProductConf.RelodIntervalMinutes * int64(time.Minute))
 	podRepoCahe := instance.NewTcZookeeperInstancePodCache(podRepo, relodInterval, logger)
 
-	interfaceRepo, err := instance.NewZookeeperTcInstanceInterfaceRepository(c.Conf, logger)
+	interfaceRepo, err := instance.NewZookeeperTcInstanceInterfaceRepository(cred, c.Conf, logger)
 	if err != nil {
 		return nil, err
 	}
 	interfaceRepoCahe := instance.NewTcZookeeperInstanceInterfaceCache(interfaceRepo, relodInterval, logger)
 
->>>>>>> master
 	handler = &ZookeeperHandler{
 		baseProductHandler: baseProductHandler{
 			monitorQueryKey: ZookeeperInstanceidKey,

@@ -11,11 +11,11 @@ require (
 	github.com/stretchr/testify v1.6.1
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cbs v1.0.334
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cdb v1.0.413
-	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cdn v1.0.423
+	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cdn v1.0.437
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/ckafka v1.0.334
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/clb v1.0.334
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cmq v1.0.334
-	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.430
+	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.437
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cvm v1.0.334
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cynosdb v1.0.413
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/dc v1.0.334

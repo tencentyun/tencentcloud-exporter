@@ -258,10 +258,15 @@ func NewCosClient(cred common.CredentialIface, conf *config.TencentConfig) (*cos
 	// 用于Get Service 查询, service域名暂时只支持外网
 	su, _ := url.Parse("http://cos." + conf.Credential.Region + ".myqcloud.com")
 	b := &cos.BaseURL{BucketURL: nil, ServiceURL: su}
+	//client := cos.NewClient(b, &http.Client{
+	//	Transport: &cos.AuthorizationTransport{
+	//		SecretID:  conf.Credential.AccessKey,
+	//		SecretKey: conf.Credential.SecretKey,
+	//	},
+	//})
 	client := cos.NewClient(b, &http.Client{
-		Transport: &cos.AuthorizationTransport{
-			SecretID:  conf.Credential.AccessKey,
-			SecretKey: conf.Credential.SecretKey,
+		Transport: &cos.CVMCredentialTransport{
+			RoleName: cred.GetRole(),
 		},
 	})
 	return client, nil
