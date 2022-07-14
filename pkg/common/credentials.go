@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"sync"
 	"time"
+
+	"github.com/tencentyun/cos-go-sdk-v5"
 )
 
 type CredentialIface interface {
@@ -18,7 +20,8 @@ type CredentialIface interface {
 }
 
 type Credential struct {
-	sync.Mutex
+	rwLocker    sync.RWMutex
+	Transport   http.RoundTripper
 	SecretId    string
 	SecretKey   string
 	Token       string
@@ -40,16 +43,21 @@ func (c *Credential) Refresh() error {
 	for {
 		select {
 		case <-tick.C:
-			if time.Now().Unix() > c.ExpiredTime-720 {
-				if err := c.refresh(); err != nil {
-					return err
-				}
+			err := c.refresh()
+			if err != nil {
+				fmt.Println("refresh credential error: ", err.Error())
 			}
 		}
 	}
 }
 
 func (c *Credential) refresh() error {
+	c.rwLocker.RLock()
+	expiredTime := c.ExpiredTime
+	c.rwLocker.RUnlock()
+	if time.Now().Unix() < expiredTime-720 {
+		return nil
+	}
 	res, err := http.Get(fmt.Sprintf("http://metadata.tencentyun.com/meta-data/cam/service-role-security-credentials/%s", c.Role))
 	if err != nil {
 		return err
@@ -82,6 +90,8 @@ func (c *Credential) refresh() error {
 		return fmt.Errorf("get Code is %s", metaData.Code)
 	}
 
+	c.rwLocker.Lock()
+	defer c.rwLocker.Unlock()
 	c.SecretId = metaData.TmpSecretId
 	c.SecretKey = metaData.TmpSecretKey
 	c.Token = metaData.Token
@@ -97,26 +107,65 @@ func NewCredential(role string) (*Credential, error) {
 	return c, err
 }
 
-func NewTokenCredential(secretId, secretKey, token string) *Credential {
+func NewCredentialTransport(role string) *Credential {
 	return &Credential{
-		SecretId:  secretId,
-		SecretKey: secretKey,
-		Token:     token,
+		Role: role,
 	}
 }
 
 func (c *Credential) GetSecretKey() string {
+	c.rwLocker.RLock()
+	defer c.rwLocker.RUnlock()
 	return c.SecretKey
 }
 
 func (c *Credential) GetSecretId() string {
+	c.rwLocker.RLock()
+	defer c.rwLocker.RUnlock()
 	return c.SecretId
 }
 
 func (c *Credential) GetToken() string {
+	c.rwLocker.RLock()
+	defer c.rwLocker.RUnlock()
 	return c.Token
 }
 
 func (c *Credential) GetRole() string {
 	return c.Role
+}
+
+func (c *Credential) RoundTrip(req *http.Request) (*http.Response, error) {
+	err := c.refresh()
+	if err != nil {
+		return nil, err
+	}
+	req = cloneRequest(req)
+	// 增加 Authorization header
+	authTime := cos.NewAuthTime(time.Hour)
+	cos.AddAuthorizationHeader(c.GetSecretId(), c.GetSecretKey(), c.GetToken(), req, authTime)
+
+	resp, err := c.transport().RoundTrip(req)
+	return resp, err
+}
+
+func (c *Credential) transport() http.RoundTripper {
+	if c.Transport != nil {
+		return c.Transport
+	}
+	return http.DefaultTransport
+}
+
+// cloneRequest returns a clone of the provided *http.Request. The clone is a
+// shallow copy of the struct and its Header map.
+func cloneRequest(r *http.Request) *http.Request {
+	// shallow copy of the struct
+	r2 := new(http.Request)
+	*r2 = *r
+	// deep copy of the Header
+	r2.Header = make(http.Header, len(r.Header))
+	for k, s := range r.Header {
+		r2.Header[k] = append([]string(nil), s...)
+	}
+	return r2
 }

@@ -265,9 +265,7 @@ func NewCosClient(cred common.CredentialIface, conf *config.TencentConfig) (*cos
 	//	},
 	//})
 	client := cos.NewClient(b, &http.Client{
-		Transport: &cos.CVMCredentialTransport{
-			RoleName: cred.GetRole(),
-		},
+		Transport: common.NewCredentialTransport(cred.GetRole()),
 	})
 	return client, nil
 }

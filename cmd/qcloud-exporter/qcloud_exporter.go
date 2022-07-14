@@ -20,6 +20,8 @@ import (
 	"github.com/tencentyun/tencentcloud-exporter/pkg/collector"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
+
+	_ "net/http/pprof"
 )
 
 func newHandler(cred common.CredentialIface, c *config.TencentConfig,
