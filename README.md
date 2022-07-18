@@ -54,15 +54,15 @@ go build cmd/qcloud-exporter/qcloud_exporter.go
 
 ```yaml
 credential:
-   access_key: "access_key"            // 云API的SecretId
-   secret_key: "secret_key"            // 云API的SecretKey
-   region: "ap-guangzhou"              // 实例所在区域信息
+  access_key: "access_key"            // 云API的SecretId
+  secret_key: "secret_key"            // 云API的SecretKey
+  region: "ap-guangzhou"              // 实例所在区域信息
 
 products:
-   - namespace: QCE/CMONGO             // 产品命名空间
-     all_metrics: true                 // 导出支持的所有指标
-     all_instances: true               // 导出region下的所有实例
-     extra_labels: [InstanceName,Zone] // 将实例的字段作为指标的lables导出
+  - namespace: QCE/CMONGO             // 产品命名空间
+    all_metrics: true                 // 导出支持的所有指标
+    all_instances: true               // 导出region下的所有实例
+    extra_labels: [InstanceName,Zone] // 将实例的字段作为指标的lables导出
 ```
 
 ### 3. 启动 Exporter
@@ -80,53 +80,52 @@ products:
 在git的`configs`里有支持产品的配置模版样例可参考
 ```yaml
 credential:
-   access_key: <YOUR_ACCESS_KEY>                  // 必须, 云API的SecretId
-   access_secret: <YOUR_ACCESS_SECRET>            // 必须, 云API的SecretKey
-   role: <YOUR_SERVICE_ROLE>                      // 可选，可在云上CVM/TKE中使用，没有access_key和access_secret时会使用role申请临时密钥
-   region: <REGION>                               // 必须, 实例所在区域信息
+  access_key: <YOUR_ACCESS_KEY>                  // 必须, 云API的SecretId
+  access_secret: <YOUR_ACCESS_SECRET>            // 必须, 云API的SecretKey
+  role: <YOUR_SERVICE_ROLE>                      // 可选，可在云上CVM/TKE中使用，没有access_key和access_secret时会使用role申请临时密钥
+  region: <REGION>                               // 必须, 实例所在区域信息
 
 rate_limit: 15                                   // 腾讯云监控拉取指标数据限制, 官方默认限制最大20qps
 
 
-   // 整个产品纬度配置, 每个产品一个item
+// 整个产品纬度配置, 每个产品一个item
 products:
-   - namespace: QCE/CMONGO                        // 必须, 产品命名空间; QCE前缀可自定义,CMONGO产品名不区分大小写, 可用别名
-     all_metrics: true                            // 常用, 推荐开启, 导出支持的所有指标
-     all_instances: true                          // 常用, 推荐开启, 导出该region下的所有实例
-     extra_labels: [InstanceName,Zone]            // 可选, 将实例的字段作为指标的lables导出
-     only_include_metrics: [Inserts]              // 可选, 只导出这些指标, 配置时all_metrics失效
-     exclude_metrics: [Reads]                     // 可选, 不导出这些指标
-     instance_filters:                            // 可选, 在all_instances开启情况下, 根据每个实例的字段进行过滤
-                                                     - ProjectId: 1
-                                                     Status: 1
-     only_include_instances: [cmgo-xxxxxxxx]      // 可选, 只导出这些实例id, 配置时all_instances失效
-     exclude_instances: [cmgo-xxxxxxxx]           // 可选, 不导出这些实例id
-     custom_query_dimensions:                     // 可选, 不常用, 自定义指标查询条件, 配置时all_instances,only_include_instances,exclude_instances失效, 用于不支持按实例纬度查询的指标
-                                                     - target: cmgo-xxxxxxxx
-     statistics_types: [avg]                      // 可选, 拉取N个数据点, 再进行max、min、avg、last计算, 默认last取最新值
-     period_seconds: 60                           // 可选, 指标统计周期, 默认自动获取指标支持的最小统计周期
-     range_seconds: 300                           // 可选, 选取时间范围, 开始时间=now-range_seconds, 结束时间=now
-     delay_seconds: 60                            // 可选, 时间偏移量, 结束时间=now-delay_seconds
-     metric_name_type: 1                          // 可选，导出指标的名字格式化类型, 1=大写转小写加下划线, 2=转小写; 默认2
-     relod_interval_minutes: 60                   // 可选, 在all_instances=true时, 周期reload实例列表, 建议频率不要太频繁
+  - namespace: QCE/CMONGO                        // 必须, 产品命名空间; QCE前缀可自定义,CMONGO产品名不区分大小写, 可用别名
+    all_metrics: true                            // 常用, 推荐开启, 导出支持的所有指标
+    all_instances: true                          // 常用, 推荐开启, 导出该region下的所有实例
+    extra_labels: [InstanceName,Zone]            // 可选, 将实例的字段作为指标的lables导出
+    only_include_metrics: [Inserts]              // 可选, 只导出这些指标, 配置时all_metrics失效
+    exclude_metrics: [Reads]                     // 可选, 不导出这些指标
+    instance_filters:                            // 可选, 在all_instances开启情况下, 根据每个实例的字段进行过滤
+      - ProjectId: 1
+        Status: 1
+    only_include_instances: [cmgo-xxxxxxxx]      // 可选, 只导出这些实例id, 配置时all_instances失效
+    exclude_instances: [cmgo-xxxxxxxx]           // 可选, 不导出这些实例id
+    custom_query_dimensions:                     // 可选, 不常用, 自定义指标查询条件, 配置时all_instances,only_include_instances,exclude_instances失效, 用于不支持按实例纬度查询的指标
+      - target: cmgo-xxxxxxxx
+    statistics_types: [avg]                      // 可选, 拉取N个数据点, 再进行max、min、avg、last计算, 默认last取最新值
+    period_seconds: 60                           // 可选, 指标统计周期, 默认自动获取指标支持的最小统计周期
+    range_seconds: 300                           // 可选, 选取时间范围, 开始时间=now-range_seconds, 结束时间=now
+    delay_seconds: 60                            // 可选, 时间偏移量, 结束时间=now-delay_seconds
+    metric_name_type: 1                          // 可选，导出指标的名字格式化类型, 1=大写转小写加下划线, 2=转小写; 默认2
+    relod_interval_minutes: 60                   // 可选, 在all_instances=true时, 周期reload实例列表, 建议频率不要太频繁
 
 
-   // 单个指标纬度配置, 每个指标一个item
+// 单个指标纬度配置, 每个指标一个item
 metrics:
-   - tc_namespace: QCE/CMONGO                     // 产品命名空间, 同namespace
-     tc_metric_name: Inserts                      // 云监控定义的指标名
-     tc_metric_rename: Inserts                    // 导出指标的显示名
-     tc_metric_name_type: 1                       // 可选，导出指标的名字格式化类型, 1=大写转小写加下划线, 2=转小写; 默认1
-     tc_labels: [InstanceName]                    // 可选, 将实例的字段作为指标的lables导出
-     tc_filters:                                  // 可选, 根据每个实例的字段进行过滤, 否则默认导出region下所有实例
-                                                     - ProjectId: 1
-                                                     Status: 1
-     tc_myself_dimensions:                        // 可选, 同custom_query_dimensions
-     tc_statistics: [Avg]                         // 可选, 同statistics_types
-     period_seconds: 60                           // 可选, 同period_seconds
-     range_seconds: 300                           // 可选, 同range_seconds
-     delay_seconds: 60                            // 可选, 同delay_seconds
-
+  - tc_namespace: QCE/CMONGO                     // 产品命名空间, 同namespace
+    tc_metric_name: Inserts                      // 云监控定义的指标名
+    tc_metric_rename: Inserts                    // 导出指标的显示名
+    tc_metric_name_type: 1                       // 可选，导出指标的名字格式化类型, 1=大写转小写加下划线, 2=转小写; 默认1
+    tc_labels: [InstanceName]                    // 可选, 将实例的字段作为指标的lables导出
+    tc_filters:                                  // 可选, 根据每个实例的字段进行过滤, 否则默认导出region下所有实例
+      - ProjectId: 1
+        Status: 1
+    tc_myself_dimensions:                        // 可选, 同custom_query_dimensions
+    tc_statistics: [Avg]                         // 可选, 同statistics_types
+    period_seconds: 60                           // 可选, 同period_seconds
+    range_seconds: 300                           // 可选, 同range_seconds
+    delay_seconds: 60                            // 可选, 同delay_seconds
 ```
 特殊说明:
 1. **custom_query_dimensions**  
