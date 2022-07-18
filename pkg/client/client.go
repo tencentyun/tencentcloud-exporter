@@ -27,7 +27,6 @@ import (
 	tdmq "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tdmq/v20200217"
 	tse "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tse/v20201207"
 	vpc "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/vpc/v20170312"
-
 	cos "github.com/tencentyun/cos-go-sdk-v5"
 
 	"github.com/tencentyun/tencentcloud-exporter/pkg/common"

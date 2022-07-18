@@ -20,8 +20,6 @@ import (
 	"github.com/tencentyun/tencentcloud-exporter/pkg/collector"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
-
-	_ "net/http/pprof"
 )
 
 func newHandler(cred common.CredentialIface, c *config.TencentConfig,
@@ -44,18 +42,24 @@ func newHandler(cred common.CredentialIface, c *config.TencentConfig,
 	if err := r.Register(nc); err != nil {
 		return nil, fmt.Errorf("couldn't register tencent cloud monitor collector: %s", err)
 	}
+	var handler http.Handler
+	gatherers := prometheus.Gatherers{exporterMetricsRegistry, r}
+	opts := promhttp.HandlerOpts{
+		ErrorHandling:       promhttp.ContinueOnError,
+		MaxRequestsInFlight: maxRequests,
+		Registry:            exporterMetricsRegistry,
+	}
+	if c.CacheInterval <= 0 {
+		handler = promhttp.HandlerFor(gatherers, opts)
+	} else {
+		handler = promhttp.HandlerForTransactional(
+			cachedtransactiongather.NewCachedTransactionGather(
+				prometheus.ToTransactionalGatherer(gatherers),
+				time.Duration(c.CacheInterval)*time.Second, logger,
+			), opts,
+		)
+	}
 
-	handler := promhttp.HandlerForTransactional(
-		cachedtransactiongather.NewCachedTransactionGather(
-			prometheus.ToTransactionalGatherer(prometheus.Gatherers{exporterMetricsRegistry, r}),
-			time.Duration(c.CacheInterval)*time.Second, logger,
-		),
-		promhttp.HandlerOpts{
-			ErrorHandling:       promhttp.ContinueOnError,
-			MaxRequestsInFlight: maxRequests,
-			Registry:            exporterMetricsRegistry,
-		},
-	)
 	if includeExporterMetrics {
 		handler = promhttp.InstrumentMetricHandler(
 			exporterMetricsRegistry, handler,
@@ -106,18 +110,25 @@ func main() {
 		level.Info(logger).Log("msg", "Load config ok")
 	}
 
-	cred, err := common.NewCredential(tencentConfig.Credential.Role)
-	if err != nil {
-		level.Error(logger).Log("msg", "init cred error", "err", err)
-		panic(err)
-	}
-	go func() {
-		err := cred.Refresh()
+	cred := &common.Credential{}
+	if tencentConfig.Credential.Role != "" {
+		var err error
+		cred, err = common.NewCredential(tencentConfig.Credential.Role)
 		if err != nil {
-			level.Error(logger).Log("msg", "cred refresh error", "err", err)
+			level.Error(logger).Log("msg", "init cred error", "err", err)
 			panic(err)
 		}
-	}()
+		go func() {
+			err := cred.Refresh()
+			if err != nil {
+				level.Error(logger).Log("msg", "cred refresh error", "err", err)
+				panic(err)
+			}
+		}()
+	} else {
+		cred.SecretId = tencentConfig.Credential.AccessKey
+		cred.SecretKey = tencentConfig.Credential.SecretKey
+	}
 
 	handler, err := newHandler(cred, tencentConfig, *enableExporterMetrics, *maxRequests, logger)
 	if err != nil {

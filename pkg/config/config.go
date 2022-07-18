@@ -17,11 +17,11 @@ const (
 	DefaultRelodIntervalMinutes = 60
 	DefaultRateLimit            = 15
 	DefaultQueryMetricBatchSize = 50
-	DefaultCacheInterval        = 60
 
-	EnvAccessKey = "TENCENTCLOUD_SECRET_ID"
-	EnvSecretKey = "TENCENTCLOUD_SECRET_KEY"
-	EnvRegion    = "TENCENTCLOUD_REGION"
+	EnvAccessKey   = "TENCENTCLOUD_SECRET_ID"
+	EnvSecretKey   = "TENCENTCLOUD_SECRET_KEY"
+	EnvServiceRole = "TENCENTCLOUD_SERVICE_ROLE"
+	EnvRegion      = "TENCENTCLOUD_REGION"
 )
 
 var (
@@ -162,20 +162,21 @@ func (c *TencentConfig) LoadFile(filename string) error {
 }
 
 func (c *TencentConfig) check() (err error) {
-	if c.Credential.Role == "" {
-		if c.Credential.AccessKey == "" {
-			c.Credential.AccessKey = os.Getenv(EnvAccessKey)
-			if c.Credential.AccessKey == "" {
-				return fmt.Errorf("credential.access_key is empty, must be set")
-			}
-		}
-		if c.Credential.SecretKey == "" {
-			c.Credential.SecretKey = os.Getenv(EnvSecretKey)
-			if c.Credential.SecretKey == "" {
-				return fmt.Errorf("credential.secret_key is empty, must be set")
-			}
+	if c.Credential.AccessKey == "" {
+		c.Credential.AccessKey = os.Getenv(EnvAccessKey)
+	}
+	if c.Credential.SecretKey == "" {
+		c.Credential.SecretKey = os.Getenv(EnvSecretKey)
+	}
+	if c.Credential.AccessKey != "" && c.Credential.SecretKey != "" {
+		c.Credential.Role = "" // 优先使用密钥，根据 role 是否为空判断使用密钥还是 role
+	} else if c.Credential.Role == "" {
+		c.Credential.Role = os.Getenv(EnvServiceRole)
+		if c.Credential.Role == "" {
+			return fmt.Errorf("credential.access_key or credential.secret_key or credential.role is empty, must be set")
 		}
 	}
+
 	if c.Credential.Region == "" {
 		c.Credential.Region = os.Getenv(EnvRegion)
 		if c.Credential.Region == "" {
@@ -250,10 +251,6 @@ func (c *TencentConfig) fillDefault() {
 		if product.RelodIntervalMinutes <= 0 {
 			c.Products[index].RelodIntervalMinutes = DefaultRelodIntervalMinutes
 		}
-	}
-
-	if c.CacheInterval == 0 {
-		c.CacheInterval = DefaultCacheInterval
 	}
 }
 
