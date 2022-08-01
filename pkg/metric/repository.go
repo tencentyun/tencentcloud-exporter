@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
+
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	"golang.org/x/time/rate"
 
 	monitor "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/monitor/v20180724"
@@ -31,6 +33,7 @@ type TcmMetricRepository interface {
 }
 
 type TcmMetricRepositoryImpl struct {
+	credential    common.CredentialIface
 	monitorClient *monitor.Client
 	limiter       *rate.Limiter // 限速
 	ctx           context.Context
@@ -70,6 +73,7 @@ func (repo *TcmMetricRepositoryImpl) ListMetaByNamespace(namespace string) (meta
 	// 限速
 	ctx, cancel := context.WithCancel(repo.ctx)
 	defer cancel()
+
 	err = repo.limiter.Wait(ctx)
 	if err != nil {
 		return
@@ -254,13 +258,14 @@ func (repo *TcmMetricRepositoryImpl) buildSamples(
 	return samples, ql, nil
 }
 
-func NewTcmMetricRepository(conf *config.TencentConfig, logger log.Logger) (repo TcmMetricRepository, err error) {
-	monitorClient, err := client.NewMonitorClient(conf)
+func NewTcmMetricRepository(cred common.CredentialIface, conf *config.TencentConfig, logger log.Logger) (repo TcmMetricRepository, err error) {
+	monitorClient, err := client.NewMonitorClient(cred, conf)
 	if err != nil {
 		return
 	}
 
 	repo = &TcmMetricRepositoryImpl{
+		credential:           cred,
 		monitorClient:        monitorClient,
 		limiter:              rate.NewLimiter(rate.Limit(conf.RateLimit), 1),
 		ctx:                  context.Background(),

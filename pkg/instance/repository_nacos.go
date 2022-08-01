@@ -2,8 +2,11 @@ package instance
 
 import (
 	"fmt"
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
+
+	pkgcommon "github.com/tencentyun/tencentcloud-exporter/pkg/common"
+
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tse/v20201207"
 
@@ -98,8 +101,8 @@ func (repo *NacosTcInstancePodRepositoryImpl) GetNacosPodInfo(instanceId string)
 	req.InstanceId = common.StringPtr(instanceId)
 	return repo.client.DescribeNacosReplicas(req)
 }
-func NewNacosTcInstancePodRepository(c *config.TencentConfig, logger log.Logger) (NacosTcInstancePodRepository, error) {
-	cli, err := client.NewTseClient(c)
+func NewNacosTcInstancePodRepository(cred pkgcommon.CredentialIface, c *config.TencentConfig, logger log.Logger) (NacosTcInstancePodRepository, error) {
+	cli, err := client.NewTseClient(cred, c)
 	if err != nil {
 		return nil, err
 	}
@@ -125,8 +128,8 @@ func (repo *NacosTcInstanceInterfaceRepositoryImpl) GetNacosInterfaceInfo(instan
 	req.InstanceId = common.StringPtr(instanceId)
 	return repo.client.DescribeNacosServerInterfaces(req)
 }
-func NewNacosTcInstanceInterfaceRepository(c *config.TencentConfig, logger log.Logger) (NacosTcInstanceInterfaceRepository, error) {
-	cli, err := client.NewTseClient(c)
+func NewNacosTcInstanceInterfaceRepository(cred pkgcommon.CredentialIface, c *config.TencentConfig, logger log.Logger) (NacosTcInstanceInterfaceRepository, error) {
+	cli, err := client.NewTseClient(cred, c)
 	if err != nil {
 		return nil, err
 	}
@@ -137,8 +140,8 @@ func NewNacosTcInstanceInterfaceRepository(c *config.TencentConfig, logger log.L
 	return repo, nil
 }
 
-func NewNaocsTcInstanceRepository(c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
-	cli, err := client.NewTseClient(c)
+func NewNaocsTcInstanceRepository(cred pkgcommon.CredentialIface, c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
+	cli, err := client.NewTseClient(cred, c)
 	if err != nil {
 		return
 	}

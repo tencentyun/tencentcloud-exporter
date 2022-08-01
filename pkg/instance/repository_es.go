@@ -3,8 +3,10 @@ package instance
 import (
 	"fmt"
 
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
+
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/es/v20180416"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/client"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
@@ -15,8 +17,9 @@ func init() {
 }
 
 type ESTcInstanceRepository struct {
-	client *sdk.Client
-	logger log.Logger
+	credential common.CredentialIface
+	client     *sdk.Client
+	logger     log.Logger
 }
 
 func (repo *ESTcInstanceRepository) GetInstanceKey() string {
@@ -62,7 +65,7 @@ getMoreInstances:
 	if total == 0 {
 		total = *resp.Response.TotalCount
 	}
-	for _, meta := range resp.Response.InstanceList{
+	for _, meta := range resp.Response.InstanceList {
 		ins, e := NewESTcInstance(*meta.InstanceId, meta)
 		if e != nil {
 			level.Error(repo.logger).Log("msg", "Create es instance fail", "id", *meta.InstanceId)
@@ -78,14 +81,15 @@ getMoreInstances:
 	return
 }
 
-func NewESTcInstanceRepository(c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
-	cli, err := client.NewESClient(c)
+func NewESTcInstanceRepository(cred common.CredentialIface, c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
+	cli, err := client.NewESClient(cred, c)
 	if err != nil {
 		return
 	}
 	repo = &ESTcInstanceRepository{
-		client: cli,
-		logger: logger,
+		credential: cred,
+		client:     cli,
+		logger:     logger,
 	}
 	return
 }

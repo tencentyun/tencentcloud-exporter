@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
+
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/clb/v20180317"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/client"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
@@ -20,8 +22,9 @@ func init() {
 var open = "OPEN"
 
 type ClbTcInstanceRepository struct {
-	client *sdk.Client
-	logger log.Logger
+	credential common.CredentialIface
+	client     *sdk.Client
+	logger     log.Logger
 }
 
 func (repo *ClbTcInstanceRepository) GetInstanceKey() string {
@@ -39,7 +42,6 @@ func (repo *ClbTcInstanceRepository) Get(id string) (instance TcInstance, err er
 		req.LoadBalancerIds = []*string{&id}
 	}
 	req.LoadBalancerType = &open
-
 	resp, err := repo.client.DescribeLoadBalancers(req)
 	if err != nil {
 		return
@@ -86,6 +88,10 @@ getMoreInstances:
 			level.Error(repo.logger).Log("msg", "Create clb instance fail", "id", *meta.LoadBalancerId)
 			continue
 		}
+		if meta.LoadBalancerVips == nil || len(meta.LoadBalancerVips) == 0 {
+			level.Warn(repo.logger).Log("msg", "clb instance no include vip", "id", *meta.LoadBalancerId)
+			continue
+		}
 		instances = append(instances, ins)
 	}
 	offset += limit
@@ -97,14 +103,15 @@ getMoreInstances:
 	return
 }
 
-func NewClbTcInstanceRepository(c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
-	cli, err := client.NewClbClient(c)
+func NewClbTcInstanceRepository(cred common.CredentialIface, c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
+	cli, err := client.NewClbClient(cred, c)
 	if err != nil {
 		return
 	}
 	repo = &ClbTcInstanceRepository{
-		client: cli,
-		logger: logger,
+		credential: cred,
+		client:     cli,
+		logger:     logger,
 	}
 	return
 }

@@ -4,9 +4,14 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
+	"github.com/tencentyun/tencentcloud-exporter/pkg/cachedtransactiongather"
+
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
+
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/common/promlog"
@@ -17,7 +22,9 @@ import (
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
-func newHandler(c *config.TencentConfig, includeExporterMetrics bool, maxRequests int, logger log.Logger) (*http.Handler, error) {
+func newHandler(cred common.CredentialIface, c *config.TencentConfig,
+	includeExporterMetrics bool, maxRequests int, logger log.Logger) (*http.Handler, error) {
+
 	exporterMetricsRegistry := prometheus.NewRegistry()
 	if includeExporterMetrics {
 		exporterMetricsRegistry.MustRegister(
@@ -26,7 +33,7 @@ func newHandler(c *config.TencentConfig, includeExporterMetrics bool, maxRequest
 		)
 	}
 
-	nc, err := collector.NewTcMonitorCollector(c, logger)
+	nc, err := collector.NewTcMonitorCollector(cred, c, logger)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create collector: %s", err)
 	}
@@ -35,15 +42,24 @@ func newHandler(c *config.TencentConfig, includeExporterMetrics bool, maxRequest
 	if err := r.Register(nc); err != nil {
 		return nil, fmt.Errorf("couldn't register tencent cloud monitor collector: %s", err)
 	}
+	var handler http.Handler
+	gatherers := prometheus.Gatherers{exporterMetricsRegistry, r}
+	opts := promhttp.HandlerOpts{
+		ErrorHandling:       promhttp.ContinueOnError,
+		MaxRequestsInFlight: maxRequests,
+		Registry:            exporterMetricsRegistry,
+	}
+	if c.CacheInterval <= 0 {
+		handler = promhttp.HandlerFor(gatherers, opts)
+	} else {
+		handler = promhttp.HandlerForTransactional(
+			cachedtransactiongather.NewCachedTransactionGather(
+				prometheus.ToTransactionalGatherer(gatherers),
+				time.Duration(c.CacheInterval)*time.Second, logger,
+			), opts,
+		)
+	}
 
-	handler := promhttp.HandlerFor(
-		prometheus.Gatherers{exporterMetricsRegistry, r},
-		promhttp.HandlerOpts{
-			ErrorHandling:       promhttp.ContinueOnError,
-			MaxRequestsInFlight: maxRequests,
-			Registry:            exporterMetricsRegistry,
-		},
-	)
 	if includeExporterMetrics {
 		handler = promhttp.InstrumentMetricHandler(
 			exporterMetricsRegistry, handler,
@@ -94,7 +110,27 @@ func main() {
 		level.Info(logger).Log("msg", "Load config ok")
 	}
 
-	handler, err := newHandler(tencentConfig, *enableExporterMetrics, *maxRequests, logger)
+	cred := &common.Credential{}
+	if tencentConfig.Credential.Role != "" {
+		var err error
+		cred, err = common.NewCredential(tencentConfig.Credential.Role)
+		if err != nil {
+			level.Error(logger).Log("msg", "init cred error", "err", err)
+			panic(err)
+		}
+		go func() {
+			err := cred.Refresh()
+			if err != nil {
+				level.Error(logger).Log("msg", "cred refresh error", "err", err)
+				panic(err)
+			}
+		}()
+	} else {
+		cred.SecretId = tencentConfig.Credential.AccessKey
+		cred.SecretKey = tencentConfig.Credential.SecretKey
+	}
+
+	handler, err := newHandler(cred, tencentConfig, *enableExporterMetrics, *maxRequests, logger)
 	if err != nil {
 		level.Error(logger).Log("msg", "Create handler fail", "err", err)
 		os.Exit(1)

@@ -1,7 +1,8 @@
 package collector
 
 import (
-	"github.com/go-kit/kit/log"
+	"github.com/go-kit/log"
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
 )
 
 const (
@@ -20,7 +21,7 @@ type mariaDBHandler struct {
 func (h *mariaDBHandler) GetNamespace() string {
 	return MariaDBNamespace
 }
-func NewMariaDBHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
+func NewMariaDBHandler(cred common.CredentialIface, c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
 	handler = &mariaDBHandler{
 		baseProductHandler{
 			monitorQueryKey: MariaDBInstanceIDKey,

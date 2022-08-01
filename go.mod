@@ -3,18 +3,19 @@ module github.com/tencentyun/tencentcloud-exporter
 go 1.12
 
 require (
-	github.com/go-kit/kit v0.9.0
+	github.com/go-kit/log v0.2.0
 	github.com/golang/mock v1.4.4
-	github.com/prometheus/client_golang v1.5.1
-	github.com/prometheus/common v0.9.1
+	github.com/prometheus/client_golang v1.12.2-0.20220630150036-810fcb46abcd
+	github.com/prometheus/client_model v0.2.0
+	github.com/prometheus/common v0.35.0
 	github.com/stretchr/testify v1.6.1
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cbs v1.0.334
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cdb v1.0.413
-	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cdn v1.0.423
+	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cdn v1.0.437
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/ckafka v1.0.334
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/clb v1.0.334
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cmq v1.0.334
-	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.430
+	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.437
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cvm v1.0.334
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cynosdb v1.0.413
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/dc v1.0.334
@@ -34,6 +35,6 @@ require (
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.35
 	golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
-	gopkg.in/yaml.v2 v2.2.5
+	gopkg.in/yaml.v2 v2.4.0
 
 )

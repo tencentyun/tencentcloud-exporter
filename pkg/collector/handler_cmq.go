@@ -2,8 +2,10 @@ package collector
 
 import (
 	"fmt"
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
+
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
 )
@@ -49,14 +51,14 @@ func (h *cmqHandler) GetSeriesByOnly(m *metric.TcmMetric) ([]*metric.TcmSeries, 
 			level.Error(h.logger).Log("msg", "Instance not found", "id", insId)
 			continue
 		}
-		queueName,err:=ins.GetFieldValueByName("QueueName")
-		if err!=nil{
+		queueName, err := ins.GetFieldValueByName("QueueName")
+		if err != nil {
 			level.Error(h.logger).Log("msg", "queue name not found")
 			continue
 		}
 		ql := map[string]string{
 			h.monitorQueryKey: ins.GetMonitorQueryKey(),
-			"queueName":queueName, // hack, hardcode 🤮
+			"queueName":       queueName, // hack, hardcode 🤮
 		}
 		s, err := metric.NewTcmSeries(m, ql, ins)
 		if err != nil {
@@ -79,14 +81,14 @@ func (h *cmqHandler) GetSeriesByAll(m *metric.TcmMetric) ([]*metric.TcmSeries, e
 		if len(m.Conf.ExcludeInstances) != 0 && util.IsStrInList(m.Conf.ExcludeInstances, ins.GetInstanceId()) {
 			continue
 		}
-		queueName,err:=ins.GetFieldValueByName("QueueName")
-		if err!=nil{
+		queueName, err := ins.GetFieldValueByName("QueueName")
+		if err != nil {
 			level.Error(h.logger).Log("msg", "queue name not found")
 			continue
 		}
 		ql := map[string]string{
 			h.monitorQueryKey: ins.GetMonitorQueryKey(),
-			"queueName":queueName, // hack, hardcode 🤮
+			"queueName":       queueName, // hack, hardcode 🤮
 		}
 		s, err := metric.NewTcmSeries(m, ql, ins)
 		if err != nil {
@@ -99,7 +101,7 @@ func (h *cmqHandler) GetSeriesByAll(m *metric.TcmMetric) ([]*metric.TcmSeries, e
 	return slist, nil
 }
 
-func NewCMQHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
+func NewCMQHandler(cred common.CredentialIface, c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
 	handler = &cmqHandler{
 		baseProductHandler{
 			monitorQueryKey: CMQInstanceIDKey,

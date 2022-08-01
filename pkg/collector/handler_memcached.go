@@ -1,7 +1,8 @@
 package collector
 
 import (
-	"github.com/go-kit/kit/log"
+	"github.com/go-kit/log"
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
 )
 
 const (
@@ -21,7 +22,7 @@ func (h *memcachedHandler) GetNamespace() string {
 	return MemcachedNamespace
 }
 
-func NewMemcachedHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
+func NewMemcachedHandler(cred common.CredentialIface, c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
 	handler = &memcachedHandler{
 		baseProductHandler{
 			monitorQueryKey: MemcachedInstanceIDKey,

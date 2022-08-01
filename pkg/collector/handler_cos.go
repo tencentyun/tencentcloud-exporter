@@ -3,8 +3,9 @@ package collector
 import (
 	"fmt"
 
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
 )
@@ -115,7 +116,7 @@ func (h *cosHandler) checkMonitorQueryKeys(m *metric.TcmMetric, ql map[string]st
 	return true
 }
 
-func NewCosHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
+func NewCosHandler(cred common.CredentialIface, c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
 	handler = &cosHandler{
 		baseProductHandler{
 			collector: c,

@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	mongodb "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/mongodb/v20190725"
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/instance"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
@@ -200,7 +201,7 @@ func (h *mongoHandler) getSeriesByMetricType(m *metric.TcmMetric, ins instance.T
 	return
 }
 
-func NewMongoHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
+func NewMongoHandler(cred common.CredentialIface, c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
 	handler = &mongoHandler{
 		baseProductHandler: baseProductHandler{
 			monitorQueryKey: MongoInstanceidKey,

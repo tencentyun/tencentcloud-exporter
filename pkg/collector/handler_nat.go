@@ -1,7 +1,8 @@
 package collector
 
 import (
-	"github.com/go-kit/kit/log"
+	"github.com/go-kit/log"
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
 )
 
@@ -30,7 +31,7 @@ func (h *natHandler) IsMetricVaild(m *metric.TcmMetric) bool {
 	return true
 }
 
-func NewNatHandler(c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
+func NewNatHandler(cred common.CredentialIface, c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
 	handler = &natHandler{
 		baseProductHandler{
 			monitorQueryKey: NatMonitorQueryKey,

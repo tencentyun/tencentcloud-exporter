@@ -2,12 +2,14 @@ package instance
 
 import (
 	"fmt"
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
+
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tse/v20201207"
 
 	"github.com/tencentyun/tencentcloud-exporter/pkg/client"
+	pkgcommon "github.com/tencentyun/tencentcloud-exporter/pkg/common"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
 )
 
@@ -98,8 +100,8 @@ func (repo *ZookeeperTcInstancePodRepositoryImpl) GetZookeeperPodInfo(instanceId
 	req.InstanceId = common.StringPtr(instanceId)
 	return repo.client.DescribeZookeeperReplicas(req)
 }
-func NewZookeeperTcInstancePodRepository(c *config.TencentConfig, logger log.Logger) (ZookeeperTcInstancePodRepository, error) {
-	cli, err := client.NewTseClient(c)
+func NewZookeeperTcInstancePodRepository(cred pkgcommon.CredentialIface, c *config.TencentConfig, logger log.Logger) (ZookeeperTcInstancePodRepository, error) {
+	cli, err := client.NewTseClient(cred, c)
 	if err != nil {
 		return nil, err
 	}
@@ -125,8 +127,8 @@ func (repo *ZookeeperTcInstanceInterfaceRepositoryImpl) GetZookeeperInterfaceInf
 	req.InstanceId = common.StringPtr(instanceId)
 	return repo.client.DescribeZookeeperServerInterfaces(req)
 }
-func NewZookeeperTcInstanceInterfaceRepository(c *config.TencentConfig, logger log.Logger) (ZookeeperTcInstanceInterfaceRepository, error) {
-	cli, err := client.NewTseClient(c)
+func NewZookeeperTcInstanceInterfaceRepository(cred pkgcommon.CredentialIface, c *config.TencentConfig, logger log.Logger) (ZookeeperTcInstanceInterfaceRepository, error) {
+	cli, err := client.NewTseClient(cred, c)
 	if err != nil {
 		return nil, err
 	}
@@ -137,8 +139,8 @@ func NewZookeeperTcInstanceInterfaceRepository(c *config.TencentConfig, logger l
 	return repo, nil
 }
 
-func NewZookeeperTcInstanceRepository(c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
-	cli, err := client.NewTseClient(c)
+func NewZookeeperTcInstanceRepository(cred pkgcommon.CredentialIface, c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
+	cli, err := client.NewTseClient(cred, c)
 	if err != nil {
 		return
 	}

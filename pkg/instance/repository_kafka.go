@@ -3,8 +3,10 @@ package instance
 import (
 	"fmt"
 
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
+
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/ckafka/v20190819"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/client"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
@@ -15,8 +17,9 @@ func init() {
 }
 
 type KafkaTcInstanceRepository struct {
-	client *sdk.Client
-	logger log.Logger
+	credential common.CredentialIface
+	client     *sdk.Client
+	logger     log.Logger
 }
 
 func (repo *KafkaTcInstanceRepository) GetInstanceKey() string {
@@ -62,7 +65,7 @@ getMoreInstances:
 	if total == 0 {
 		total = *resp.Response.Result.TotalCount
 	}
-	for _, meta := range resp.Response.Result.InstanceList{
+	for _, meta := range resp.Response.Result.InstanceList {
 		ins, e := NewKafkaTcInstance(*meta.InstanceId, meta)
 		if e != nil {
 			level.Error(repo.logger).Log("msg", "Create kafka instance fail", "id", *meta.InstanceId)
@@ -78,14 +81,15 @@ getMoreInstances:
 	return
 }
 
-func NewKafkaTcInstanceRepository(c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
-	cli, err := client.NewKafkaClient(c)
+func NewKafkaTcInstanceRepository(cred common.CredentialIface, c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
+	cli, err := client.NewKafkaClient(cred, c)
 	if err != nil {
 		return
 	}
 	repo = &KafkaTcInstanceRepository{
-		client: cli,
-		logger: logger,
+		credential: cred,
+		client:     cli,
+		logger:     logger,
 	}
 	return
 }

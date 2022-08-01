@@ -2,10 +2,12 @@ package instance
 
 import (
 	"fmt"
-	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
+	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
+	selfcommon "github.com/tencentyun/tencentcloud-exporter/pkg/common"
+
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tdmq/v20200217"
 
 	"github.com/tencentyun/tencentcloud-exporter/pkg/client"
@@ -101,8 +103,8 @@ func (repo *TdmqTcInstanceRocketMQNameSpacesRepositoryImpl) GetRocketMQNamespace
 	return repo.client.DescribeRocketMQNamespaces(req)
 }
 
-func NewTdmqTcInstanceRocketMQNameSpacesRepository(c *config.TencentConfig, logger log.Logger) (TdmqTcInstanceRocketMQNameSpacesRepository, error) {
-	cli, err := client.NewTDMQClient(c)
+func NewTdmqTcInstanceRocketMQNameSpacesRepository(cred selfcommon.CredentialIface, c *config.TencentConfig, logger log.Logger) (TdmqTcInstanceRocketMQNameSpacesRepository, error) {
+	cli, err := client.NewTDMQClient(cred, c)
 	if err != nil {
 		return nil, err
 	}
@@ -134,8 +136,8 @@ func (repo *TdmqTcInstanceRocketMQTopicsRepositoryImpl) GetRocketMQTopicsInfo(in
 	return repo.client.DescribeRocketMQTopics(req)
 }
 
-func NewTdmqTcInstanceRocketMQTopicsRepository(c *config.TencentConfig, logger log.Logger) (TdmqTcInstanceRocketMQTopicsRepository, error) {
-	cli, err := client.NewTDMQClient(c)
+func NewTdmqTcInstanceRocketMQTopicsRepository(cred selfcommon.CredentialIface, c *config.TencentConfig, logger log.Logger) (TdmqTcInstanceRocketMQTopicsRepository, error) {
+	cli, err := client.NewTDMQClient(cred, c)
 	if err != nil {
 		return nil, err
 	}
@@ -146,8 +148,8 @@ func NewTdmqTcInstanceRocketMQTopicsRepository(c *config.TencentConfig, logger l
 	return repo, nil
 }
 
-func NewTdmqTcInstanceRepository(c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
-	cli, err := client.NewTDMQClient(c)
+func NewTdmqTcInstanceRepository(cred selfcommon.CredentialIface, c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
+	cli, err := client.NewTDMQClient(cred, c)
 	if err != nil {
 		return
 	}

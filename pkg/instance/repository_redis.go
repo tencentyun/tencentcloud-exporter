@@ -3,8 +3,10 @@ package instance
 import (
 	"fmt"
 
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
+	mycommon "github.com/tencentyun/tencentcloud-exporter/pkg/common"
+
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/redis/v20180412"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/client"
@@ -19,18 +21,20 @@ func init() {
 }
 
 type RedisTcInstanceRepository struct {
-	client *sdk.Client
-	logger log.Logger
+	credential mycommon.CredentialIface
+	client     *sdk.Client
+	logger     log.Logger
 }
 
-func NewRedisTcInstanceRepository(c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
-	cli, err := client.NewRedisClient(c)
+func NewRedisTcInstanceRepository(cred mycommon.CredentialIface, c *config.TencentConfig, logger log.Logger) (repo TcInstanceRepository, err error) {
+	cli, err := client.NewRedisClient(cred, c)
 	if err != nil {
 		return
 	}
 	repo = &RedisTcInstanceRepository{
-		client: cli,
-		logger: logger,
+		credential: cred,
+		client:     cli,
+		logger:     logger,
 	}
 	return
 }
@@ -100,8 +104,9 @@ type RedisTcInstanceNodeRepository interface {
 }
 
 type RedisTcInstanceNodeRepositoryImpl struct {
-	client *sdk.Client
-	logger log.Logger
+	credential mycommon.CredentialIface
+	client     *sdk.Client
+	logger     log.Logger
 }
 
 func (repo *RedisTcInstanceNodeRepositoryImpl) GetNodeInfo(instanceId string) (*sdk.DescribeInstanceNodeInfoResponse, error) {
@@ -110,14 +115,15 @@ func (repo *RedisTcInstanceNodeRepositoryImpl) GetNodeInfo(instanceId string) (*
 	return repo.client.DescribeInstanceNodeInfo(req)
 }
 
-func NewRedisTcInstanceNodeRepository(c *config.TencentConfig, logger log.Logger) (RedisTcInstanceNodeRepository, error) {
-	cli, err := client.NewRedisClient(c)
+func NewRedisTcInstanceNodeRepository(cred mycommon.CredentialIface, c *config.TencentConfig, logger log.Logger) (RedisTcInstanceNodeRepository, error) {
+	cli, err := client.NewRedisClient(cred, c)
 	if err != nil {
 		return nil, err
 	}
 	repo := &RedisTcInstanceNodeRepositoryImpl{
-		client: cli,
-		logger: logger,
+		credential: cred,
+		client:     cli,
+		logger:     logger,
 	}
 	return repo, nil
 }

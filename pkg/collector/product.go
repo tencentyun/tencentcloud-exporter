@@ -3,13 +3,16 @@ package collector
 import (
 	"context"
 	"fmt"
-	"github.com/tencentyun/tencentcloud-exporter/pkg/constant"
 	"strings"
 	"sync"
 	"time"
 
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
+	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
+
+	"github.com/tencentyun/tencentcloud-exporter/pkg/constant"
+
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/instance"
@@ -301,7 +304,7 @@ func (r *TcProductCollectorReloader) reloadMetricsByProductConf() error {
 }
 
 // 创建新的TcProductCollector, 每个产品一个
-func NewTcProductCollector(namespace string, metricRepo metric.TcmMetricRepository,
+func NewTcProductCollector(namespace string, metricRepo metric.TcmMetricRepository, cred common.CredentialIface,
 	conf *config.TencentConfig, pconf *config.TencentProduct, logger log.Logger) (*TcProductCollector, error) {
 	factory, exists := handlerFactoryMap[namespace]
 	if !exists {
@@ -311,7 +314,7 @@ func NewTcProductCollector(namespace string, metricRepo metric.TcmMetricReposito
 	var instanceRepoCache instance.TcInstanceRepository
 	if !util.IsStrInList(constant.NotSupportInstanceNamespaces, namespace) {
 		// 支持实例自动发现的产品
-		instanceRepo, err := instance.NewTcInstanceRepository(namespace, conf, logger)
+		instanceRepo, err := instance.NewTcInstanceRepository(namespace, cred, conf, logger)
 		if err != nil {
 			return nil, err
 		}
@@ -329,7 +332,7 @@ func NewTcProductCollector(namespace string, metricRepo metric.TcmMetricReposito
 		logger:       logger,
 	}
 
-	handler, err := factory(c, logger)
+	handler, err := factory(cred, c, logger)
 	if err != nil {
 		return nil, err
 	}

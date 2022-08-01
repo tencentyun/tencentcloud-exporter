@@ -18,9 +18,10 @@ const (
 	DefaultRateLimit            = 15
 	DefaultQueryMetricBatchSize = 50
 
-	EnvAccessKey = "TENCENTCLOUD_SECRET_ID"
-	EnvSecretKey = "TENCENTCLOUD_SECRET_KEY"
-	EnvRegion    = "TENCENTCLOUD_REGION"
+	EnvAccessKey   = "TENCENTCLOUD_SECRET_ID"
+	EnvSecretKey   = "TENCENTCLOUD_SECRET_KEY"
+	EnvServiceRole = "TENCENTCLOUD_SERVICE_ROLE"
+	EnvRegion      = "TENCENTCLOUD_REGION"
 )
 
 var (
@@ -73,10 +74,13 @@ var (
 )
 
 type TencentCredential struct {
-	AccessKey  string `yaml:"access_key"`
-	SecretKey  string `yaml:"secret_key"`
-	Region     string `yaml:"region"`
-	IsInternal bool   `yaml:"is_internal"`
+	AccessKey   string `yaml:"access_key"`
+	SecretKey   string `yaml:"secret_key"`
+	Role        string `yaml:"role"`
+	Region      string `yaml:"region"`
+	Token       string `yaml:"token"`
+	ExpiredTime int64  `yaml:"expired_time"`
+	IsInternal  bool   `yaml:"is_internal"`
 }
 
 type TencentMetric struct {
@@ -112,6 +116,14 @@ type TencentProduct struct {
 	RelodIntervalMinutes  int64               `yaml:"relod_interval_minutes"`
 }
 
+type metadataResponse struct {
+	TmpSecretId  string
+	TmpSecretKey string
+	Token        string
+	ExpiredTime  int64
+	Code         string
+}
+
 func (p *TencentProduct) IsReloadEnable() bool {
 	if util.IsStrInList(constant.NotSupportInstanceNamespaces, p.Namespace) {
 		return false
@@ -126,6 +138,7 @@ type TencentConfig struct {
 	RateLimit            float64           `yaml:"rate_limit"`
 	MetricQueryBatchSize int               `yaml:"metric_query_batch_size"`
 	Filename             string            `yaml:"filename"`
+	CacheInterval        int64             `yaml:"cache_interval"` // 单位 s
 }
 
 func NewConfig() *TencentConfig {
@@ -140,7 +153,6 @@ func (c *TencentConfig) LoadFile(filename string) error {
 	}
 	if err = yaml.UnmarshalStrict(content, c); err != nil {
 		return err
-
 	}
 	if err = c.check(); err != nil {
 		return err
@@ -152,16 +164,19 @@ func (c *TencentConfig) LoadFile(filename string) error {
 func (c *TencentConfig) check() (err error) {
 	if c.Credential.AccessKey == "" {
 		c.Credential.AccessKey = os.Getenv(EnvAccessKey)
-		if c.Credential.AccessKey == "" {
-			return fmt.Errorf("credential.access_key is empty, must be set")
-		}
 	}
 	if c.Credential.SecretKey == "" {
 		c.Credential.SecretKey = os.Getenv(EnvSecretKey)
-		if c.Credential.SecretKey == "" {
-			return fmt.Errorf("credential.secret_key is empty, must be set")
+	}
+	if c.Credential.AccessKey != "" && c.Credential.SecretKey != "" {
+		c.Credential.Role = "" // 优先使用密钥，根据 role 是否为空判断使用密钥还是 role
+	} else if c.Credential.Role == "" {
+		c.Credential.Role = os.Getenv(EnvServiceRole)
+		if c.Credential.Role == "" {
+			return fmt.Errorf("credential.access_key or credential.secret_key or credential.role is empty, must be set")
 		}
 	}
+
 	if c.Credential.Region == "" {
 		c.Credential.Region = os.Getenv(EnvRegion)
 		if c.Credential.Region == "" {
@@ -288,5 +303,4 @@ func GetStandardNamespaceFromCustomNamespace(cns string) string {
 	} else {
 		panic(fmt.Sprintf("Product not support, namespace=%s, product=%s", cns, pname))
 	}
-
 }
