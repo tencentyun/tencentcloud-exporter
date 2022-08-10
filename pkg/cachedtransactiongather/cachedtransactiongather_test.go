@@ -18,7 +18,7 @@ type mockGatherer struct {
 func (m mockGatherer) Gather() ([]*io_prometheus_client.MetricFamily, error) {
 	fmt.Println("start gather: " + m.sleepUntil.String())
 	time.Sleep(m.sleepUntil)
-	fmt.Sprintf("end gather: " + m.sleepUntil.String())
+	fmt.Println("end gather: " + m.sleepUntil.String())
 	return []*io_prometheus_client.MetricFamily{}, nil
 }
 
