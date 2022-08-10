@@ -65,16 +65,16 @@ func TestCache(t *testing.T) {
 	promlogConfig := &promlog.Config{}
 	cacheInterval := 60 * time.Second
 	logger := promlog.New(promlogConfig)
-	gather := NewCachedTransactionGather(
-		newMultiConcurrencyRegistry(
-			prometheus.ToTransactionalGatherer(newMockGatherer(time.Second*40)),
-			prometheus.ToTransactionalGatherer(newMockGatherer(time.Second*23)),
-			prometheus.ToTransactionalGatherer(newMockGatherer(time.Second*7)),
-		),
-		cacheInterval, logger,
-	)
 
 	t.Run("gather with multiple calls should not error", func(t *testing.T) {
+		gather := NewCachedTransactionGather(
+			newMultiConcurrencyRegistry(
+				prometheus.ToTransactionalGatherer(newMockGatherer(time.Second*40)),
+				prometheus.ToTransactionalGatherer(newMockGatherer(time.Second*23)),
+				prometheus.ToTransactionalGatherer(newMockGatherer(time.Second*7)),
+			),
+			cacheInterval, logger,
+		)
 		wait := sync.WaitGroup{}
 		wait.Add(10)
 		for range [10]int{} {
@@ -97,6 +97,14 @@ func TestCache(t *testing.T) {
 	})
 
 	t.Run("gather success", func(t *testing.T) {
+		gather := NewCachedTransactionGather(
+			newMultiConcurrencyRegistry(
+				prometheus.ToTransactionalGatherer(newMockGatherer(time.Second*40)),
+				prometheus.ToTransactionalGatherer(newMockGatherer(time.Second*23)),
+				prometheus.ToTransactionalGatherer(newMockGatherer(time.Second*7)),
+			),
+			cacheInterval, logger,
+		)
 		wait := sync.WaitGroup{}
 		wait.Add(3)
 		go func() {
@@ -129,6 +137,60 @@ func TestCache(t *testing.T) {
 			logger.Log("mfs", mfs, "done", "err", err)
 			wait.Done()
 		}()
+		wait.Wait()
+	})
+
+	t.Run("gather with 5s step", func(t *testing.T) {
+		gather := NewCachedTransactionGather(
+			newMultiConcurrencyRegistry(
+				prometheus.ToTransactionalGatherer(newMockGatherer(time.Second*40)),
+				prometheus.ToTransactionalGatherer(newMockGatherer(time.Second*23)),
+				prometheus.ToTransactionalGatherer(newMockGatherer(time.Second*7)),
+			),
+			cacheInterval, logger,
+		)
+		wait := sync.WaitGroup{}
+		wait.Add(10)
+		for range [10]int{} {
+			time.Sleep(time.Second * 5)
+			go func() {
+				mfs, done, err := gather.Gather()
+				defer done()
+				if err != nil {
+					logger.Log("err", err)
+					t.Errorf("gather error: %v", err)
+				}
+				logger.Log("mfs", mfs, "done", "err", err)
+				wait.Done()
+			}()
+		}
+		wait.Wait()
+	})
+
+	t.Run("gather with 65s step", func(t *testing.T) {
+		gather := NewCachedTransactionGather(
+			newMultiConcurrencyRegistry(
+				prometheus.ToTransactionalGatherer(newMockGatherer(time.Second*40)),
+				prometheus.ToTransactionalGatherer(newMockGatherer(time.Second*23)),
+				prometheus.ToTransactionalGatherer(newMockGatherer(time.Second*7)),
+			),
+			cacheInterval, logger,
+		)
+		wait := sync.WaitGroup{}
+		wait.Add(3)
+		for range [3]int{} {
+			time.Sleep(time.Second * 65)
+			go func() {
+				mfs, done, err := gather.Gather()
+				defer done()
+				if err != nil {
+					logger.Log("err", err)
+					t.Errorf("gather error: %v", err)
+				}
+				logger.Log("mfs", mfs, "done", "err", err)
+				wait.Done()
+			}()
+		}
 		wait.Wait()
 	})
 }
