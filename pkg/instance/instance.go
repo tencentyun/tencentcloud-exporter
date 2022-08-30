@@ -2,9 +2,8 @@ package instance
 
 import (
 	"fmt"
+	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
 	"reflect"
-	"regexp"
-	"unicode"
 )
 
 // 每个产品的实例对象, 可用于配置导出指标的额外label填充, 根据字段名获取值
@@ -68,7 +67,6 @@ func (ins *baseTcInstance) GetFieldValuesByName(name string) (val map[string][]s
 				valueMap[name] = append(val[name], fmt.Sprintf("%v", v.Index(i).Elem().Interface()))
 			} else if v.Index(i).Elem().Kind() == reflect.Struct {
 				var tagKey, tagValue reflect.Value
-
 				if v.Index(i).Elem().FieldByName("TagKey").IsValid() && v.Index(i).Elem().FieldByName("TagValue").IsValid() {
 					tagKey = v.Index(i).Elem().FieldByName("TagKey")
 					tagValue = v.Index(i).Elem().FieldByName("TagValue")
@@ -82,7 +80,7 @@ func (ins *baseTcInstance) GetFieldValuesByName(name string) (val map[string][]s
 				if tagValue.Kind() == reflect.Ptr {
 					tagValue = reflect.Indirect(tagValue)
 				}
-				if IsValidTagKey(tagKey.String()) {
+				if util.IsValidTagKey(tagKey.String()) {
 					valueMap[tagKey.String()] = append(val[tagKey.String()], tagValue.String())
 				}
 			}
@@ -91,16 +89,4 @@ func (ins *baseTcInstance) GetFieldValuesByName(name string) (val map[string][]s
 		valueMap[name] = append(val[name], fmt.Sprintf("%v", v.Interface()))
 	}
 	return valueMap, nil
-}
-
-func IsValidTagKey(str string) bool {
-	for _, r := range str {
-		if unicode.Is(unicode.Scripts["Han"], r) || (regexp.MustCompile("[\u3002\uff1b\uff0c\uff1a\u201c\u201d\uff08\uff09\u3001\uff1f\u300a\u300b]").MatchString(string(r))) {
-			return false
-		}
-	}
-	if !regexp.MustCompile(`^[A-Za-z0-9_]+$`).MatchString(str) {
-		return false
-	}
-	return true
 }
