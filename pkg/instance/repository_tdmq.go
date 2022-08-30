@@ -64,7 +64,10 @@ func (repo *TdmqTcInstanceRepository) ListByFilters(filters map[string]string) (
 
 	req.Offset = &offset
 	req.Limit = &limit
-
+	req.Filters = []*sdk.Filter{{
+		Name:   &includeVip,
+		Values: []*string{&includeVipTrue},
+	}}
 getMoreInstances:
 	resp, err := repo.client.DescribeRocketMQClusters(req)
 	if err != nil {
