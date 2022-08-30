@@ -18,9 +18,6 @@ func init() {
 	registerRepository("QCE/TDMQ", NewTdmqTcInstanceRepository)
 }
 
-var includeVip = "includeVip"
-var includeVipTrue = "true"
-
 type TdmqTcInstanceRepository struct {
 	client *sdk.Client
 	logger log.Logger
@@ -32,10 +29,6 @@ func (repo *TdmqTcInstanceRepository) GetInstanceKey() string {
 
 func (repo *TdmqTcInstanceRepository) Get(id string) (instance TcInstance, err error) {
 	req := sdk.NewDescribeRocketMQClustersRequest()
-	req.Filters = []*sdk.Filter{{
-		Name:   &includeVip,
-		Values: []*string{&includeVipTrue},
-	}}
 	req.ClusterIdList = []*string{&id}
 	resp, err := repo.client.DescribeRocketMQClusters(req)
 	if err != nil {

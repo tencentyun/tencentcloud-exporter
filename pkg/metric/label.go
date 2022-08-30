@@ -44,14 +44,9 @@ func (l *TcmLabels) GetValues(filters map[string]string, ins instance.TcInstance
 		}
 	}
 	for _, name := range l.instanceLabelNames {
-		vMap, e := ins.GetFieldValuesByName(name)
-		if e == nil && vMap != nil {
-			for vName, values := range vMap {
-				for _, value := range values {
-					nameValues[vName] = value
-				}
-
-			}
+		v, e := ins.GetFieldValueByName(name)
+		if e == nil && v != "" {
+			nameValues[name] = v
 		}
 	}
 	for name, value := range l.constLabels {
