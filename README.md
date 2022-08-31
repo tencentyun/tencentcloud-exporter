@@ -81,8 +81,7 @@ products:
 ```yaml
 credential:
   access_key: <YOUR_ACCESS_KEY>                  // 必须, 云API的SecretId
-  access_secret: <YOUR_ACCESS_SECRET>            // 必须, 云API的SecretKey
-  role: <YOUR_SERVICE_ROLE>                      // 可选，可在云上CVM/TKE中使用，没有access_key和access_secret时会使用role申请临时密钥
+  secret_key: <YOUR_ACCESS_SECRET>            // 必须, 云API的SecretKey
   region: <REGION>                               // 必须, 实例所在区域信息
 
 rate_limit: 15                                   // 腾讯云监控拉取指标数据限制, 官方默认限制最大20qps
@@ -139,7 +138,6 @@ metrics:
 ```bash
 export TENCENTCLOUD_SECRET_ID="YOUR_ACCESS_KEY"
 export TENCENTCLOUD_SECRET_KEY="YOUR_ACCESS_SECRET"
-export TENCENTCLOUD_SERVICE_ROLE = "YOUR_SERVICE_ROLE"
 export TENCENTCLOUD_REGION="REGION"
 ```
 
@@ -159,7 +157,6 @@ export TENCENTCLOUD_REGION="REGION"
 
 ## 五、qcloud.yml样例
 在git的configs里有支持产品的配置模版样例
-
 
 
 
