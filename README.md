@@ -81,7 +81,7 @@ products:
 ```yaml
 credential:
   access_key: <YOUR_ACCESS_KEY>                  // 必须, 云API的SecretId
-  access_secret: <YOUR_ACCESS_SECRET>            // 必须, 云API的SecretKey
+  secret_key: <YOUR_ACCESS_SECRET>            // 必须, 云API的SecretKey
   region: <REGION>                               // 必须, 实例所在区域信息
 
 rate_limit: 15                                   // 腾讯云监控拉取指标数据限制, 官方默认限制最大20qps
