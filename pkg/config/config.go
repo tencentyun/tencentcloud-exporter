@@ -63,6 +63,7 @@ var (
 		"vpngw":         "QCE/VPNGW",         // for vpngw
 		"vpnx":          "QCE/VPNX",          // for vpnx
 		"cynosdb_mysql": "QCE/CYNOSDB_MYSQL", // for cynosdb_mysql
+		"dts":           "QCE/DTS",           // for dts
 	}
 
 	SupportStatisticsTypes = map[string]bool{
