@@ -1,6 +1,9 @@
 # 腾讯云监控 Exporter v2
 
-腾讯云监控已于2022年09月01日开始对超出免费额度的 API 接口的请求进行计费，需要手动开通 API 付费，详见计费说明与开通指引：https://cloud.tencent.com/document/product/248/77914
+腾讯云监控已于2022年09月01日开始对超出免费额度的 API 接口的请求进行计费，需要手动开通 API 付费，详见计费说明与开通指引。
+开通页面：https://buy.cloud.tencent.com/APIRequestBuy
+资源消耗页：https://console.cloud.tencent.com/monitor/consumer/products
+计费文档：https://cloud.tencent.com/document/product/248/77914
 
 通过qcloud exporter将云监控支持的产品监控指标自动批量导出  
 (`兼容v1版本`)
