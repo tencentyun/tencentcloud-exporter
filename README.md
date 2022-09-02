@@ -1,5 +1,10 @@
 # 腾讯云监控 Exporter v2
 
+腾讯云监控已于2022年09月01日开始对超出免费额度的 API 接口的请求进行计费，需要手动开通 API 付费，详见计费说明与开通指引。     
+开通页面：https://buy.cloud.tencent.com/APIRequestBuy    
+资源消耗页：https://console.cloud.tencent.com/monitor/consumer/products   
+计费文档：https://cloud.tencent.com/document/product/248/77914   
+
 通过qcloud exporter将云监控支持的产品监控指标自动批量导出  
 (`兼容v1版本`)
 
@@ -81,7 +86,7 @@ products:
 ```yaml
 credential:
   access_key: <YOUR_ACCESS_KEY>                  // 必须, 云API的SecretId
-  access_secret: <YOUR_ACCESS_SECRET>            // 必须, 云API的SecretKey
+  secret_key: <YOUR_ACCESS_SECRET>            // 必须, 云API的SecretKey
   region: <REGION>                               // 必须, 实例所在区域信息
 
 rate_limit: 15                                   // 腾讯云监控拉取指标数据限制, 官方默认限制最大20qps
