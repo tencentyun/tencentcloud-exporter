@@ -160,7 +160,6 @@ func (m *TcmMetric) GetSeriesSplitByBatch(batch int) (steps [][]*TcmSeries) {
 // 创建TcmMetric
 func NewTcmMetric(meta *TcmMeta, conf *TcmMetricConfig) (*TcmMetric, error) {
 	id := fmt.Sprintf("%s-%s", meta.Namespace, meta.MetricName)
-
 	labels, err := NewTcmLabels(meta.SupportDimensions, conf.InstanceLabelNames, conf.ConstLabels)
 	if err != nil {
 		return nil, err

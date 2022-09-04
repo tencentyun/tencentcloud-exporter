@@ -135,7 +135,6 @@ func (h *dtsHandler) getSeriesByMetricType(m *metric.TcmMetric, ins instance.TcI
 	var dimensions []string
 	for _, v := range m.Meta.SupportDimensions {
 		dimensions = append(dimensions, v)
-		fmt.Println(v)
 	}
 	if util.IsStrInList(dimensions, "replicationjobid") {
 		return h.getReplicationSeries(m, ins)
@@ -163,27 +162,19 @@ func (h *dtsHandler) getInstanceSeries(m *metric.TcmMetric, ins instance.TcInsta
 
 func (h *dtsHandler) getReplicationSeries(m *metric.TcmMetric, ins instance.TcInstance) ([]*metric.TcmSeries, error) {
 	var series []*metric.TcmSeries
-	// replicationResp, err := h.namespaceRepo.GetRocketMQNamespacesInfo(ins.GetInstanceId())
+	// replications, err := h.replicationsRepo.GetReplicationInfo()
 	// if err != nil {
 	// 	return nil, err
 	// }
-	// for _, namespace := range namespacesResp.Response.Namespaces {
-	// 	topicsResp, err := h.topicRepo.GetRocketMQTopicsInfo(ins.GetInstanceId(), *namespace.NamespaceId)
+	// for _, replication := range replications.Response.JobList {
+	// 	ql := map[string]string{
+	// 		"replicationjobid": *replication.JobId,
+	// 	}
+	// 	s, err := metric.NewTcmSeries(m, ql, ins)
 	// 	if err != nil {
 	// 		return nil, err
 	// 	}
-	// 	for _, topic := range topicsResp.Response.Topics {
-	// 		ql := map[string]string{
-	// 			"tenantId":      ins.GetMonitorQueryKey(),
-	// 			"environmentId": *namespace.NamespaceId,
-	// 			"topicName":     *topic.Name,
-	// 		}
-	// 		s, err := metric.NewTcmSeries(m, ql, ins)
-	// 		if err != nil {
-	// 			return nil, err
-	// 		}
-	// 		series = append(series, s)
-	// 	}
+	// 	series = append(series, s)
 	// }
 	return series, nil
 }
@@ -202,8 +193,8 @@ func (h *dtsHandler) getMigrateInfoSeries(m *metric.TcmMetric, ins instance.TcIn
 			return nil, err
 		}
 		series = append(series, s)
-
 	}
+
 	return series, nil
 }
 

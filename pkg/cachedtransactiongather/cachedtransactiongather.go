@@ -40,12 +40,10 @@ type cachedTransactionGather struct {
 }
 
 func (c *cachedTransactionGather) Gather() ([]*io_prometheus_client.MetricFamily, func(), error) {
-	c.lock.RLock()
+	c.lock.Lock()
 	shouldGather := time.Now().After(c.nextCollectionTime)
-	c.lock.RUnlock()
 	if shouldGather {
 		begin := time.Now()
-		c.lock.Lock()
 		c.nextCollectionTime = c.nextCollectionTime.Add(c.cacheInterval)
 		metrics, done, err := c.gather.Gather()
 		if err != nil {
@@ -60,6 +58,8 @@ func (c *cachedTransactionGather) Gather() ([]*io_prometheus_client.MetricFamily
 		c.lock.Unlock()
 		duration := time.Since(begin)
 		level.Info(c.logger).Log("msg", "Collect all products done", "duration_seconds", duration.Seconds())
+	} else {
+		c.lock.Unlock()
 	}
 	c.lock.RLock()
 	defer c.lock.RUnlock()
