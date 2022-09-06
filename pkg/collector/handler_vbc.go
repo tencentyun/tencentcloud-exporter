@@ -16,6 +16,14 @@ const (
 	VbcInstanceidKey = "CcnId"
 )
 
+var (
+	// BetweenRegionMetricNames = []string{
+	// 	"OutDropBandwidth", "InBandwidthRate", "OutBandwidthRate", "OutDropPkg", "OutDropPkgRate", "InBandwidth", "InPkg", "OutPkg", "OutBandwidth",
+	// }
+	SingleRegionMetricNames = []string{
+		"Regioninbandwidthbm", "Regionoutbandwidthbm", "Regionoutdropbandwidthbm", "Regioninpkgbm", "Regionoutbandwidthbmrate", "Regionoutdroppkgbmrate", "Regionoutpkgbm", "Regionoutdroppkgbm",
+	}
+)
 var conf *config.TencentConfig
 
 func init() {
@@ -124,16 +132,22 @@ func (h *VbcHandler) GetSeriesByCustom(m *metric.TcmMetric) ([]*metric.TcmSeries
 	return slist, nil
 }
 func (h *VbcHandler) getSeriesByMetricType(m *metric.TcmMetric, ins instance.TcInstance) ([]*metric.TcmSeries, error) {
-	var dimensions []string
-	for _, v := range m.Meta.SupportDimensions {
-		dimensions = append(dimensions, v)
-	}
-	if util.IsStrInList(dimensions, "DRegion") {
+	// var dimensions []string
+	// for _, v := range m.Meta.SupportDimensions {
+	// 	dimensions = append(dimensions, v)
+	// }
+	// if util.IsStrInList(dimensions, "DRegion") {
+	// 	return h.getSingleRegionSeries(m, ins)
+	// } else {
+	// 	return h.getSingleRegionSeries(m, ins)
+	// }
+	if util.IsStrInList(SingleRegionMetricNames, m.Meta.MetricName) {
 		return h.getSingleRegionSeries(m, ins)
 	} else {
-		return h.getSingleRegionSeries(m, ins)
+		return h.getBetweenRegionSeries(m, ins)
 	}
 }
+
 func (h *VbcHandler) getSingleRegionSeries(m *metric.TcmMetric, ins instance.TcInstance) ([]*metric.TcmSeries, error) {
 	var series []*metric.TcmSeries
 	ql := map[string]string{
@@ -149,7 +163,7 @@ func (h *VbcHandler) getSingleRegionSeries(m *metric.TcmMetric, ins instance.TcI
 	return series, nil
 }
 
-func (h *VbcHandler) getRegionsSeries(m *metric.TcmMetric, ins instance.TcInstance) ([]*metric.TcmSeries, error) {
+func (h *VbcHandler) getBetweenRegionSeries(m *metric.TcmMetric, ins instance.TcInstance) ([]*metric.TcmSeries, error) {
 	var series []*metric.TcmSeries
 
 	return series, nil
