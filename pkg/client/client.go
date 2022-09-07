@@ -15,6 +15,7 @@ import (
 	cynosdb "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cynosdb/v20190107"
 	dc "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/dc/v20180410"
 	dcdb "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/dcdb/v20180411"
+	dts "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/dts/v20180330"
 	es "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/es/v20180416"
 	lh "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/lighthouse/v20200324"
 	mariadb "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/mariadb/v20170312"
@@ -257,14 +258,24 @@ func NewCosClient(cred common.CredentialIface, conf *config.TencentConfig) (*cos
 	// 用于Get Service 查询, service域名暂时只支持外网
 	su, _ := url.Parse("http://cos." + conf.Credential.Region + ".myqcloud.com")
 	b := &cos.BaseURL{BucketURL: nil, ServiceURL: su}
-	//client := cos.NewClient(b, &http.Client{
+	// client := cos.NewClient(b, &http.Client{
 	//	Transport: &cos.AuthorizationTransport{
 	//		SecretID:  conf.Credential.AccessKey,
 	//		SecretKey: conf.Credential.SecretKey,
 	//	},
-	//})
+	// })
 	client := cos.NewClient(b, &http.Client{
 		Transport: common.NewCredentialTransport(cred.GetRole()),
 	})
 	return client, nil
+}
+
+func NewDTSClient(cred common.CredentialIface, conf *config.TencentConfig) (*dts.Client, error) {
+	cpf := profile.NewClientProfile()
+	if conf.Credential.IsInternal == true {
+		cpf.HttpProfile.Endpoint = "dts.internal.tencentcloudapi.com"
+	} else {
+		cpf.HttpProfile.Endpoint = "dts.tencentcloudapi.com"
+	}
+	return dts.NewClient(cred, conf.Credential.Region, cpf)
 }
