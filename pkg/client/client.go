@@ -15,6 +15,7 @@ import (
 	cynosdb "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cynosdb/v20190107"
 	dc "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/dc/v20180410"
 	dcdb "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/dcdb/v20180411"
+	dts "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/dts/v20180330"
 	es "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/es/v20180416"
 	lh "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/lighthouse/v20200324"
 	mariadb "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/mariadb/v20170312"
@@ -270,5 +271,16 @@ func NewCosClient(cred common.CredentialIface, conf *config.TencentConfig) (*cos
 			Transport: common.NewCredentialTransport(cred.GetRole()),
 		})
 	}
+
 	return client, nil
+}
+
+func NewDTSClient(cred common.CredentialIface, conf *config.TencentConfig) (*dts.Client, error) {
+	cpf := profile.NewClientProfile()
+	if conf.Credential.IsInternal == true {
+		cpf.HttpProfile.Endpoint = "dts.internal.tencentcloudapi.com"
+	} else {
+		cpf.HttpProfile.Endpoint = "dts.tencentcloudapi.com"
+	}
+	return dts.NewClient(cred, conf.Credential.Region, cpf)
 }

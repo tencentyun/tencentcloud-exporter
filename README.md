@@ -1,5 +1,10 @@
 # 腾讯云监控 Exporter v2
 
+腾讯云监控已于2022年09月01日开始对超出免费额度的 API 接口的请求进行计费，需要手动开通 API 付费，详见计费说明与开通指引。     
+开通页面：https://buy.cloud.tencent.com/APIRequestBuy    
+资源消耗页：https://console.cloud.tencent.com/monitor/consumer/products   
+计费文档：https://cloud.tencent.com/document/product/248/77914   
+
 通过qcloud exporter将云监控支持的产品监控指标自动批量导出  
 (`兼容v1版本`)
 
@@ -36,6 +41,9 @@ TDMQ RocketMQ 版|QCE/TDMQ|[指标详情](https://cloud.tencent.com/document/pro
 VPN 网关|QCE/VPNGW|[指标详情](https://cloud.tencent.com/document/product/248/45070)
 VPN 通道|QCE/VPNX|[指标详情](https://cloud.tencent.com/document/product/248/45071)
 CYNOSDB_MYSQL|QCE/CYNOSDB_MYSQL|[指标详情](https://cloud.tencent.com/document/product/248/45106)
+云联网|QCE/VBC|[指标详情](https://cloud.tencent.com/document/product/248/75629)
+数据传输 |QCE/DTS|指标详情说明文档(待上线)
+专线网关 |QCE/DCG|指标详情说明文档(待上线)
 
 `后续会有更多的产品支持`
 
