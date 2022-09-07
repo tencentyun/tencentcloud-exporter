@@ -42,6 +42,8 @@ VPN 网关|QCE/VPNGW|[指标详情](https://cloud.tencent.com/document/product/2
 VPN 通道|QCE/VPNX|[指标详情](https://cloud.tencent.com/document/product/248/45071)
 CYNOSDB_MYSQL|QCE/CYNOSDB_MYSQL|[指标详情](https://cloud.tencent.com/document/product/248/45106)
 云联网|QCE/VBC|[指标详情](https://cloud.tencent.com/document/product/248/75629)
+数据传输 |QCE/DTS|指标详情说明文档(待上线)
+专线网关 |QCE/DCG|指标详情说明文档(待上线)
 
 `后续会有更多的产品支持`
 
