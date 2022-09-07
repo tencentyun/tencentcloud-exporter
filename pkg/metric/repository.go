@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
+
 	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
 
 	"github.com/go-kit/log"
@@ -121,11 +123,11 @@ func (repo *TcmMetricRepositoryImpl) GetSamples(s *TcmSeries, st int64, et int64
 	}
 	request.Instances = []*monitor.Instance{instanceFilters}
 
-	stStr := time.Unix(st, 0).Format(timeStampFormat)
+	stStr := util.FormatTime(time.Unix(st, 0), timeStampFormat)
 	request.StartTime = &stStr
 	if et != 0 {
-		etStr := time.Unix(et, 0).Format(timeStampFormat)
-		request.StartTime = &etStr
+		etStr := util.FormatTime(time.Unix(et, 0), timeStampFormat)
+		request.EndTime = &etStr
 	}
 
 	response, err := repo.monitorClient.GetMonitorData(request)
@@ -173,6 +175,7 @@ func (repo *TcmMetricRepositoryImpl) listSampleByBatch(
 		return nil, err
 	}
 
+	//level.Info(repo.logger).Log("st", st, "et", et)
 	request := repo.buildGetMonitorDataRequest(m, seriesList, st, et)
 	response, err := repo.monitorClient.GetMonitorData(request)
 	if err != nil {
@@ -217,11 +220,11 @@ func (repo *TcmMetricRepositoryImpl) buildGetMonitorDataRequest(
 		request.Instances = append(request.Instances, ifilters)
 	}
 
-	stStr := time.Unix(st, 0).Format(timeStampFormat)
+	stStr := util.FormatTime(time.Unix(st, 0), timeStampFormat)
 	request.StartTime = &stStr
 	if et != 0 {
-		etStr := time.Unix(et, 0).Format(timeStampFormat)
-		request.StartTime = &etStr
+		etStr := util.FormatTime(time.Unix(et, 0), timeStampFormat)
+		request.EndTime = &etStr
 	}
 	return request
 }
