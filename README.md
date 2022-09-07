@@ -41,7 +41,7 @@ TDMQ RocketMQ 版|QCE/TDMQ|[指标详情](https://cloud.tencent.com/document/pro
 VPN 网关|QCE/VPNGW|[指标详情](https://cloud.tencent.com/document/product/248/45070)
 VPN 通道|QCE/VPNX|[指标详情](https://cloud.tencent.com/document/product/248/45071)
 CYNOSDB_MYSQL|QCE/CYNOSDB_MYSQL|[指标详情](https://cloud.tencent.com/document/product/248/45106)
-
+云联网|QCE/VBC|[指标详情](https://cloud.tencent.com/document/product/248/75629)
 `后续会有更多的产品支持`
 
 ## 二、快速开始
