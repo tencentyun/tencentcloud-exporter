@@ -34,14 +34,14 @@ import (
 	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
 )
 
-func NewMonitorClient(cred common.CredentialIface, conf *config.TencentConfig) (*monitor.Client, error) {
+func NewMonitorClient(cred common.CredentialIface, conf *config.TencentConfig, region string) (*monitor.Client, error) {
 	cpf := profile.NewClientProfile()
 	if conf.Credential.IsInternal == true {
 		cpf.HttpProfile.Endpoint = "monitor.internal.tencentcloudapi.com"
 	} else {
 		cpf.HttpProfile.Endpoint = "monitor.tencentcloudapi.com"
 	}
-	return monitor.NewClient(cred, conf.Credential.Region, cpf)
+	return monitor.NewClient(cred, region, cpf)
 }
 
 func NewMongodbClient(cred common.CredentialIface, conf *config.TencentConfig) (*mongodb.Client, error) {
