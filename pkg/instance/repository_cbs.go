@@ -6,6 +6,7 @@ import (
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cbs/v20170312"
+	cvm "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cvm/v20170312"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/client"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
@@ -93,4 +94,55 @@ func NewCbsTcInstanceRepository(cred common.CredentialIface, c *config.TencentCo
 		logger:     logger,
 	}
 	return
+}
+
+// cvm instance
+type CbsTcInstanceInfosRepository interface {
+	Get(id string) ([]string, error)
+	GetInstanceInfosInfoByFilters([]string) (*cvm.DescribeInstancesResponse, error)
+}
+
+type CbsTcInstanceInfosRepositoryImpl struct {
+	client *cvm.Client
+	logger log.Logger
+}
+
+func (repo *CbsTcInstanceInfosRepositoryImpl) Get(id string) (instanceIds []string, err error) {
+	req := cvm.NewDescribeInstancesRequest()
+	req.InstanceIds = []*string{&id}
+	resp, err := repo.client.DescribeInstances(req)
+	if err != nil {
+		return
+	}
+	for _, instanceInfo := range resp.Response.InstanceSet {
+		instanceIds = append(instanceIds, *instanceInfo.InstanceId)
+	}
+	return
+}
+
+func (repo *CbsTcInstanceInfosRepositoryImpl) GetInstanceInfosInfoByFilters(ids []string) (instances *cvm.DescribeInstancesResponse, err error) {
+	req := cvm.NewDescribeInstancesRequest()
+	var offset int64 = 0
+	var limit int64 = 100
+
+	req.Offset = &offset
+	req.Limit = &limit
+	if ids!=nil{
+		for _, id := range ids {
+			req.InstanceIds = []*string{&id}
+		}
+	}
+	return repo.client.DescribeInstances(req)
+}
+
+func NewCbsTcInstanceInfosRepository(cred common.CredentialIface, c *config.TencentConfig, logger log.Logger) (CbsTcInstanceInfosRepository, error) {
+	cli, err := client.NewCvmClient(cred, c)
+	if err != nil {
+		return nil, err
+	}
+	repo := &CbsTcInstanceInfosRepositoryImpl{
+		client: cli,
+		logger: logger,
+	}
+	return repo, nil
 }
