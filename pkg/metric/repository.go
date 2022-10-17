@@ -138,7 +138,6 @@ func (repo *TcmMetricRepositoryImpl) GetSamples(s *TcmSeries, st int64, et int64
 	} else {
 		response, err = repo.monitorClient.GetMonitorData(request)
 	}
-	level.Info(repo.logger).Log("reqid",response.Response.RequestId)
 	if err != nil {
 		return
 	}
@@ -191,7 +190,6 @@ func (repo *TcmMetricRepositoryImpl) listSampleByBatch(
 	} else {
 		response, err = repo.monitorClient.GetMonitorData(request)
 	}
-	level.Info(repo.logger).Log("reqid",response.Response.RequestId)
 	if err != nil {
 		return nil, err
 	}
