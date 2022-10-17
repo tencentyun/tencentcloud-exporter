@@ -34,14 +34,14 @@ import (
 	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
 )
 
-func NewMonitorClient(cred common.CredentialIface, conf *config.TencentConfig) (*monitor.Client, error) {
+func NewMonitorClient(cred common.CredentialIface, conf *config.TencentConfig, region string) (*monitor.Client, error) {
 	cpf := profile.NewClientProfile()
 	if conf.Credential.IsInternal == true {
 		cpf.HttpProfile.Endpoint = "monitor.internal.tencentcloudapi.com"
 	} else {
 		cpf.HttpProfile.Endpoint = "monitor.tencentcloudapi.com"
 	}
-	return monitor.NewClient(cred, conf.Credential.Region, cpf)
+	return monitor.NewClient(cred, region, cpf)
 }
 
 func NewMongodbClient(cred common.CredentialIface, conf *config.TencentConfig) (*mongodb.Client, error) {
@@ -258,15 +258,20 @@ func NewCosClient(cred common.CredentialIface, conf *config.TencentConfig) (*cos
 	// 用于Get Service 查询, service域名暂时只支持外网
 	su, _ := url.Parse("http://cos." + conf.Credential.Region + ".myqcloud.com")
 	b := &cos.BaseURL{BucketURL: nil, ServiceURL: su}
-	// client := cos.NewClient(b, &http.Client{
-	//	Transport: &cos.AuthorizationTransport{
-	//		SecretID:  conf.Credential.AccessKey,
-	//		SecretKey: conf.Credential.SecretKey,
-	//	},
-	// })
-	client := cos.NewClient(b, &http.Client{
-		Transport: common.NewCredentialTransport(cred.GetRole()),
-	})
+	client := &cos.Client{}
+	if conf.Credential.Role == "" {
+		client = cos.NewClient(b, &http.Client{
+			Transport: &cos.AuthorizationTransport{
+				SecretID:  conf.Credential.AccessKey,
+				SecretKey: conf.Credential.SecretKey,
+			},
+		})
+	} else {
+		client = cos.NewClient(b, &http.Client{
+			Transport: common.NewCredentialTransport(cred.GetRole()),
+		})
+	}
+
 	return client, nil
 }
 

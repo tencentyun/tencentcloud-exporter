@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
+
 	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
 
 	"github.com/go-kit/log"
@@ -12,6 +14,7 @@ import (
 	"golang.org/x/time/rate"
 
 	monitor "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/monitor/v20180724"
+	v20180724 "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/monitor/v20180724"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/client"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
 )
@@ -33,10 +36,11 @@ type TcmMetricRepository interface {
 }
 
 type TcmMetricRepositoryImpl struct {
-	credential    common.CredentialIface
-	monitorClient *monitor.Client
-	limiter       *rate.Limiter // 限速
-	ctx           context.Context
+	credential               common.CredentialIface
+	monitorClient            *monitor.Client
+	monitorClientInGuangzhou *monitor.Client
+	limiter                  *rate.Limiter // 限速
+	ctx                      context.Context
 
 	queryMetricBatchSize int
 
@@ -121,14 +125,20 @@ func (repo *TcmMetricRepositoryImpl) GetSamples(s *TcmSeries, st int64, et int64
 	}
 	request.Instances = []*monitor.Instance{instanceFilters}
 
-	stStr := time.Unix(st, 0).Format(timeStampFormat)
+	stStr := util.FormatTime(time.Unix(st, 0), timeStampFormat)
 	request.StartTime = &stStr
 	if et != 0 {
-		etStr := time.Unix(et, 0).Format(timeStampFormat)
-		request.StartTime = &etStr
+		etStr := util.FormatTime(time.Unix(et, 0), timeStampFormat)
+		request.EndTime = &etStr
 	}
 
-	response, err := repo.monitorClient.GetMonitorData(request)
+	response := &v20180724.GetMonitorDataResponse{}
+	if util.IsStrInList(config.QcloudNamespace, s.Metric.Meta.ProductName) {
+		response, err = repo.monitorClientInGuangzhou.GetMonitorData(request)
+	} else {
+		response, err = repo.monitorClient.GetMonitorData(request)
+	}
+	level.Info(repo.logger).Log("reqid",response.Response.RequestId)
 	if err != nil {
 		return
 	}
@@ -174,7 +184,14 @@ func (repo *TcmMetricRepositoryImpl) listSampleByBatch(
 	}
 
 	request := repo.buildGetMonitorDataRequest(m, seriesList, st, et)
-	response, err := repo.monitorClient.GetMonitorData(request)
+
+	response := &v20180724.GetMonitorDataResponse{}
+	if util.IsStrInList(config.QcloudNamespace, m.Meta.ProductName) {
+		response, err = repo.monitorClientInGuangzhou.GetMonitorData(request)
+	} else {
+		response, err = repo.monitorClient.GetMonitorData(request)
+	}
+	level.Info(repo.logger).Log("reqid",response.Response.RequestId)
 	if err != nil {
 		return nil, err
 	}
@@ -217,11 +234,11 @@ func (repo *TcmMetricRepositoryImpl) buildGetMonitorDataRequest(
 		request.Instances = append(request.Instances, ifilters)
 	}
 
-	stStr := time.Unix(st, 0).Format(timeStampFormat)
+	stStr := util.FormatTime(time.Unix(st, 0), timeStampFormat)
 	request.StartTime = &stStr
 	if et != 0 {
-		etStr := time.Unix(et, 0).Format(timeStampFormat)
-		request.StartTime = &etStr
+		etStr := util.FormatTime(time.Unix(et, 0), timeStampFormat)
+		request.EndTime = &etStr
 	}
 	return request
 }
@@ -259,18 +276,23 @@ func (repo *TcmMetricRepositoryImpl) buildSamples(
 }
 
 func NewTcmMetricRepository(cred common.CredentialIface, conf *config.TencentConfig, logger log.Logger) (repo TcmMetricRepository, err error) {
-	monitorClient, err := client.NewMonitorClient(cred, conf)
+	monitorClient, err := client.NewMonitorClient(cred, conf, conf.Credential.Region)
+	if err != nil {
+		return
+	}
+	monitorClientInGuangzhou, err := client.NewMonitorClient(cred, conf, "ap-guangzhou")
 	if err != nil {
 		return
 	}
 
 	repo = &TcmMetricRepositoryImpl{
-		credential:           cred,
-		monitorClient:        monitorClient,
-		limiter:              rate.NewLimiter(rate.Limit(conf.RateLimit), 1),
-		ctx:                  context.Background(),
-		queryMetricBatchSize: conf.MetricQueryBatchSize,
-		logger:               logger,
+		credential:               cred,
+		monitorClient:            monitorClient,
+		monitorClientInGuangzhou: monitorClientInGuangzhou,
+		limiter:                  rate.NewLimiter(rate.Limit(conf.RateLimit), 1),
+		ctx:                      context.Background(),
+		queryMetricBatchSize:     conf.MetricQueryBatchSize,
+		logger:                   logger,
 	}
 
 	return

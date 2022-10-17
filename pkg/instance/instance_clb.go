@@ -15,6 +15,8 @@ type ClbInstance struct {
 func (ins *ClbInstance) GetMonitorQueryKey() string {
 	if len(ins.meta.LoadBalancerVips) == 1 {
 		return *ins.meta.LoadBalancerVips[0]
+	} else if *ins.meta.AddressIPv6 != "" {
+		return *ins.meta.AddressIPv6
 	} else {
 		return ""
 	}

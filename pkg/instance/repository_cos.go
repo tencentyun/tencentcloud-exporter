@@ -18,6 +18,7 @@ func init() {
 }
 
 type CosTcInstanceRepository struct {
+	region string
 	client *sdk.Client
 	logger log.Logger
 }
@@ -62,6 +63,11 @@ func (repo *CosTcInstanceRepository) ListByFilters(filters map[string]string) (i
 		return
 	}
 	for _, meta := range resp.Buckets {
+		// when region is ap-guangzhou, will get all buckets in every region.
+		// need to filter by region
+		if meta.Region != repo.region {
+			continue
+		}
 		ins, e := NewCosTcInstance(meta.Name, &meta)
 		if e != nil {
 			level.Error(repo.logger).Log("msg", "Create Cos instance fail", "id", meta.Name)
@@ -84,6 +90,7 @@ func NewCosTcInstanceRepository(cred common.CredentialIface, c *config.TencentCo
 		return
 	}
 	repo = &CosTcInstanceRepository{
+		region: c.Credential.Region,
 		client: cli,
 		logger: logger,
 	}
