@@ -88,7 +88,7 @@ getMoreInstances:
 			level.Error(repo.logger).Log("msg", "Create clb instance fail", "id", *meta.LoadBalancerId)
 			continue
 		}
-		if meta.LoadBalancerVips == nil || len(meta.LoadBalancerVips) == 0 {
+		if (meta.LoadBalancerVips == nil || len(meta.LoadBalancerVips) == 0) && meta.AddressIPv6 == nil {
 			level.Warn(repo.logger).Log("msg", "clb instance no include vip", "id", *meta.LoadBalancerId)
 			continue
 		}
