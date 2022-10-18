@@ -133,7 +133,7 @@ func (repo *TcmMetricRepositoryImpl) GetSamples(s *TcmSeries, st int64, et int64
 	}
 
 	response := &v20180724.GetMonitorDataResponse{}
-	if s.Metric.Meta.ProductName == "COS" {
+	if util.IsStrInList(config.QcloudNamespace, s.Metric.Meta.ProductName) {
 		response, err = repo.monitorClientInGuangzhou.GetMonitorData(request)
 	} else {
 		response, err = repo.monitorClient.GetMonitorData(request)
@@ -185,7 +185,7 @@ func (repo *TcmMetricRepositoryImpl) listSampleByBatch(
 	request := repo.buildGetMonitorDataRequest(m, seriesList, st, et)
 
 	response := &v20180724.GetMonitorDataResponse{}
-	if m.Meta.ProductName == "COS" {
+	if util.IsStrInList(config.QcloudNamespace, m.Meta.ProductName) {
 		response, err = repo.monitorClientInGuangzhou.GetMonitorData(request)
 	} else {
 		response, err = repo.monitorClient.GetMonitorData(request)

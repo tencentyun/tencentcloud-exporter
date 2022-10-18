@@ -76,6 +76,8 @@ var (
 	}
 )
 
+var QcloudNamespace = []string{"COS", "CDN"}
+
 type TencentCredential struct {
 	AccessKey   string `yaml:"access_key"`
 	SecretKey   string `yaml:"secret_key"`
