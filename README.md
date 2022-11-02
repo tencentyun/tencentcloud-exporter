@@ -122,9 +122,6 @@ metrics:
     tc_metric_rename: Inserts                    // 导出指标的显示名
     tc_metric_name_type: 1                       // 可选，导出指标的名字格式化类型, 1=大写转小写加下划线, 2=转小写; 默认1
     tc_labels: [InstanceName]                    // 可选, 将实例的字段作为指标的lables导出
-    tc_filters:                                  // 可选, 根据每个实例的字段进行过滤, 否则默认导出region下所有实例
-      - ProjectId: 1
-        Status: 1
     tc_myself_dimensions:                        // 可选, 同custom_query_dimensions
     tc_statistics: [Avg]                         // 可选, 同statistics_types
     period_seconds: 60                           // 可选, 同period_seconds
