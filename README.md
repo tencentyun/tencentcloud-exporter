@@ -89,7 +89,7 @@ products:
 ```yaml
 credential:
   access_key: <YOUR_ACCESS_KEY>                  // 必须, 云API的SecretId
-  secret_key: <YOUR_ACCESS_SECRET>            // 必须, 云API的SecretKey
+  secret_key: <YOUR_ACCESS_SECRET>               // 必须, 云API的SecretKey
   region: <REGION>                               // 必须, 实例所在区域信息
 
 rate_limit: 15                                   // 腾讯云监控拉取指标数据限制, 官方默认限制最大20qps
@@ -97,7 +97,7 @@ rate_limit: 15                                   // 腾讯云监控拉取指标�
 
 // 整个产品纬度配置, 每个产品一个item
 products:
-  - namespace: QCE/CMONGO                        // 必须, 产品命名空间; 
+  - namespace: QCE/CMONGO                        // 必须, 产品命名空间
     all_metrics: true                            // 常用, 推荐开启, 导出支持的所有指标
     all_instances: true                          // 常用, 推荐开启, 导出该region下的所有实例
     extra_labels: [InstanceName,Zone]            // 可选, 将实例的字段作为指标的lables导出
