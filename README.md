@@ -97,7 +97,7 @@ rate_limit: 15                                   // 腾讯云监控拉取指标�
 
 // 整个产品纬度配置, 每个产品一个item
 products:
-  - namespace: QCE/CMONGO                        // 必须, 产品命名空间; QCE前缀可自定义,CMONGO产品名不区分大小写, 可用别名
+  - namespace: QCE/CMONGO                        // 必须, 产品命名空间; 
     all_metrics: true                            // 常用, 推荐开启, 导出支持的所有指标
     all_instances: true                          // 常用, 推荐开启, 导出该region下的所有实例
     extra_labels: [InstanceName,Zone]            // 可选, 将实例的字段作为指标的lables导出
