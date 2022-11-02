@@ -103,9 +103,6 @@ products:
     extra_labels: [InstanceName,Zone]            // 可选, 将实例的字段作为指标的lables导出
     only_include_metrics: [Inserts]              // 可选, 只导出这些指标, 配置时all_metrics失效
     exclude_metrics: [Reads]                     // 可选, 不导出这些指标
-    instance_filters:                            // 可选, 在all_instances开启情况下, 根据每个实例的字段进行过滤
-      - ProjectId: 1
-        Status: 1
     only_include_instances: [cmgo-xxxxxxxx]      // 可选, 只导出这些实例id, 配置时all_instances失效
     exclude_instances: [cmgo-xxxxxxxx]           // 可选, 不导出这些实例id
     custom_query_dimensions:                     // 可选, 不常用, 自定义指标查询条件, 配置时all_instances,only_include_instances,exclude_instances失效, 用于不支持按实例纬度查询的指标
