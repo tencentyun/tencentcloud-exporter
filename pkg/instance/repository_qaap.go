@@ -6,6 +6,7 @@ import (
 	"github.com/go-kit/log/level"
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/gaap/v20180529"
 
+	selfcommon "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/client"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
@@ -25,9 +26,9 @@ func (repo *QaapTcInstanceRepository) GetInstanceKey() string {
 }
 
 func (repo *QaapTcInstanceRepository) Get(id string) (instance TcInstance, err error) {
-	req := sdk.NewDescribeProxyInstancesRequest()
+	req := sdk.NewDescribeProxiesRequest()
 	req.ProxyIds = []*string{&id}
-	resp, err := repo.client.DescribeProxyInstances(req)
+	resp, err := repo.client.DescribeProxies(req)
 	if err != nil {
 		return
 	}
@@ -47,16 +48,16 @@ func (repo *QaapTcInstanceRepository) ListByIds(id []string) (instances []TcInst
 }
 
 func (repo *QaapTcInstanceRepository) ListByFilters(filters map[string]string) (instances []TcInstance, err error) {
-	req := sdk.NewDescribeProxyInstancesRequest()
-	var offset int64 = 0
-	var limit int64 = 100
+	req := sdk.NewDescribeProxiesRequest()
+	var offset uint64 = 0
+	var limit uint64 = 100
 	var total int64 = -1
 
 	req.Offset = &offset
 	req.Limit = &limit
 
 getMoreInstances:
-	resp, err := repo.client.DescribeProxyInstances(req)
+	resp, err := repo.client.DescribeProxies(req)
 	if err != nil {
 		return
 	}
@@ -72,7 +73,7 @@ getMoreInstances:
 		instances = append(instances, ins)
 	}
 	offset += limit
-	if offset < total {
+	if int64(offset) < total {
 		req.Offset = &offset
 		goto getMoreInstances
 	}
@@ -90,4 +91,68 @@ func NewQaapTcInstanceRepository(cred common.CredentialIface, c *config.TencentC
 		logger: logger,
 	}
 	return
+}
+
+// TCPListeners
+type QaapTcInstanceTCPListenersRepository interface {
+	GetTCPListenersInfo(instanceId string) (*sdk.DescribeTCPListenersResponse, error)
+}
+
+type QaapTcInstanceTCPListenersRepositoryImpl struct {
+	client *sdk.Client
+	logger log.Logger
+}
+
+func (repo *QaapTcInstanceTCPListenersRepositoryImpl) GetTCPListenersInfo(instanceId string) (*sdk.DescribeTCPListenersResponse, error) {
+	req := sdk.NewDescribeTCPListenersRequest()
+	var offset uint64 = 0
+	var limit uint64 = 100
+	req.Limit = &limit
+	req.Offset = &offset
+	req.ProxyId = selfcommon.StringPtr(instanceId)
+	return repo.client.DescribeTCPListeners(req)
+}
+
+func NewQaapTcInstanceTCPListenersRepository(cred common.CredentialIface, c *config.TencentConfig, logger log.Logger) (QaapTcInstanceTCPListenersRepository, error) {
+	cli, err := client.NewGAAPClient(cred, c)
+	if err != nil {
+		return nil, err
+	}
+	repo := &QaapTcInstanceTCPListenersRepositoryImpl{
+		client: cli,
+		logger: logger,
+	}
+	return repo, nil
+}
+
+// UDPListeners
+type QaapTcInstanceUDPListenersRepository interface {
+	GetUDPListenersInfo(instanceId string) (*sdk.DescribeUDPListenersResponse, error)
+}
+
+type QaapTcInstanceUDPListenersRepositoryImpl struct {
+	client *sdk.Client
+	logger log.Logger
+}
+
+func (repo *QaapTcInstanceUDPListenersRepositoryImpl) GetUDPListenersInfo(instanceId string) (*sdk.DescribeUDPListenersResponse, error) {
+	req := sdk.NewDescribeUDPListenersRequest()
+	var offset uint64 = 0
+	var limit uint64 = 100
+	req.Limit = &limit
+	req.Offset = &offset
+	req.ProxyId = selfcommon.StringPtr(instanceId)
+	return repo.client.DescribeUDPListeners(req)
+}
+
+func NewQaapTcInstanceUDPListenersRepository(cred common.CredentialIface, c *config.TencentConfig, logger log.Logger) (QaapTcInstanceUDPListenersRepository, error) {
+	cli, err := client.NewGAAPClient(cred, c)
+	if err != nil {
+		return nil, err
+	}
+	repo := &QaapTcInstanceUDPListenersRepositoryImpl{
+		client: cli,
+		logger: logger,
+	}
+	return repo, nil
 }

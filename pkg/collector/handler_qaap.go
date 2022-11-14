@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
-	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/gaap/v20180529"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/instance"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
+	"time"
 )
 
 const (
@@ -22,6 +22,8 @@ func init() {
 
 type QaapHandler struct {
 	baseProductHandler
+	tcpListenersRepo instance.QaapTcInstanceTCPListenersRepository
+	udpListenersRepo instance.QaapTcInstanceUDPListenersRepository
 }
 
 func (h *QaapHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
@@ -160,18 +162,36 @@ func (h *QaapHandler) getInstanceSeries(m *metric.TcmMetric, ins instance.TcInst
 
 func (h *QaapHandler) getListenerIdSeries(m *metric.TcmMetric, ins instance.TcInstance) ([]*metric.TcmSeries, error) {
 	var series []*metric.TcmSeries
-	meta, ok := ins.GetMeta().(*sdk.ProxyDetail)
-	if !ok {
-		return nil, fmt.Errorf("get instacne raw meta fail, metric=%s, instacne=%s",
-			m.Meta.MetricName, ins.GetInstanceId())
+	tcpListenersInfos, err := h.tcpListenersRepo.GetTCPListenersInfo(ins.GetInstanceId())
+	if err != nil {
+		return nil, err
 	}
-	for _, l4ListenerSet := range meta.L4ListenerSet {
-		for _, rsSet := range l4ListenerSet.RsSet {
+	for _, tcpListenersInfo := range tcpListenersInfos.Response.ListenerSet {
+		for _, realServerSet := range tcpListenersInfo.RealServerSet {
 			ql := map[string]string{
 				h.monitorQueryKey:  ins.GetMonitorQueryKey(),
-				"listenerId":       *l4ListenerSet.ListenerId,
-				"originServerInfo": *rsSet.RsInfo,
-				"protocol":         *l4ListenerSet.Protocol,
+				"listenerId":       *tcpListenersInfo.ListenerId,
+				"originServerInfo": *realServerSet.RealServerIP,
+				"protocol":         *tcpListenersInfo.Protocol,
+			}
+			s, err := metric.NewTcmSeries(m, ql, ins)
+			if err != nil {
+				return nil, err
+			}
+			series = append(series, s)
+		}
+	}
+	udpListenersInfos, err := h.udpListenersRepo.GetUDPListenersInfo(ins.GetInstanceId())
+	if err != nil {
+		return nil, err
+	}
+	for _, udpListenersInfo := range udpListenersInfos.Response.ListenerSet {
+		for _, realServerSet := range udpListenersInfo.RealServerSet {
+			ql := map[string]string{
+				h.monitorQueryKey:  ins.GetMonitorQueryKey(),
+				"listenerId":       *udpListenersInfo.ListenerId,
+				"originServerInfo": *realServerSet.RealServerIP,
+				"protocol":         *udpListenersInfo.Protocol,
 			}
 			s, err := metric.NewTcmSeries(m, ql, ins)
 			if err != nil {
@@ -184,12 +204,27 @@ func (h *QaapHandler) getListenerIdSeries(m *metric.TcmMetric, ins instance.TcIn
 }
 
 func NewQaapHandler(cred common.CredentialIface, c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
+	tcpListenersRepo, err := instance.NewQaapTcInstanceTCPListenersRepository(cred, c.Conf, logger)
+	if err != nil {
+		return nil, err
+	}
+	relodInterval := time.Duration(c.ProductConf.RelodIntervalMinutes * int64(time.Minute))
+	tcpListenersRepoCache := instance.NewTcGaapInstanceeTCPListenersCache(tcpListenersRepo, relodInterval, logger)
+
+	udpListenersRepo, err := instance.NewQaapTcInstanceUDPListenersRepository(cred, c.Conf, logger)
+	if err != nil {
+		return nil, err
+	}
+	udpListenersRepoCache := instance.NewTcGaapInstanceeUDPListenersCache(udpListenersRepo, relodInterval, logger)
+
 	handler = &QaapHandler{
-		baseProductHandler{
+		baseProductHandler: baseProductHandler{
 			monitorQueryKey: QaapInstanceidKey,
 			collector:       c,
 			logger:          logger,
 		},
+		tcpListenersRepo: tcpListenersRepoCache,
+		udpListenersRepo: udpListenersRepoCache,
 	}
 	return
 
