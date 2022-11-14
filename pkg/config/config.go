@@ -66,6 +66,7 @@ var (
 		"dts":           "QCE/DTS",           // for dts
 		"dcg":           "QCE/DCG",           // for dcg
 		"vbc":           "QCE/VBC",           // for vbc
+		"qaap":          "QCE/QAAP",          // for qaap
 	}
 
 	SupportStatisticsTypes = map[string]bool{
@@ -76,7 +77,7 @@ var (
 	}
 )
 
-var QcloudNamespace = []string{"COS", "CDN"}
+var QcloudNamespace = []string{"COS", "CDN", "QAAP"}
 
 type TencentCredential struct {
 	AccessKey   string `yaml:"access_key"`

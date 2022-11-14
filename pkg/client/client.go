@@ -16,7 +16,9 @@ import (
 	dc "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/dc/v20180410"
 	dcdb "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/dcdb/v20180411"
 	dts "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/dts/v20180330"
+	dtsNew "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/dts/v20211206"
 	es "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/es/v20180416"
+	gaap "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/gaap/v20180529"
 	lh "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/lighthouse/v20200324"
 	mariadb "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/mariadb/v20170312"
 	memcached "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/memcached/v20190318"
@@ -283,4 +285,23 @@ func NewDTSClient(cred common.CredentialIface, conf *config.TencentConfig) (*dts
 		cpf.HttpProfile.Endpoint = "dts.tencentcloudapi.com"
 	}
 	return dts.NewClient(cred, conf.Credential.Region, cpf)
+}
+func NewDTSNewClient(cred common.CredentialIface, conf *config.TencentConfig) (*dtsNew.Client, error) {
+	cpf := profile.NewClientProfile()
+	if conf.Credential.IsInternal == true {
+		cpf.HttpProfile.Endpoint = "dts.internal.tencentcloudapi.com"
+	} else {
+		cpf.HttpProfile.Endpoint = "dts.tencentcloudapi.com"
+	}
+	return dtsNew.NewClient(cred, conf.Credential.Region, cpf)
+}
+
+func NewGAAPClient(cred common.CredentialIface, conf *config.TencentConfig) (*gaap.Client, error) {
+	cpf := profile.NewClientProfile()
+	if conf.Credential.IsInternal == true {
+		cpf.HttpProfile.Endpoint = "gaap.internal.tencentcloudapi.com"
+	} else {
+		cpf.HttpProfile.Endpoint = "gaap.tencentcloudapi.com"
+	}
+	return gaap.NewClient(cred, conf.Credential.Region, cpf)
 }

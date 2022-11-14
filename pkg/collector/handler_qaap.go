@@ -12,29 +12,29 @@ import (
 )
 
 const (
-	DTSNamespace     = "QCE/DTS"
-	DTSInstanceidKey = "SubscribeId"
+	QaapNamespace     = "QCE/QAAP"
+	QaapInstanceidKey = "channelId"
 )
 
 func init() {
-	registerHandler(DTSNamespace, defaultHandlerEnabled, NewDTSHandler)
+	registerHandler(QaapNamespace, defaultHandlerEnabled, NewQaapHandler)
 }
 
-type dtsHandler struct {
+type QaapHandler struct {
 	baseProductHandler
-	replicationRepo  instance.DtsTcInstanceReplicationsRepository
-	migrateInfosRepo instance.DtsTcInstanceMigrateInfosRepository
+	tcpListenersRepo instance.QaapTcInstanceTCPListenersRepository
+	udpListenersRepo instance.QaapTcInstanceUDPListenersRepository
 }
 
-func (h *dtsHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *QaapHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
 	return true
 }
 
-func (h *dtsHandler) GetNamespace() string {
-	return DTSNamespace
+func (h *QaapHandler) GetNamespace() string {
+	return QaapNamespace
 }
 
-func (h *dtsHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *QaapHandler) IsMetricVaild(m *metric.TcmMetric) bool {
 	_, ok := excludeMetricName[m.Meta.MetricName]
 	if ok {
 		return false
@@ -49,7 +49,7 @@ func (h *dtsHandler) IsMetricVaild(m *metric.TcmMetric) bool {
 	return true
 }
 
-func (h *dtsHandler) GetSeries(m *metric.TcmMetric) ([]*metric.TcmSeries, error) {
+func (h *QaapHandler) GetSeries(m *metric.TcmMetric) ([]*metric.TcmSeries, error) {
 	if m.Conf.IsIncludeOnlyInstance() {
 		return h.GetSeriesByOnly(m)
 	}
@@ -65,7 +65,7 @@ func (h *dtsHandler) GetSeries(m *metric.TcmMetric) ([]*metric.TcmSeries, error)
 	return nil, fmt.Errorf("must config all_instances or only_include_instances or custom_query_dimensions")
 }
 
-func (h *dtsHandler) GetSeriesByOnly(m *metric.TcmMetric) ([]*metric.TcmSeries, error) {
+func (h *QaapHandler) GetSeriesByOnly(m *metric.TcmMetric) ([]*metric.TcmSeries, error) {
 	var slist []*metric.TcmSeries
 	for _, insId := range m.Conf.OnlyIncludeInstances {
 		ins, err := h.collector.InstanceRepo.Get(insId)
@@ -84,7 +84,7 @@ func (h *dtsHandler) GetSeriesByOnly(m *metric.TcmMetric) ([]*metric.TcmSeries, 
 	return slist, nil
 }
 
-func (h *dtsHandler) GetSeriesByAll(m *metric.TcmMetric) ([]*metric.TcmSeries, error) {
+func (h *QaapHandler) GetSeriesByAll(m *metric.TcmMetric) ([]*metric.TcmSeries, error) {
 	var slist []*metric.TcmSeries
 	insList, err := h.collector.InstanceRepo.ListByFilters(m.Conf.InstanceFilters)
 	if err != nil {
@@ -105,7 +105,7 @@ func (h *dtsHandler) GetSeriesByAll(m *metric.TcmMetric) ([]*metric.TcmSeries, e
 	return slist, nil
 }
 
-func (h *dtsHandler) GetSeriesByCustom(m *metric.TcmMetric) ([]*metric.TcmSeries, error) {
+func (h *QaapHandler) GetSeriesByCustom(m *metric.TcmMetric) ([]*metric.TcmSeries, error) {
 	var slist []*metric.TcmSeries
 	for _, ql := range m.Conf.CustomQueryDimensions {
 		v, ok := ql[h.monitorQueryKey]
@@ -132,22 +132,20 @@ func (h *dtsHandler) GetSeriesByCustom(m *metric.TcmMetric) ([]*metric.TcmSeries
 	return slist, nil
 }
 
-func (h *dtsHandler) getSeriesByMetricType(m *metric.TcmMetric, ins instance.TcInstance) ([]*metric.TcmSeries, error) {
+func (h *QaapHandler) getSeriesByMetricType(m *metric.TcmMetric, ins instance.TcInstance) ([]*metric.TcmSeries, error) {
 	var dimensions []string
 	for _, v := range m.Meta.SupportDimensions {
 		dimensions = append(dimensions, v)
 	}
 
-	if util.IsStrInList(dimensions, "replicationjobid") {
-		return h.getReplicationSeries(m, ins)
-	} else if util.IsStrInList(dimensions, "migratejobid") {
-		return h.getMigrateInfoSeries(m, ins)
+	if util.IsStrInList(dimensions, "listenerId") {
+		return h.getListenerIdSeries(m, ins)
 	} else {
 		return h.getInstanceSeries(m, ins)
 	}
 }
 
-func (h *dtsHandler) getInstanceSeries(m *metric.TcmMetric, ins instance.TcInstance) ([]*metric.TcmSeries, error) {
+func (h *QaapHandler) getInstanceSeries(m *metric.TcmMetric, ins instance.TcInstance) ([]*metric.TcmSeries, error) {
 	var series []*metric.TcmSeries
 
 	ql := map[string]string{
@@ -162,66 +160,71 @@ func (h *dtsHandler) getInstanceSeries(m *metric.TcmMetric, ins instance.TcInsta
 	return series, nil
 }
 
-func (h *dtsHandler) getReplicationSeries(m *metric.TcmMetric, ins instance.TcInstance) ([]*metric.TcmSeries, error) {
+func (h *QaapHandler) getListenerIdSeries(m *metric.TcmMetric, ins instance.TcInstance) ([]*metric.TcmSeries, error) {
 	var series []*metric.TcmSeries
-	replications, err := h.replicationRepo.GetReplicationsInfo("")
+	tcpListenersInfos, err := h.tcpListenersRepo.GetTCPListenersInfo(ins.GetInstanceId())
 	if err != nil {
 		return nil, err
 	}
-	for _, replication := range replications.Response.JobList {
-		ql := map[string]string{
-			"replicationjobid": *replication.JobId,
+	for _, tcpListenersInfo := range tcpListenersInfos.Response.ListenerSet {
+		for _, realServerSet := range tcpListenersInfo.RealServerSet {
+			ql := map[string]string{
+				h.monitorQueryKey:  ins.GetMonitorQueryKey(),
+				"listenerId":       *tcpListenersInfo.ListenerId,
+				"originServerInfo": *realServerSet.RealServerIP,
+				"protocol":         *tcpListenersInfo.Protocol,
+			}
+			s, err := metric.NewTcmSeries(m, ql, ins)
+			if err != nil {
+				return nil, err
+			}
+			series = append(series, s)
 		}
-		s, err := metric.NewTcmSeries(m, ql, ins)
-		if err != nil {
-			return nil, err
-		}
-		series = append(series, s)
 	}
-	return series, nil
-}
-func (h *dtsHandler) getMigrateInfoSeries(m *metric.TcmMetric, ins instance.TcInstance) ([]*metric.TcmSeries, error) {
-	var series []*metric.TcmSeries
-	migrateInfos, err := h.migrateInfosRepo.GetMigrateInfos("")
+	udpListenersInfos, err := h.udpListenersRepo.GetUDPListenersInfo(ins.GetInstanceId())
 	if err != nil {
 		return nil, err
 	}
-	for _, migrateInfo := range migrateInfos.Response.JobList {
-		ql := map[string]string{
-			"migratejob_id": *migrateInfo.JobId,
+	for _, udpListenersInfo := range udpListenersInfos.Response.ListenerSet {
+		for _, realServerSet := range udpListenersInfo.RealServerSet {
+			ql := map[string]string{
+				h.monitorQueryKey:  ins.GetMonitorQueryKey(),
+				"listenerId":       *udpListenersInfo.ListenerId,
+				"originServerInfo": *realServerSet.RealServerIP,
+				"protocol":         *udpListenersInfo.Protocol,
+			}
+			s, err := metric.NewTcmSeries(m, ql, ins)
+			if err != nil {
+				return nil, err
+			}
+			series = append(series, s)
 		}
-		s, err := metric.NewTcmSeries(m, ql, ins)
-		if err != nil {
-			return nil, err
-		}
-		series = append(series, s)
 	}
-
 	return series, nil
 }
 
-func NewDTSHandler(cred common.CredentialIface, c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
-	migrateInfosRepo, err := instance.NewDtsTcInstanceMigrateInfosRepository(cred, c.Conf, logger)
+func NewQaapHandler(cred common.CredentialIface, c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
+	tcpListenersRepo, err := instance.NewQaapTcInstanceTCPListenersRepository(cred, c.Conf, logger)
 	if err != nil {
 		return nil, err
 	}
 	relodInterval := time.Duration(c.ProductConf.RelodIntervalMinutes * int64(time.Minute))
-	migrateInfosRepoCache := instance.NewTcDtsInstanceMigrateInfosCache(migrateInfosRepo, relodInterval, logger)
+	tcpListenersRepoCache := instance.NewTcGaapInstanceeTCPListenersCache(tcpListenersRepo, relodInterval, logger)
 
-	replicationRepo, err := instance.NewDtsTcInstanceReplicationsRepository(cred, c.Conf, logger)
+	udpListenersRepo, err := instance.NewQaapTcInstanceUDPListenersRepository(cred, c.Conf, logger)
 	if err != nil {
 		return nil, err
 	}
-	replicationRepoCache := instance.NewTcDtsInstanceReplicationsInfosCache(replicationRepo, relodInterval, logger)
+	udpListenersRepoCache := instance.NewTcGaapInstanceeUDPListenersCache(udpListenersRepo, relodInterval, logger)
 
-	handler = &dtsHandler{
+	handler = &QaapHandler{
 		baseProductHandler: baseProductHandler{
-			monitorQueryKey: DTSInstanceidKey,
+			monitorQueryKey: QaapInstanceidKey,
 			collector:       c,
 			logger:          logger,
 		},
-		migrateInfosRepo: migrateInfosRepoCache,
-		replicationRepo:  replicationRepoCache,
+		tcpListenersRepo: tcpListenersRepoCache,
+		udpListenersRepo: udpListenersRepoCache,
 	}
 	return
 
