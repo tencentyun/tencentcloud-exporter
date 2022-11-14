@@ -206,7 +206,7 @@ func NewDTSHandler(cred common.CredentialIface, c *TcProductCollector, logger lo
 		return nil, err
 	}
 	relodInterval := time.Duration(c.ProductConf.RelodIntervalMinutes * int64(time.Minute))
-	migrateInfosRepoCahe := instance.NewTcDtsInstanceMigrateInfosCache(migrateInfosRepo, relodInterval, logger)
+	migrateInfosRepoCache := instance.NewTcDtsInstanceMigrateInfosCache(migrateInfosRepo, relodInterval, logger)
 
 	replicationRepo, err := instance.NewDtsTcInstanceReplicationsRepository(cred, c.Conf, logger)
 	if err != nil {
@@ -220,7 +220,7 @@ func NewDTSHandler(cred common.CredentialIface, c *TcProductCollector, logger lo
 			collector:       c,
 			logger:          logger,
 		},
-		migrateInfosRepo: migrateInfosRepoCahe,
+		migrateInfosRepo: migrateInfosRepoCache,
 		replicationRepo:  replicationRepoCache,
 	}
 	return

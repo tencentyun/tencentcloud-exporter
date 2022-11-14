@@ -9,16 +9,14 @@ import (
 
 type QaapTcInstance struct {
 	baseTcInstance
-	meta             *sdk.ProxyDetail
-	// listenerMeta     *sdk.ProxyDetail
-	// originServerMeta *sdk.ProxyDetail
+	meta *sdk.ProxyInfo
 }
 
 func (ins *QaapTcInstance) GetMeta() interface{} {
 	return ins.meta
 }
 
-func NewQaapTcInstance(instanceId string, meta *sdk.ProxyDetail) (ins *QaapTcInstance, err error) {
+func NewQaapTcInstance(instanceId string, meta *sdk.ProxyInfo) (ins *QaapTcInstance, err error) {
 	if instanceId == "" {
 		return nil, fmt.Errorf("instanceId is empty ")
 	}

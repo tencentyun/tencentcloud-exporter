@@ -9,6 +9,7 @@ import (
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
 	dtsNew "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/dts/v20211206"
+	gaap "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/gaap/v20180529"
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/redis/v20180412"
 	tdmq "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tdmq/v20200217"
 	tse "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tse/v20201207"
@@ -519,6 +520,87 @@ func NewVbcTcInstanceDRegionRepositoryCache(repo VbcTcInstanceDRegionRepository,
 	cache := &TcVbcInstanceeDRegionCache{
 		Raw:            repo,
 		cache:          map[string]*vbc.DescribeCcnRegionBandwidthLimitsResponse{},
+		lastReloadTime: map[string]time.Time{},
+		reloadInterval: reloadInterval,
+		logger:         logger,
+	}
+	return cache
+}
+
+// gaap
+type TcGaapInstanceeTCPListenersCache struct {
+	Raw            QaapTcInstanceTCPListenersRepository
+	cache          map[string]*gaap.DescribeTCPListenersResponse
+	lastReloadTime map[string]time.Time
+	reloadInterval time.Duration
+	mu             sync.Mutex
+
+	logger log.Logger
+}
+
+func (c *TcGaapInstanceeTCPListenersCache) GetTCPListenersInfo(instanceId string) (*gaap.DescribeTCPListenersResponse, error) {
+	lrtime, exists := c.lastReloadTime[instanceId]
+	if exists && time.Now().Sub(lrtime) < c.reloadInterval {
+		namespace, ok := c.cache[instanceId]
+		if ok {
+			return namespace, nil
+		}
+	}
+
+	tcpListeners, err := c.Raw.GetTCPListenersInfo(instanceId)
+	if err != nil {
+		return nil, err
+	}
+	c.cache[instanceId] = tcpListeners
+	c.lastReloadTime[instanceId] = time.Now()
+	level.Debug(c.logger).Log("msg", "Get gaap Namespaces info from api", "instanceId", instanceId)
+	return tcpListeners, nil
+}
+
+func NewTcGaapInstanceeTCPListenersCache(repo QaapTcInstanceTCPListenersRepository, reloadInterval time.Duration, logger log.Logger) QaapTcInstanceTCPListenersRepository {
+	cache := &TcGaapInstanceeTCPListenersCache{
+		Raw:            repo,
+		cache:          map[string]*gaap.DescribeTCPListenersResponse{},
+		lastReloadTime: map[string]time.Time{},
+		reloadInterval: reloadInterval,
+		logger:         logger,
+	}
+	return cache
+}
+
+type TcGaapInstanceeUDPListenersCache struct {
+	Raw            QaapTcInstanceUDPListenersRepository
+	cache          map[string]*gaap.DescribeUDPListenersResponse
+	lastReloadTime map[string]time.Time
+	reloadInterval time.Duration
+	mu             sync.Mutex
+
+	logger log.Logger
+}
+
+func (c *TcGaapInstanceeUDPListenersCache) GetUDPListenersInfo(instanceId string) (*gaap.DescribeUDPListenersResponse, error) {
+	lrtime, exists := c.lastReloadTime[instanceId]
+	if exists && time.Now().Sub(lrtime) < c.reloadInterval {
+		namespace, ok := c.cache[instanceId]
+		if ok {
+			return namespace, nil
+		}
+	}
+
+	tcpListeners, err := c.Raw.GetUDPListenersInfo(instanceId)
+	if err != nil {
+		return nil, err
+	}
+	c.cache[instanceId] = tcpListeners
+	c.lastReloadTime[instanceId] = time.Now()
+	level.Debug(c.logger).Log("msg", "Get gaap Namespaces info from api", "instanceId", instanceId)
+	return tcpListeners, nil
+}
+
+func NewTcGaapInstanceeUDPListenersCache(repo QaapTcInstanceUDPListenersRepository, reloadInterval time.Duration, logger log.Logger) QaapTcInstanceUDPListenersRepository {
+	cache := &TcGaapInstanceeUDPListenersCache{
+		Raw:            repo,
+		cache:          map[string]*gaap.DescribeUDPListenersResponse{},
 		lastReloadTime: map[string]time.Time{},
 		reloadInterval: reloadInterval,
 		logger:         logger,

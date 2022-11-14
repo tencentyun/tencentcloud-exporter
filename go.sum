@@ -237,6 +237,8 @@ github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.528 h1:ECUV
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.528/go.mod h1:7sCQWVkxcsR38nffDW057DRGk8mUjK1Ing/EFOK8s8Y=
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.531 h1:E8vq0WQBjB3jjtCK3u5DPrWGqlgyQUvQ19EkgBob1A8=
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.531/go.mod h1:7sCQWVkxcsR38nffDW057DRGk8mUjK1Ing/EFOK8s8Y=
+github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.534 h1:ZsJCXIZO2KfmEsrVN6a75VncTuaSkD4PNd1iXZ1I8BU=
+github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.534/go.mod h1:7sCQWVkxcsR38nffDW057DRGk8mUjK1Ing/EFOK8s8Y=
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cvm v1.0.334 h1:ulfSODMy8rpKa8MfnTIPbe5HyOArnlB4RJ1qmpj09to=
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cvm v1.0.334/go.mod h1:AqyM/ZZMD7q5mHBqNY9YImbSpEpoEe7E/vrTbUWX+po=
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cynosdb v1.0.413 h1:MomwSkFrSLB16s51Yu1h4JO+p3Pzc1yesIj+oNwAVM0=
@@ -253,6 +255,8 @@ github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/es v1.0.334 h1:oXOMQ2Em
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/es v1.0.334/go.mod h1:UegCt4vv9jAlzpgDu31ZJTuRP5T2BTV8w+jZBTsZIzg=
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/gaap v1.0.528 h1:CS8HIQNpfYQogrPR/WEFdVNJX6GIOwDyBzn1IHMb46g=
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/gaap v1.0.528/go.mod h1:J+xFyeGmSCp0x4tXPu5mlAhg2BAYQPIy3fQ4afy26tI=
+github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/gaap v1.0.534 h1:E/ccMQB7Il/U6Da5jrS4YUxpEZhVatageVdny+xAoMk=
+github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/gaap v1.0.534/go.mod h1:MNvt4sQeoetKfp8y3Y1iKv4aR+P7Z5khZX5QXG31ULA=
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/kms v1.0.194/go.mod h1:yrBKWhChnDqNz1xuXdSbWXG56XawEq0G5j1lg4VwBD4=
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/lighthouse v1.0.334 h1:druwbDkTAvVwEGW4nHVuTuOX0bjk1CtLUDiC3r4gmgY=
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/lighthouse v1.0.334/go.mod h1:r8txjlw4DjLDZFOpnPC/hOFHr1VckZc0jjBK6XIFLP0=
