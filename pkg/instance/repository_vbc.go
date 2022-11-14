@@ -7,6 +7,7 @@ import (
 	"github.com/go-kit/log/level"
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/vpc/v20170312"
 
+	tccommon "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/client"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
@@ -27,7 +28,7 @@ func (repo *VbcTcInstanceRepository) GetInstanceKey() string {
 
 func (repo *VbcTcInstanceRepository) Get(id string) (instance TcInstance, err error) {
 	req := sdk.NewDescribeCcnsRequest()
-	// req.
+	req.CcnIds = []*string{&id}
 	resp, err := repo.client.DescribeCcns(req)
 	if err != nil {
 		return
@@ -91,4 +92,31 @@ func NewVbcTcInstanceRepository(cred common.CredentialIface, c *config.TencentCo
 		logger: logger,
 	}
 	return
+}
+
+// VbcDRegion
+type VbcTcInstanceDRegionRepository interface {
+	GetVbcDRegionInfo(instanceId string) (*sdk.DescribeCcnRegionBandwidthLimitsResponse, error)
+}
+
+type VbcTcInstanceDRegionRepositoryImpl struct {
+	client *sdk.Client
+	logger log.Logger
+}
+
+func (repo *VbcTcInstanceDRegionRepositoryImpl) GetVbcDRegionInfo(instanceId string) (*sdk.DescribeCcnRegionBandwidthLimitsResponse, error) {
+	req := sdk.NewDescribeCcnRegionBandwidthLimitsRequest()
+	req.CcnId = tccommon.StringPtr(instanceId)
+	return repo.client.DescribeCcnRegionBandwidthLimits(req)
+}
+func NewVbcTcInstanceDRegionRepository(cred common.CredentialIface, c *config.TencentConfig, logger log.Logger) (VbcTcInstanceDRegionRepository, error) {
+	cli, err := client.NewVpvClient(cred, c)
+	if err != nil {
+		return nil, err
+	}
+	repo := &VbcTcInstanceDRegionRepositoryImpl{
+		client: cli,
+		logger: logger,
+	}
+	return repo, nil
 }

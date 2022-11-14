@@ -9,6 +9,7 @@ import (
 	"github.com/tencentyun/tencentcloud-exporter/pkg/instance"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
+	"time"
 )
 
 const (
@@ -17,9 +18,9 @@ const (
 )
 
 var (
-	// BetweenRegionMetricNames = []string{
-	// 	"OutDropBandwidth", "InBandwidthRate", "OutBandwidthRate", "OutDropPkg", "OutDropPkgRate", "InBandwidth", "InPkg", "OutPkg", "OutBandwidth",
-	// }
+	BetweenRegionMetricNames = []string{
+		"OutDropBandwidth", "InBandwidthRate", "OutBandwidthRate", "OutDropPkg", "OutDropPkgRate", "InBandwidth", "InPkg", "OutPkg", "OutBandwidth",
+	}
 	SingleRegionMetricNames = []string{
 		"Regioninbandwidthbm", "Regionoutbandwidthbm", "Regionoutdropbandwidthbm", "Regioninpkgbm", "Regionoutbandwidthbmrate", "Regionoutdroppkgbmrate", "Regionoutpkgbm", "Regionoutdroppkgbm",
 	}
@@ -32,6 +33,7 @@ func init() {
 
 type VbcHandler struct {
 	baseProductHandler
+	dRegionRepo instance.VbcTcInstanceDRegionRepository
 }
 
 func (h *VbcHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
@@ -132,15 +134,6 @@ func (h *VbcHandler) GetSeriesByCustom(m *metric.TcmMetric) ([]*metric.TcmSeries
 	return slist, nil
 }
 func (h *VbcHandler) getSeriesByMetricType(m *metric.TcmMetric, ins instance.TcInstance) ([]*metric.TcmSeries, error) {
-	// var dimensions []string
-	// for _, v := range m.Meta.SupportDimensions {
-	// 	dimensions = append(dimensions, v)
-	// }
-	// if util.IsStrInList(dimensions, "DRegion") {
-	// 	return h.getSingleRegionSeries(m, ins)
-	// } else {
-	// 	return h.getSingleRegionSeries(m, ins)
-	// }
 	if util.IsStrInList(SingleRegionMetricNames, m.Meta.MetricName) {
 		return h.getSingleRegionSeries(m, ins)
 	} else {
@@ -165,6 +158,22 @@ func (h *VbcHandler) getSingleRegionSeries(m *metric.TcmMetric, ins instance.TcI
 
 func (h *VbcHandler) getBetweenRegionSeries(m *metric.TcmMetric, ins instance.TcInstance) ([]*metric.TcmSeries, error) {
 	var series []*metric.TcmSeries
+	dRegionResp, err := h.dRegionRepo.GetVbcDRegionInfo(ins.GetInstanceId())
+	if err != nil {
+		return nil, err
+	}
+	for _, v := range dRegionResp.Response.CcnRegionBandwidthLimitSet {
+		ql := map[string]string{
+			h.monitorQueryKey: ins.GetMonitorQueryKey(),
+			"SRegion":         h.collector.Conf.Credential.Region,
+			"DRegion":         *v.Region,
+		}
+		s, err := metric.NewTcmSeries(m, ql, ins)
+		if err != nil {
+			return nil, err
+		}
+		series = append(series, s)
+	}
 
 	return series, nil
 }
@@ -180,12 +189,20 @@ func (h *VbcHandler) checkMonitorQueryKeys(m *metric.TcmMetric, ql map[string]st
 }
 
 func NewVbcHandler(cred common.CredentialIface, c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
+	dRegionRepo, err := instance.NewVbcTcInstanceDRegionRepository(cred, c.Conf, logger)
+	if err != nil {
+		return nil, err
+	}
+	relodInterval := time.Duration(c.ProductConf.RelodIntervalMinutes * int64(time.Minute))
+	dRegionRepoCahe := instance.NewVbcTcInstanceDRegionRepositoryCache(dRegionRepo, relodInterval, logger)
+
 	handler = &VbcHandler{
 		baseProductHandler: baseProductHandler{
 			monitorQueryKey: VbcInstanceidKey,
 			collector:       c,
 			logger:          logger,
 		},
+		dRegionRepo: dRegionRepoCahe,
 	}
 	return
 

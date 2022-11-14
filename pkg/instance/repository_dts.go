@@ -2,7 +2,7 @@ package instance
 
 import (
 	"fmt"
-
+	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
 
 	selfcommon "github.com/tencentyun/tencentcloud-exporter/pkg/common"
@@ -10,6 +10,7 @@ import (
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/dts/v20180330"
+	dtsNew "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/dts/v20211206"
 
 	"github.com/tencentyun/tencentcloud-exporter/pkg/client"
 )
@@ -84,40 +85,40 @@ getMoreInstances:
 }
 
 // Replications
-// type DtsTcInstanceReplicationsRepository interface {
-// 	GetReplicationsInfo(instanceId string) (*sdk.DescribeRocketMQNamespacesResponse, error)
-// }
-//
-// type DtsTcInstanceReplicationsRepositoryImpl struct {
-// 	client *sdk.Client
-// 	logger log.Logger
-// }
-//
-// func (repo *DtsTcInstanceReplicationsRepositoryImpl) GetReplicationsInfo(instanceId string) (*sdk.DescribeRocketMQNamespacesResponse, error) {
-// 	req := sdk.NewDescribeRocketMQNamespacesRequest()
-// 	var offset uint64 = 0
-// 	var limit uint64 = 100
-// 	req.Limit = &limit
-// 	req.Offset = &offset
-// 	req.ClusterId = common.StringPtr(instanceId)
-// 	return repo.client.DescribeRocketMQNamespaces(req)
-// }
-//
-// func NewDtsTcInstanceReplicationsRepository(cred selfcommon.CredentialIface, c *config.TencentConfig, logger log.Logger) (TdmqTcInstanceRocketMQNameSpacesRepository, error) {
-// 	cli, err := client.NewTDMQClient(cred, c)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	repo := &TdmqTcInstanceRocketMQNameSpacesRepositoryImpl{
-// 		client: cli,
-// 		logger: logger,
-// 	}
-// 	return repo, nil
-// }
+type DtsTcInstanceReplicationsRepository interface {
+	GetReplicationsInfo(instanceId string) (*dtsNew.DescribeSyncJobsResponse, error)
+}
+
+type DtsTcInstanceReplicationsRepositoryImpl struct {
+	client *dtsNew.Client
+	logger log.Logger
+}
+
+func (repo *DtsTcInstanceReplicationsRepositoryImpl) GetReplicationsInfo(instanceId string) (*dtsNew.DescribeSyncJobsResponse, error) {
+	req := dtsNew.NewDescribeSyncJobsRequest()
+	var offset uint64 = 0
+	var limit uint64 = 100
+	req.Limit = &limit
+	req.Offset = &offset
+	req.JobId = common.StringPtr(instanceId)
+	return repo.client.DescribeSyncJobs(req)
+}
+
+func NewDtsTcInstanceReplicationsRepository(cred selfcommon.CredentialIface, c *config.TencentConfig, logger log.Logger) (DtsTcInstanceReplicationsRepository, error) {
+	cli, err := client.NewDTSNewClient(cred, c)
+	if err != nil {
+		return nil, err
+	}
+	repo := &DtsTcInstanceReplicationsRepositoryImpl{
+		client: cli,
+		logger: logger,
+	}
+	return repo, nil
+}
 
 // MigrateInfos
 type DtsTcInstanceMigrateInfosRepository interface {
-	GetMigrateInfosInfo() (*sdk.DescribeMigrateJobsResponse, error)
+	GetMigrateInfos(instanceId string) (*sdk.DescribeMigrateJobsResponse, error)
 }
 
 type DtsTcInstanceMigrateInfosRepositoryImpl struct {
@@ -125,12 +126,13 @@ type DtsTcInstanceMigrateInfosRepositoryImpl struct {
 	logger log.Logger
 }
 
-func (repo *DtsTcInstanceMigrateInfosRepositoryImpl) GetMigrateInfosInfo() (*sdk.DescribeMigrateJobsResponse, error) {
+func (repo *DtsTcInstanceMigrateInfosRepositoryImpl) GetMigrateInfos(instanceId string) (*sdk.DescribeMigrateJobsResponse, error) {
 	req := sdk.NewDescribeMigrateJobsRequest()
 	var offset uint64 = 0
 	var limit uint64 = 100
 	req.Limit = &limit
 	req.Offset = &offset
+	req.JobId = common.StringPtr(instanceId)
 	return repo.client.DescribeMigrateJobs(req)
 }
 

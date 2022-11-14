@@ -66,6 +66,7 @@ var (
 		"dts":           "QCE/DTS",           // for dts
 		"dcg":           "QCE/DCG",           // for dcg
 		"vbc":           "QCE/VBC",           // for vbc
+		"qaap":          "QCE/QAAP",          // for qaap
 	}
 
 	SupportStatisticsTypes = map[string]bool{
