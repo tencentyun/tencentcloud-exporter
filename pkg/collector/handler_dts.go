@@ -149,9 +149,10 @@ func (h *dtsHandler) getSeriesByMetricType(m *metric.TcmMetric, ins instance.TcI
 
 func (h *dtsHandler) getInstanceSeries(m *metric.TcmMetric, ins instance.TcInstance) ([]*metric.TcmSeries, error) {
 	var series []*metric.TcmSeries
-
+	subscribeName, err := ins.GetFieldValueByName("SubscribeName")
 	ql := map[string]string{
 		h.monitorQueryKey: ins.GetMonitorQueryKey(),
+		"subscribe_name":  subscribeName,
 	}
 	s, err := metric.NewTcmSeries(m, ql, ins)
 	if err != nil {
@@ -170,7 +171,8 @@ func (h *dtsHandler) getReplicationSeries(m *metric.TcmMetric, ins instance.TcIn
 	}
 	for _, replication := range replications.Response.JobList {
 		ql := map[string]string{
-			"replicationjobid": *replication.JobId,
+			"replicationjobid":   *replication.JobId,
+			"replicationjob_ame": *replication.JobName,
 		}
 		s, err := metric.NewTcmSeries(m, ql, ins)
 		if err != nil {
@@ -188,7 +190,8 @@ func (h *dtsHandler) getMigrateInfoSeries(m *metric.TcmMetric, ins instance.TcIn
 	}
 	for _, migrateInfo := range migrateInfos.Response.JobList {
 		ql := map[string]string{
-			"migratejob_id": *migrateInfo.JobId,
+			"migratejob_id":   *migrateInfo.JobId,
+			"migratejob_name": *migrateInfo.JobName,
 		}
 		s, err := metric.NewTcmSeries(m, ql, ins)
 		if err != nil {
@@ -205,14 +208,14 @@ func NewDTSHandler(cred common.CredentialIface, c *TcProductCollector, logger lo
 	if err != nil {
 		return nil, err
 	}
-	relodInterval := time.Duration(c.ProductConf.RelodIntervalMinutes * int64(time.Minute))
-	migrateInfosRepoCache := instance.NewTcDtsInstanceMigrateInfosCache(migrateInfosRepo, relodInterval, logger)
+	reloadInterval := time.Duration(c.ProductConf.RelodIntervalMinutes * int64(time.Minute))
+	migrateInfosRepoCahe := instance.NewTcDtsInstanceMigrateInfosCache(migrateInfosRepo, reloadInterval, logger)
 
 	replicationRepo, err := instance.NewDtsTcInstanceReplicationsRepository(cred, c.Conf, logger)
 	if err != nil {
 		return nil, err
 	}
-	replicationRepoCache := instance.NewTcDtsInstanceReplicationsInfosCache(replicationRepo, relodInterval, logger)
+	replicationRepoCache := instance.NewTcDtsInstanceReplicationsInfosCache(replicationRepo, reloadInterval, logger)
 
 	handler = &dtsHandler{
 		baseProductHandler: baseProductHandler{
@@ -220,7 +223,7 @@ func NewDTSHandler(cred common.CredentialIface, c *TcProductCollector, logger lo
 			collector:       c,
 			logger:          logger,
 		},
-		migrateInfosRepo: migrateInfosRepoCache,
+		migrateInfosRepo: migrateInfosRepoCahe,
 		replicationRepo:  replicationRepoCache,
 	}
 	return

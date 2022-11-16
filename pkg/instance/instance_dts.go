@@ -10,8 +10,6 @@ import (
 type DtsTcInstance struct {
 	baseTcInstance
 	meta            *sdk.SubscribeInfo
-	subscribeMeta   *sdk.SubscribeInfo
-	migrateInfoMeta *sdk.MigrateJobInfo
 }
 
 func (ins *DtsTcInstance) GetMeta() interface{} {
