@@ -172,7 +172,7 @@ func (h *dtsHandler) getReplicationSeries(m *metric.TcmMetric, ins instance.TcIn
 	for _, replication := range replications.Response.JobList {
 		ql := map[string]string{
 			"replicationjobid":   *replication.JobId,
-			"replicationjob_ame": *replication.JobName,
+			"replicationjob_name": *replication.JobName,
 		}
 		s, err := metric.NewTcmSeries(m, ql, ins)
 		if err != nil {
