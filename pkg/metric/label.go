@@ -53,7 +53,6 @@ func (l *TcmLabels) GetValues(filters map[string]string, ins instance.TcInstance
 				for _, value := range values {
 					nameValues[vName] = value
 				}
-
 			}
 		}
 	}
