@@ -173,6 +173,7 @@ func (h *QaapHandler) getListenerIdSeries(m *metric.TcmMetric, ins instance.TcIn
 				"listenerId":       *tcpListenersInfo.ListenerId,
 				"originServerInfo": *realServerSet.RealServerIP,
 				"protocol":         *tcpListenersInfo.Protocol,
+				"listenerName":     *tcpListenersInfo.ListenerName,
 			}
 			s, err := metric.NewTcmSeries(m, ql, ins)
 			if err != nil {
@@ -192,6 +193,7 @@ func (h *QaapHandler) getListenerIdSeries(m *metric.TcmMetric, ins instance.TcIn
 				"listenerId":       *udpListenersInfo.ListenerId,
 				"originServerInfo": *realServerSet.RealServerIP,
 				"protocol":         *udpListenersInfo.Protocol,
+				"listenerName":     *udpListenersInfo.ListenerName,
 			}
 			s, err := metric.NewTcmSeries(m, ql, ins)
 			if err != nil {
