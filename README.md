@@ -44,6 +44,7 @@ CYNOSDB_MYSQL|QCE/CYNOSDB_MYSQL|[指标详情](https://cloud.tencent.com/documen
 云联网|QCE/VBC|[指标详情](https://cloud.tencent.com/document/product/248/75629)
 数据传输 |QCE/DTS|指标详情说明文档(待上线)
 专线网关 |QCE/DCG|指标详情说明文档(待上线)
+全球应用加速 ｜QCE/QAAP|[指标详情](https://cloud.tencent.com/document/product/248/45062)
 
 `后续会有更多的产品支持`
 
