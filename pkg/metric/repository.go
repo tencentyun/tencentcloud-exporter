@@ -189,7 +189,9 @@ func (repo *TcmMetricRepositoryImpl) listSampleByBatch(
 	request := repo.buildGetMonitorDataRequest(m, seriesList, st, et)
 
 	response := &v20180724.GetMonitorDataResponse{}
-	if util.IsStrInList(config.QcloudNamespace, m.Meta.ProductName) {
+	if repo.IsInternational && m.Meta.ProductName == "QAAP" {
+		response, err = repo.monitorClientInSinapore.GetMonitorData(request)
+	} else if util.IsStrInList(config.QcloudNamespace, m.Meta.ProductName) {
 		response, err = repo.monitorClientInGuangzhou.GetMonitorData(request)
 	} else {
 		response, err = repo.monitorClient.GetMonitorData(request)
