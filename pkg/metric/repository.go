@@ -39,8 +39,10 @@ type TcmMetricRepositoryImpl struct {
 	credential               common.CredentialIface
 	monitorClient            *monitor.Client
 	monitorClientInGuangzhou *monitor.Client
+	monitorClientInSinapore  *monitor.Client
 	limiter                  *rate.Limiter // 限速
 	ctx                      context.Context
+	IsInternational          bool
 
 	queryMetricBatchSize int
 
@@ -133,7 +135,9 @@ func (repo *TcmMetricRepositoryImpl) GetSamples(s *TcmSeries, st int64, et int64
 	}
 
 	response := &v20180724.GetMonitorDataResponse{}
-	if util.IsStrInList(config.QcloudNamespace, s.Metric.Meta.ProductName) {
+	if repo.IsInternational && s.Metric.Meta.ProductName == "QAAP" {
+		response, err = repo.monitorClientInSinapore.GetMonitorData(request)
+	} else if util.IsStrInList(config.QcloudNamespace, s.Metric.Meta.ProductName) {
 		response, err = repo.monitorClientInGuangzhou.GetMonitorData(request)
 	} else {
 		response, err = repo.monitorClient.GetMonitorData(request)
@@ -283,12 +287,21 @@ func NewTcmMetricRepository(cred common.CredentialIface, conf *config.TencentCon
 		return
 	}
 
+	var monitorClientInSingapore *monitor.Client
+	if conf.IsInternational {
+		if monitorClientInSingapore, err = client.NewMonitorClient(cred, conf, "ap"); err != nil {
+			return
+		}
+	}
+
 	repo = &TcmMetricRepositoryImpl{
 		credential:               cred,
 		monitorClient:            monitorClient,
 		monitorClientInGuangzhou: monitorClientInGuangzhou,
+		monitorClientInSinapore:  monitorClientInSingapore,
 		limiter:                  rate.NewLimiter(rate.Limit(conf.RateLimit), 1),
 		ctx:                      context.Background(),
+		IsInternational:          conf.IsInternational,
 		queryMetricBatchSize:     conf.MetricQueryBatchSize,
 		logger:                   logger,
 	}
