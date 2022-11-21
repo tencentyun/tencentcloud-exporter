@@ -288,10 +288,9 @@ func NewTcmMetricRepository(cred common.CredentialIface, conf *config.TencentCon
 	if err != nil {
 		return
 	}
-
 	var monitorClientInSingapore *monitor.Client
 	if conf.IsInternational {
-		if monitorClientInSingapore, err = client.NewMonitorClient(cred, conf, "ap"); err != nil {
+		if monitorClientInSingapore, err = client.NewMonitorClient(cred, conf, "ap-singapore"); err != nil {
 			return
 		}
 	}
