@@ -1,9 +1,11 @@
 package instance
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
+	tchttp "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/http"
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/gaap/v20180529"
 
 	selfcommon "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
@@ -151,6 +153,83 @@ func NewQaapTcInstanceUDPListenersRepository(cred common.CredentialIface, c *con
 		return nil, err
 	}
 	repo := &QaapTcInstanceUDPListenersRepositoryImpl{
+		client: cli,
+		logger: logger,
+	}
+	return repo, nil
+}
+
+// 内部接口
+
+type ProxyInstancesRsp struct {
+	TotalCount int64
+	ProxySet   []ProxyDetail
+}
+type ProxyDetail struct {
+	ProxyId       string
+	ProxyName     string
+	L4ListenerSet []L4ListenerDetail
+	L7ListenerSet []L7ListenerDetail
+}
+type L4ListenerDetail struct {
+	ListenerId   string
+	ListenerName string
+	Protocol     string
+	RsSet        []BoundRsDetail
+}
+type BoundRsDetail struct {
+	RsId   string
+	RsInfo string
+}
+type L7ListenerDetail struct {
+	ListenerId      string
+	ListenerName    string
+	ForwardProtocol string
+	RuleSet         []RuleDetail
+}
+type RuleDetail struct {
+	RsSet  []BoundRsDetail
+	RuleId string
+}
+
+type CommonQaapTcInstanceRepository interface {
+	GetCommonQaapInfo(instanceId string) (ProxyInstancesRsp, error)
+}
+
+type CommonQaapTcInstanceRepositoryImpl struct {
+	client *selfcommon.Client
+	logger log.Logger
+}
+
+func (repo *CommonQaapTcInstanceRepositoryImpl) GetCommonQaapInfo(instanceId string) (ProxyInstancesRsp, error) {
+	var proxyInstancesRsp ProxyInstancesRsp
+	request := tchttp.NewCommonRequest("gaap", "2018-05-29", "DescribeProxyInstances")
+	body:=map[string]interface{}{
+		"Limit":1,
+		"Offset":0,
+		"ProxyIds":[]string{"link-2r1whx05"},
+	}
+	// 设置action所需的请求数据
+	err := request.SetActionParameters(body)
+	if err != nil {
+		return proxyInstancesRsp, err
+	}
+	// 创建common response
+	response := tchttp.NewCommonResponse()
+	// 发送请求
+	err = repo.client.Send(request, response)
+	if err != nil {
+		fmt.Printf("fail to invoke api: %v \n", err)
+	}
+	// 获取响应结果
+	fmt.Println(string(response.GetBody()))
+	json.Unmarshal(response.GetBody(), &proxyInstancesRsp)
+	return proxyInstancesRsp, nil
+}
+
+func NewCommonQaapTcInstanceRepository(cred common.CredentialIface, c *config.TencentConfig, logger log.Logger) (CommonQaapTcInstanceRepository, error) {
+	cli := client.NewGAAPCommonClient(cred, c)
+	repo := &CommonQaapTcInstanceRepositoryImpl{
 		client: cli,
 		logger: logger,
 	}

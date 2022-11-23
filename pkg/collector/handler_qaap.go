@@ -24,6 +24,7 @@ type QaapHandler struct {
 	baseProductHandler
 	tcpListenersRepo instance.QaapTcInstanceTCPListenersRepository
 	udpListenersRepo instance.QaapTcInstanceUDPListenersRepository
+	commonQaap       instance.CommonQaapTcInstanceRepository
 }
 
 func (h *QaapHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
@@ -147,7 +148,11 @@ func (h *QaapHandler) getSeriesByMetricType(m *metric.TcmMetric, ins instance.Tc
 
 func (h *QaapHandler) getInstanceSeries(m *metric.TcmMetric, ins instance.TcInstance) ([]*metric.TcmSeries, error) {
 	var series []*metric.TcmSeries
-
+	commoninfo, err := h.commonQaap.GetCommonQaapInfo(ins.GetInstanceId())
+	if err != nil {
+		return nil, err
+	}
+	level.Info(h.logger).Log("commoninfo", commoninfo)
 	ql := map[string]string{
 		h.monitorQueryKey: ins.GetMonitorQueryKey(),
 	}
@@ -162,6 +167,7 @@ func (h *QaapHandler) getInstanceSeries(m *metric.TcmMetric, ins instance.TcInst
 
 func (h *QaapHandler) getListenerIdSeries(m *metric.TcmMetric, ins instance.TcInstance) ([]*metric.TcmSeries, error) {
 	var series []*metric.TcmSeries
+
 	tcpListenersInfos, err := h.tcpListenersRepo.GetTCPListenersInfo(ins.GetInstanceId())
 	if err != nil {
 		return nil, err
@@ -219,6 +225,8 @@ func NewQaapHandler(cred common.CredentialIface, c *TcProductCollector, logger l
 	}
 	udpListenersRepoCache := instance.NewTcGaapInstanceeUDPListenersCache(udpListenersRepo, relodInterval, logger)
 
+	commonQaap, err := instance.NewCommonQaapTcInstanceRepository(cred, c.Conf, logger)
+
 	handler = &QaapHandler{
 		baseProductHandler: baseProductHandler{
 			monitorQueryKey: QaapInstanceidKey,
@@ -227,6 +235,7 @@ func NewQaapHandler(cred common.CredentialIface, c *TcProductCollector, logger l
 		},
 		tcpListenersRepo: tcpListenersRepoCache,
 		udpListenersRepo: udpListenersRepoCache,
+		commonQaap:       commonQaap,
 	}
 	return
 
