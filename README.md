@@ -109,7 +109,7 @@ products:
     custom_query_dimensions:                     // 可选, 不常用, 自定义指标查询条件, 配置时all_instances,only_include_instances,exclude_instances失效, 用于不支持按实例纬度查询的指标
       - target: cmgo-xxxxxxxx
     statistics_types: [avg]                      // 可选, 拉取N个数据点, 再进行max、min、avg、last计算, 默认last取最新值
-    period_seconds: 60                           // 可选, 指标统计周期, 默认自动获取指标支持的最小统计周期
+    period_seconds: 60                           // 可选, 指标统计周期
     range_seconds: 300                           // 可选, 选取时间范围, 开始时间=now-range_seconds, 结束时间=now
     delay_seconds: 60                            // 可选, 时间偏移量, 结束时间=now-delay_seconds
     metric_name_type: 1                          // 可选，导出指标的名字格式化类型, 1=大写转小写加下划线, 2=转小写; 默认2
