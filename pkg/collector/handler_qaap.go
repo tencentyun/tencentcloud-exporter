@@ -51,6 +51,13 @@ func (h *QaapHandler) IsMetricVaild(m *metric.TcmMetric) bool {
 }
 
 func (h *QaapHandler) GetSeries(m *metric.TcmMetric) ([]*metric.TcmSeries, error) {
+	noneBgpIpListRsp, err := h.commonQaap.GetCommonQaapNoneBgpIpList("")
+	proxyInstancesRsp, err := h.commonQaap.GetCommonQaapProxyInstances("")
+	if err != nil {
+		return nil, err
+	}
+	level.Info(h.logger).Log("noneBgpIpListRsp count:",noneBgpIpListRsp.Response.TotalCount)
+	level.Info(h.logger).Log("proxyInstancesRsp count:",proxyInstancesRsp.Response.TotalCount)
 	if m.Conf.IsIncludeOnlyInstance() {
 		return h.GetSeriesByOnly(m)
 	}
@@ -148,11 +155,6 @@ func (h *QaapHandler) getSeriesByMetricType(m *metric.TcmMetric, ins instance.Tc
 
 func (h *QaapHandler) getInstanceSeries(m *metric.TcmMetric, ins instance.TcInstance) ([]*metric.TcmSeries, error) {
 	var series []*metric.TcmSeries
-	commoninfo, err := h.commonQaap.GetCommonQaapInfo(ins.GetInstanceId())
-	if err != nil {
-		return nil, err
-	}
-	level.Info(h.logger).Log("commoninfo", commoninfo)
 	ql := map[string]string{
 		h.monitorQueryKey: ins.GetMonitorQueryKey(),
 	}

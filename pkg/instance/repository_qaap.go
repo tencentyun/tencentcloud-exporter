@@ -161,9 +161,12 @@ func NewQaapTcInstanceUDPListenersRepository(cred common.CredentialIface, c *con
 
 // 内部接口
 
-type ProxyInstancesRsp struct {
+type Rsp struct {
 	TotalCount int64
 	ProxySet   []ProxyDetail
+}
+type ProxyInstancesRsp struct {
+	Response Rsp
 }
 type ProxyDetail struct {
 	ProxyId       string
@@ -191,9 +194,12 @@ type RuleDetail struct {
 	RsSet  []BoundRsDetail
 	RuleId string
 }
-
+type NoneBgpIpListRsp struct {
+	Response Rsp
+}
 type CommonQaapTcInstanceRepository interface {
-	GetCommonQaapInfo(instanceId string) (ProxyInstancesRsp, error)
+	GetCommonQaapProxyInstances(instanceId string) (ProxyInstancesRsp, error)
+	GetCommonQaapNoneBgpIpList(instanceId string) (NoneBgpIpListRsp, error)
 }
 
 type CommonQaapTcInstanceRepositoryImpl struct {
@@ -201,13 +207,13 @@ type CommonQaapTcInstanceRepositoryImpl struct {
 	logger log.Logger
 }
 
-func (repo *CommonQaapTcInstanceRepositoryImpl) GetCommonQaapInfo(instanceId string) (ProxyInstancesRsp, error) {
+func (repo *CommonQaapTcInstanceRepositoryImpl) GetCommonQaapProxyInstances(instanceId string) (ProxyInstancesRsp, error) {
 	var proxyInstancesRsp ProxyInstancesRsp
 	request := tchttp.NewCommonRequest("gaap", "2018-05-29", "DescribeProxyInstances")
-	body:=map[string]interface{}{
-		"Limit":1,
-		"Offset":0,
-		"ProxyIds":[]string{"link-2r1whx05"},
+	body := map[string]interface{}{
+		"Limit":    1,
+		"Offset":   0,
+		"ProxyIds": []string{"link-2r1whx05"},
 	}
 	// 设置action所需的请求数据
 	err := request.SetActionParameters(body)
@@ -222,9 +228,34 @@ func (repo *CommonQaapTcInstanceRepositoryImpl) GetCommonQaapInfo(instanceId str
 		fmt.Printf("fail to invoke api: %v \n", err)
 	}
 	// 获取响应结果
-	fmt.Println(string(response.GetBody()))
+	// fmt.Println(string(response.GetBody()))
 	json.Unmarshal(response.GetBody(), &proxyInstancesRsp)
 	return proxyInstancesRsp, nil
+}
+
+func (repo *CommonQaapTcInstanceRepositoryImpl) GetCommonQaapNoneBgpIpList(instanceId string) (NoneBgpIpListRsp, error) {
+	var noneBgpIpListRsp NoneBgpIpListRsp
+	request := tchttp.NewCommonRequest("gaap", "2018-05-29", "DescribeNoneBgpIpList")
+	body := map[string]interface{}{
+		"Limit":    1,
+		"Offset":   0,
+	}
+	// 设置action所需的请求数据
+	err := request.SetActionParameters(body)
+	if err != nil {
+		return noneBgpIpListRsp, err
+	}
+	// 创建common response
+	response := tchttp.NewCommonResponse()
+	// 发送请求
+	err = repo.client.Send(request, response)
+	if err != nil {
+		fmt.Printf("fail to invoke api: %v \n", err)
+	}
+	// 获取响应结果
+	// fmt.Println(string(response.GetBody()))
+	json.Unmarshal(response.GetBody(), &noneBgpIpListRsp)
+	return noneBgpIpListRsp, nil
 }
 
 func NewCommonQaapTcInstanceRepository(cred common.CredentialIface, c *config.TencentConfig, logger log.Logger) (CommonQaapTcInstanceRepository, error) {
