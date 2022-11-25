@@ -56,8 +56,12 @@ func (h *QaapHandler) GetSeries(m *metric.TcmMetric) ([]*metric.TcmSeries, error
 	if err != nil {
 		return nil, err
 	}
-	level.Info(h.logger).Log("noneBgpIpListRsp count:",noneBgpIpListRsp.Response.TotalCount)
-	level.Info(h.logger).Log("proxyInstancesRsp count:",proxyInstancesRsp.Response.TotalCount)
+	level.Info(h.logger).Log("noneBgpIpListRsp count:", noneBgpIpListRsp.Response.TotalCount)
+	level.Info(h.logger).Log("proxyInstancesRsp count:", proxyInstancesRsp.Response.TotalCount)
+	if proxyInstancesRsp.Response.TotalCount != 0 {
+		level.Info(h.logger).Log("proxyInstancesRsp ProxyId:", proxyInstancesRsp.Response.ProxySet[0].ProxyId)
+	}
+
 	if m.Conf.IsIncludeOnlyInstance() {
 		return h.GetSeriesByOnly(m)
 	}

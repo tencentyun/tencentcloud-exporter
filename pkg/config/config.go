@@ -145,6 +145,7 @@ type TencentConfig struct {
 	MetricQueryBatchSize int               `yaml:"metric_query_batch_size"`
 	Filename             string            `yaml:"filename"`
 	CacheInterval        int64             `yaml:"cache_interval"` // 单位 s
+	IsInternational      bool              `yaml:"is_international"` // true 表示是国际站
 }
 
 func NewConfig() *TencentConfig {
