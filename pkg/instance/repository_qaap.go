@@ -159,8 +159,39 @@ func NewQaapTcInstanceUDPListenersRepository(cred common.CredentialIface, c *con
 	return repo, nil
 }
 
-// 内部接口
+// DescribeProxyGroupList
+type QaapTcInstanceProxyGroupListRepository interface {
+	GetProxyGroupList(instanceId string) (*sdk.DescribeProxyGroupListResponse, error)
+}
 
+type QaapTcInstanceProxyGroupListRepositoryImpl struct {
+	client *sdk.Client
+	logger log.Logger
+}
+
+func (repo *QaapTcInstanceProxyGroupListRepositoryImpl) GetProxyGroupList(instanceId string) (*sdk.DescribeProxyGroupListResponse, error) {
+	req := sdk.NewDescribeProxyGroupListRequest()
+	var offset int64 = 0
+	var limit int64 = 100
+	req.Limit = &limit
+	req.Offset = &offset
+	// req. = selfcommon.StringPtr(instanceId)
+	return repo.client.DescribeProxyGroupList(req)
+}
+
+func NewQaapTcInstanceProxyGroupListRepository(cred common.CredentialIface, c *config.TencentConfig, logger log.Logger) (QaapTcInstanceUDPListenersRepository, error) {
+	cli, err := client.NewGAAPClient(cred, c)
+	if err != nil {
+		return nil, err
+	}
+	repo := &QaapTcInstanceUDPListenersRepositoryImpl{
+		client: cli,
+		logger: logger,
+	}
+	return repo, nil
+}
+
+// 内部接口
 type Rsp struct {
 	TotalCount int64
 	ProxySet   []ProxyDetail
@@ -237,8 +268,8 @@ func (repo *CommonQaapTcInstanceRepositoryImpl) GetCommonQaapNoneBgpIpList(insta
 	var noneBgpIpListRsp NoneBgpIpListRsp
 	request := tchttp.NewCommonRequest("gaap", "2018-05-29", "DescribeNoneBgpIpList")
 	body := map[string]interface{}{
-		"Limit":    1,
-		"Offset":   0,
+		"Limit":  1,
+		"Offset": 0,
 	}
 	// 设置action所需的请求数据
 	err := request.SetActionParameters(body)

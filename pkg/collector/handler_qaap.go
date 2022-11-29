@@ -16,6 +16,24 @@ const (
 	QaapInstanceidKey = "channelId"
 )
 
+var (
+	QaapDetail2GroupidMetricNames = []string{
+		"GroupInFlow", "GroupOutFlow", "GroupInbandwidth", "GroupOutbandwidth",
+	}
+	QaapIpDetailMetricNames = []string{
+		"IpConnum", "IpInbandwidth", "IpInpacket", "IpLatency", "IpOutbandwidth", "IpOutpacket", "IpPacketLoss",
+	}
+	QaapListenerStatMetricNames = []string{
+		"ListenerConnum", "ListenerOutbandwidth", "ListenerInpacket", "ListenerOutpacket", "ListenerInbandwidth",
+	}
+	QaapListenerRsMetricNames = []string{
+		"ListenerRsStatus",
+	}
+	QaapRuleRsMetricNames = []string{
+		"RuleRsStatus", "RuleRsStatusTest",
+	}
+)
+
 func init() {
 	registerHandler(QaapNamespace, defaultHandlerEnabled, NewQaapHandler)
 }
@@ -149,8 +167,15 @@ func (h *QaapHandler) getSeriesByMetricType(m *metric.TcmMetric, ins instance.Tc
 	for _, v := range m.Meta.SupportDimensions {
 		dimensions = append(dimensions, v)
 	}
-
-	if util.IsStrInList(dimensions, "listenerId") {
+	if util.IsStrInList(QaapDetail2GroupidMetricNames, m.Meta.MetricName) {
+		return h.getQaapDetail2GroupidSeries(m, ins)
+	} else if util.IsStrInList(QaapIpDetailMetricNames, m.Meta.MetricName) {
+		return h.getListenerIdSeries(m, ins)
+	} else if util.IsStrInList(QaapListenerStatMetricNames, m.Meta.MetricName) {
+		return h.getListenerIdSeries(m, ins)
+	} else if util.IsStrInList(QaapListenerRsMetricNames, m.Meta.MetricName) {
+		return h.getListenerIdSeries(m, ins)
+	} else if util.IsStrInList(QaapRuleRsMetricNames, m.Meta.MetricName) {
 		return h.getListenerIdSeries(m, ins)
 	} else {
 		return h.getInstanceSeries(m, ins)
@@ -214,6 +239,20 @@ func (h *QaapHandler) getListenerIdSeries(m *metric.TcmMetric, ins instance.TcIn
 			series = append(series, s)
 		}
 	}
+	return series, nil
+}
+
+func (h *QaapHandler) getQaapDetail2GroupidSeries(m *metric.TcmMetric, ins instance.TcInstance) ([]*metric.TcmSeries, error) {
+	var series []*metric.TcmSeries
+	ql := map[string]string{
+		"GroupId": ins.GetMonitorQueryKey(),
+	}
+	s, err := metric.NewTcmSeries(m, ql, ins)
+	if err != nil {
+		return nil, err
+	}
+	series = append(series, s)
+
 	return series, nil
 }
 
