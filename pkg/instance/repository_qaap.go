@@ -95,17 +95,38 @@ func NewQaapTcInstanceRepository(cred common.CredentialIface, c *config.TencentC
 	return
 }
 
-// TCPListeners
-type QaapTcInstanceTCPListenersRepository interface {
+// DescribeProxyGroupList
+type QaapTcInstanceInfoRepository interface {
+	GetProxyGroupList(instanceId string) (*sdk.DescribeProxyGroupListResponse, error)
+	GetUDPListenersInfo(instanceId string) (*sdk.DescribeUDPListenersResponse, error)
 	GetTCPListenersInfo(instanceId string) (*sdk.DescribeTCPListenersResponse, error)
 }
 
-type QaapTcInstanceTCPListenersRepositoryImpl struct {
+type QaapTcInstanceInfoRepositoryImpl struct {
 	client *sdk.Client
 	logger log.Logger
 }
 
-func (repo *QaapTcInstanceTCPListenersRepositoryImpl) GetTCPListenersInfo(instanceId string) (*sdk.DescribeTCPListenersResponse, error) {
+func (repo *QaapTcInstanceInfoRepositoryImpl) GetProxyGroupList(instanceId string) (*sdk.DescribeProxyGroupListResponse, error) {
+	req := sdk.NewDescribeProxyGroupListRequest()
+	var offset int64 = 0
+	var limit int64 = 100
+	var projectId int64 = -1
+	req.Limit = &limit
+	req.Offset = &offset
+	req.ProjectId = &projectId
+	return repo.client.DescribeProxyGroupList(req)
+}
+func (repo *QaapTcInstanceInfoRepositoryImpl) GetUDPListenersInfo(instanceId string) (*sdk.DescribeUDPListenersResponse, error) {
+	req := sdk.NewDescribeUDPListenersRequest()
+	var offset uint64 = 0
+	var limit uint64 = 100
+	req.Limit = &limit
+	req.Offset = &offset
+	req.ProxyId = selfcommon.StringPtr(instanceId)
+	return repo.client.DescribeUDPListeners(req)
+}
+func (repo *QaapTcInstanceInfoRepositoryImpl) GetTCPListenersInfo(instanceId string) (*sdk.DescribeTCPListenersResponse, error) {
 	req := sdk.NewDescribeTCPListenersRequest()
 	var offset uint64 = 0
 	var limit uint64 = 100
@@ -115,76 +136,12 @@ func (repo *QaapTcInstanceTCPListenersRepositoryImpl) GetTCPListenersInfo(instan
 	return repo.client.DescribeTCPListeners(req)
 }
 
-func NewQaapTcInstanceTCPListenersRepository(cred common.CredentialIface, c *config.TencentConfig, logger log.Logger) (QaapTcInstanceTCPListenersRepository, error) {
+func NewQaapTcInstanceInfoRepository(cred common.CredentialIface, c *config.TencentConfig, logger log.Logger) (QaapTcInstanceInfoRepository, error) {
 	cli, err := client.NewGAAPClient(cred, c)
 	if err != nil {
 		return nil, err
 	}
-	repo := &QaapTcInstanceTCPListenersRepositoryImpl{
-		client: cli,
-		logger: logger,
-	}
-	return repo, nil
-}
-
-// UDPListeners
-type QaapTcInstanceUDPListenersRepository interface {
-	GetUDPListenersInfo(instanceId string) (*sdk.DescribeUDPListenersResponse, error)
-}
-
-type QaapTcInstanceUDPListenersRepositoryImpl struct {
-	client *sdk.Client
-	logger log.Logger
-}
-
-func (repo *QaapTcInstanceUDPListenersRepositoryImpl) GetUDPListenersInfo(instanceId string) (*sdk.DescribeUDPListenersResponse, error) {
-	req := sdk.NewDescribeUDPListenersRequest()
-	var offset uint64 = 0
-	var limit uint64 = 100
-	req.Limit = &limit
-	req.Offset = &offset
-	req.ProxyId = selfcommon.StringPtr(instanceId)
-	return repo.client.DescribeUDPListeners(req)
-}
-
-func NewQaapTcInstanceUDPListenersRepository(cred common.CredentialIface, c *config.TencentConfig, logger log.Logger) (QaapTcInstanceUDPListenersRepository, error) {
-	cli, err := client.NewGAAPClient(cred, c)
-	if err != nil {
-		return nil, err
-	}
-	repo := &QaapTcInstanceUDPListenersRepositoryImpl{
-		client: cli,
-		logger: logger,
-	}
-	return repo, nil
-}
-
-// DescribeProxyGroupList
-type QaapTcInstanceProxyGroupListRepository interface {
-	GetProxyGroupList(instanceId string) (*sdk.DescribeProxyGroupListResponse, error)
-}
-
-type QaapTcInstanceProxyGroupListRepositoryImpl struct {
-	client *sdk.Client
-	logger log.Logger
-}
-
-func (repo *QaapTcInstanceProxyGroupListRepositoryImpl) GetProxyGroupList(instanceId string) (*sdk.DescribeProxyGroupListResponse, error) {
-	req := sdk.NewDescribeProxyGroupListRequest()
-	var offset int64 = 0
-	var limit int64 = 100
-	req.Limit = &limit
-	req.Offset = &offset
-	// req. = selfcommon.StringPtr(instanceId)
-	return repo.client.DescribeProxyGroupList(req)
-}
-
-func NewQaapTcInstanceProxyGroupListRepository(cred common.CredentialIface, c *config.TencentConfig, logger log.Logger) (QaapTcInstanceUDPListenersRepository, error) {
-	cli, err := client.NewGAAPClient(cred, c)
-	if err != nil {
-		return nil, err
-	}
-	repo := &QaapTcInstanceUDPListenersRepositoryImpl{
+	repo := &QaapTcInstanceInfoRepositoryImpl{
 		client: cli,
 		logger: logger,
 	}
@@ -192,12 +149,12 @@ func NewQaapTcInstanceProxyGroupListRepository(cred common.CredentialIface, c *c
 }
 
 // 内部接口
-type Rsp struct {
+type ProxyInstancesResponse struct {
 	TotalCount int64
 	ProxySet   []ProxyDetail
 }
 type ProxyInstancesRsp struct {
-	Response Rsp
+	Response ProxyInstancesResponse
 }
 type ProxyDetail struct {
 	ProxyId       string
@@ -222,11 +179,22 @@ type L7ListenerDetail struct {
 	RuleSet         []RuleDetail
 }
 type RuleDetail struct {
-	RsSet  []BoundRsDetail
+	RsInfo []BoundRsDetail
 	RuleId string
 }
+
 type NoneBgpIpListRsp struct {
-	Response Rsp
+	Response NoneBgpIpListResponse
+}
+type NoneBgpIpListResponse struct {
+	TotalCount  int64
+	InstanceSet []InstanceDetail
+}
+type InstanceDetail struct {
+	IP      string
+	Isp     string
+	ProxyId string
+	GroupId string
 }
 type CommonQaapTcInstanceRepository interface {
 	GetCommonQaapProxyInstances(instanceId string) (ProxyInstancesRsp, error)
@@ -242,9 +210,9 @@ func (repo *CommonQaapTcInstanceRepositoryImpl) GetCommonQaapProxyInstances(inst
 	var proxyInstancesRsp ProxyInstancesRsp
 	request := tchttp.NewCommonRequest("gaap", "2018-05-29", "DescribeProxyInstances")
 	body := map[string]interface{}{
-		"Limit":    1,
-		"Offset":   0,
-		"ProxyIds": []string{"link-2r1whx05"},
+		"Limit":  1,
+		"Offset": 0,
+		// "ProxyIds": []string{"link-09ai6y0r"},
 	}
 	// 设置action所需的请求数据
 	err := request.SetActionParameters(body)
@@ -259,7 +227,6 @@ func (repo *CommonQaapTcInstanceRepositoryImpl) GetCommonQaapProxyInstances(inst
 		fmt.Printf("fail to invoke api: %v \n", err)
 	}
 	// 获取响应结果
-	// fmt.Println(string(response.GetBody()))
 	json.Unmarshal(response.GetBody(), &proxyInstancesRsp)
 	return proxyInstancesRsp, nil
 }
@@ -284,7 +251,6 @@ func (repo *CommonQaapTcInstanceRepositoryImpl) GetCommonQaapNoneBgpIpList(insta
 		fmt.Printf("fail to invoke api: %v \n", err)
 	}
 	// 获取响应结果
-	// fmt.Println(string(response.GetBody()))
 	json.Unmarshal(response.GetBody(), &noneBgpIpListRsp)
 	return noneBgpIpListRsp, nil
 }

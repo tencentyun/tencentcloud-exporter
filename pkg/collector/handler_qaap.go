@@ -8,6 +8,7 @@ import (
 	"github.com/tencentyun/tencentcloud-exporter/pkg/instance"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
+	"strings"
 	"time"
 )
 
@@ -30,7 +31,7 @@ var (
 		"ListenerRsStatus",
 	}
 	QaapRuleRsMetricNames = []string{
-		"RuleRsStatus", "RuleRsStatusTest",
+		"RuleRsStatus",
 	}
 )
 
@@ -40,9 +41,8 @@ func init() {
 
 type QaapHandler struct {
 	baseProductHandler
-	tcpListenersRepo instance.QaapTcInstanceTCPListenersRepository
-	udpListenersRepo instance.QaapTcInstanceUDPListenersRepository
-	commonQaap       instance.CommonQaapTcInstanceRepository
+	commonQaapInstanceInfoRepo instance.CommonQaapTcInstanceRepository
+	qaapInstanceInfoRepo       instance.QaapTcInstanceInfoRepository
 }
 
 func (h *QaapHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
@@ -69,17 +69,6 @@ func (h *QaapHandler) IsMetricVaild(m *metric.TcmMetric) bool {
 }
 
 func (h *QaapHandler) GetSeries(m *metric.TcmMetric) ([]*metric.TcmSeries, error) {
-	noneBgpIpListRsp, err := h.commonQaap.GetCommonQaapNoneBgpIpList("")
-	proxyInstancesRsp, err := h.commonQaap.GetCommonQaapProxyInstances("")
-	if err != nil {
-		return nil, err
-	}
-	level.Info(h.logger).Log("noneBgpIpListRsp count:", noneBgpIpListRsp.Response.TotalCount)
-	level.Info(h.logger).Log("proxyInstancesRsp count:", proxyInstancesRsp.Response.TotalCount)
-	if proxyInstancesRsp.Response.TotalCount != 0 {
-		level.Info(h.logger).Log("proxyInstancesRsp ProxyId:", proxyInstancesRsp.Response.ProxySet[0].ProxyId)
-	}
-
 	if m.Conf.IsIncludeOnlyInstance() {
 		return h.GetSeriesByOnly(m)
 	}
@@ -170,13 +159,13 @@ func (h *QaapHandler) getSeriesByMetricType(m *metric.TcmMetric, ins instance.Tc
 	if util.IsStrInList(QaapDetail2GroupidMetricNames, m.Meta.MetricName) {
 		return h.getQaapDetail2GroupidSeries(m, ins)
 	} else if util.IsStrInList(QaapIpDetailMetricNames, m.Meta.MetricName) {
-		return h.getListenerIdSeries(m, ins)
+		return h.getQaapIpDetailSeries(m, ins)
 	} else if util.IsStrInList(QaapListenerStatMetricNames, m.Meta.MetricName) {
-		return h.getListenerIdSeries(m, ins)
+		return h.getQaapListenerStatSeries(m, ins)
 	} else if util.IsStrInList(QaapListenerRsMetricNames, m.Meta.MetricName) {
-		return h.getListenerIdSeries(m, ins)
+		return h.getQaapListenerRsSeries(m, ins)
 	} else if util.IsStrInList(QaapRuleRsMetricNames, m.Meta.MetricName) {
-		return h.getListenerIdSeries(m, ins)
+		return h.getRuleRsSeries(m, ins)
 	} else {
 		return h.getInstanceSeries(m, ins)
 	}
@@ -196,10 +185,10 @@ func (h *QaapHandler) getInstanceSeries(m *metric.TcmMetric, ins instance.TcInst
 	return series, nil
 }
 
-func (h *QaapHandler) getListenerIdSeries(m *metric.TcmMetric, ins instance.TcInstance) ([]*metric.TcmSeries, error) {
+func (h *QaapHandler) getQaapListenerRsSeries(m *metric.TcmMetric, ins instance.TcInstance) ([]*metric.TcmSeries, error) {
 	var series []*metric.TcmSeries
 
-	tcpListenersInfos, err := h.tcpListenersRepo.GetTCPListenersInfo(ins.GetInstanceId())
+	tcpListenersInfos, err := h.qaapInstanceInfoRepo.GetTCPListenersInfo(ins.GetInstanceId())
 	if err != nil {
 		return nil, err
 	}
@@ -219,7 +208,7 @@ func (h *QaapHandler) getListenerIdSeries(m *metric.TcmMetric, ins instance.TcIn
 			series = append(series, s)
 		}
 	}
-	udpListenersInfos, err := h.udpListenersRepo.GetUDPListenersInfo(ins.GetInstanceId())
+	udpListenersInfos, err := h.qaapInstanceInfoRepo.GetUDPListenersInfo(ins.GetInstanceId())
 	if err != nil {
 		return nil, err
 	}
@@ -244,33 +233,123 @@ func (h *QaapHandler) getListenerIdSeries(m *metric.TcmMetric, ins instance.TcIn
 
 func (h *QaapHandler) getQaapDetail2GroupidSeries(m *metric.TcmMetric, ins instance.TcInstance) ([]*metric.TcmSeries, error) {
 	var series []*metric.TcmSeries
-	ql := map[string]string{
-		"GroupId": ins.GetMonitorQueryKey(),
-	}
-	s, err := metric.NewTcmSeries(m, ql, ins)
+	proxyGroupLists, err := h.qaapInstanceInfoRepo.GetProxyGroupList(ins.GetInstanceId())
 	if err != nil {
 		return nil, err
 	}
-	series = append(series, s)
+	for _, proxyGroupList := range proxyGroupLists.Response.ProxyGroupList {
+		ql := map[string]string{
+			"GroupId": *proxyGroupList.GroupId,
+		}
+		s, err := metric.NewTcmSeries(m, ql, ins)
+		if err != nil {
+			return nil, err
+		}
+		series = append(series, s)
+	}
+	return series, nil
+}
 
+func (h *QaapHandler) getQaapIpDetailSeries(m *metric.TcmMetric, ins instance.TcInstance) ([]*metric.TcmSeries, error) {
+	var series []*metric.TcmSeries
+	noneBgpIpLists, err := h.commonQaapInstanceInfoRepo.GetCommonQaapNoneBgpIpList(ins.GetInstanceId())
+	if err != nil {
+		return nil, err
+	}
+	for _, instanceSet := range noneBgpIpLists.Response.InstanceSet {
+		ql := map[string]string{
+			"ip":      instanceSet.IP,
+			"proxyid": instanceSet.ProxyId,
+			"groupid": instanceSet.GroupId,
+			"isp":     strings.ToLower(instanceSet.Isp),
+		}
+		s, err := metric.NewTcmSeries(m, ql, ins)
+		if err != nil {
+			return nil, err
+		}
+		series = append(series, s)
+	}
+	return series, nil
+}
+
+func (h *QaapHandler) getQaapListenerStatSeries(m *metric.TcmMetric, ins instance.TcInstance) ([]*metric.TcmSeries, error) {
+	var series []*metric.TcmSeries
+	ProxyInstances, err := h.commonQaapInstanceInfoRepo.GetCommonQaapProxyInstances(ins.GetInstanceId())
+	if err != nil {
+		return nil, err
+	}
+	for _, proxySet := range ProxyInstances.Response.ProxySet {
+		for _, l4Listener := range proxySet.L4ListenerSet {
+			ql := map[string]string{
+				"instanceid": proxySet.ProxyId,
+				"listenerid": l4Listener.ListenerId,
+			}
+			s, err := metric.NewTcmSeries(m, ql, ins)
+			if err != nil {
+				return nil, err
+			}
+			series = append(series, s)
+		}
+		for _, l7Listener := range proxySet.L7ListenerSet {
+			ql := map[string]string{
+				"instanceid": proxySet.ProxyId,
+				"listenerid": l7Listener.ListenerId,
+			}
+			s, err := metric.NewTcmSeries(m, ql, ins)
+			if err != nil {
+				return nil, err
+			}
+			series = append(series, s)
+		}
+
+	}
+	return series, nil
+}
+func (h *QaapHandler) getRuleRsSeries(m *metric.TcmMetric, ins instance.TcInstance) ([]*metric.TcmSeries, error) {
+	var series []*metric.TcmSeries
+	ProxyInstances, err := h.commonQaapInstanceInfoRepo.GetCommonQaapProxyInstances(ins.GetInstanceId())
+	if err != nil {
+		return nil, err
+	}
+	for _, proxySet := range ProxyInstances.Response.ProxySet {
+		for _, l7Listener := range proxySet.L7ListenerSet {
+			for _, rule := range l7Listener.RuleSet {
+				for _, rs := range rule.RsInfo {
+					fmt.Print(proxySet.ProxyId, "-", l7Listener.ListenerId, "")
+					ql := map[string]string{
+						"instanceid": proxySet.ProxyId,
+						"listenerid": l7Listener.ListenerId,
+						"ruleid":     rule.RuleId,
+						"rs_ip":      rs.RsInfo,
+					}
+					s, err := metric.NewTcmSeries(m, ql, ins)
+					if err != nil {
+						return nil, err
+					}
+					series = append(series, s)
+				}
+
+			}
+
+		}
+
+	}
 	return series, nil
 }
 
 func NewQaapHandler(cred common.CredentialIface, c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
-	tcpListenersRepo, err := instance.NewQaapTcInstanceTCPListenersRepository(cred, c.Conf, logger)
+	qaapInstanceInfo, err := instance.NewQaapTcInstanceInfoRepository(cred, c.Conf, logger)
 	if err != nil {
 		return nil, err
 	}
-	relodInterval := time.Duration(c.ProductConf.RelodIntervalMinutes * int64(time.Minute))
-	tcpListenersRepoCache := instance.NewTcGaapInstanceeTCPListenersCache(tcpListenersRepo, relodInterval, logger)
+	reloadInterval := time.Duration(c.ProductConf.RelodIntervalMinutes * int64(time.Minute))
+	qaapInstanceInfoCache := instance.NewTcGaapInstanceeInfosCache(qaapInstanceInfo, reloadInterval, logger)
 
-	udpListenersRepo, err := instance.NewQaapTcInstanceUDPListenersRepository(cred, c.Conf, logger)
+	commonQaapInstanceInfoRepo, err := instance.NewCommonQaapTcInstanceRepository(cred, c.Conf, logger)
 	if err != nil {
 		return nil, err
 	}
-	udpListenersRepoCache := instance.NewTcGaapInstanceeUDPListenersCache(udpListenersRepo, relodInterval, logger)
-
-	commonQaap, err := instance.NewCommonQaapTcInstanceRepository(cred, c.Conf, logger)
+	commonQaapInstanceInfoCache := instance.NewTcCommonGaapInstanceeInfosCache(commonQaapInstanceInfoRepo, reloadInterval, logger)
 
 	handler = &QaapHandler{
 		baseProductHandler: baseProductHandler{
@@ -278,9 +357,8 @@ func NewQaapHandler(cred common.CredentialIface, c *TcProductCollector, logger l
 			collector:       c,
 			logger:          logger,
 		},
-		tcpListenersRepo: tcpListenersRepoCache,
-		udpListenersRepo: udpListenersRepoCache,
-		commonQaap:       commonQaap,
+		commonQaapInstanceInfoRepo: commonQaapInstanceInfoCache,
+		qaapInstanceInfoRepo:       qaapInstanceInfoCache,
 	}
 	return
 
