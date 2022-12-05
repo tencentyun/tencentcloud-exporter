@@ -199,7 +199,6 @@ func (repo *TcmMetricRepositoryImpl) listSampleByBatch(
 	if err != nil {
 		return nil, err
 	}
-
 	for _, points := range response.Response.DataPoints {
 		samples, ql, e := repo.buildSamples(m, points)
 		if e != nil {

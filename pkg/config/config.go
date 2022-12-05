@@ -144,7 +144,7 @@ type TencentConfig struct {
 	RateLimit            float64           `yaml:"rate_limit"`
 	MetricQueryBatchSize int               `yaml:"metric_query_batch_size"`
 	Filename             string            `yaml:"filename"`
-	CacheInterval        int64             `yaml:"cache_interval"`   // 单位 s
+	CacheInterval        int64             `yaml:"cache_interval"` // 单位 s
 	IsInternational      bool              `yaml:"is_international"` // true 表示是国际站
 }
 
