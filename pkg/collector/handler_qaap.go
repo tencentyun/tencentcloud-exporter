@@ -283,6 +283,7 @@ func (h *QaapHandler) getQaapListenerStatSeries(m *metric.TcmMetric, ins instanc
 			ql := map[string]string{
 				"instanceid": proxySet.ProxyId,
 				"listenerid": l4Listener.ListenerId,
+				"protocol":l4Listener.Protocol,
 			}
 			s, err := metric.NewTcmSeries(m, ql, ins)
 			if err != nil {
@@ -294,6 +295,7 @@ func (h *QaapHandler) getQaapListenerStatSeries(m *metric.TcmMetric, ins instanc
 			ql := map[string]string{
 				"instanceid": proxySet.ProxyId,
 				"listenerid": l7Listener.ListenerId,
+				"protocol":l7Listener.ForwardProtocol,
 			}
 			s, err := metric.NewTcmSeries(m, ql, ins)
 			if err != nil {
@@ -314,8 +316,7 @@ func (h *QaapHandler) getRuleRsSeries(m *metric.TcmMetric, ins instance.TcInstan
 	for _, proxySet := range ProxyInstances.Response.ProxySet {
 		for _, l7Listener := range proxySet.L7ListenerSet {
 			for _, rule := range l7Listener.RuleSet {
-				for _, rs := range rule.RsInfo {
-					fmt.Print(proxySet.ProxyId, "-", l7Listener.ListenerId, "")
+				for _, rs := range rule.RsSet {
 					ql := map[string]string{
 						"instanceid": proxySet.ProxyId,
 						"listenerid": l7Listener.ListenerId,

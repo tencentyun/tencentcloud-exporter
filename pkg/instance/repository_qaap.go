@@ -179,7 +179,7 @@ type L7ListenerDetail struct {
 	RuleSet         []RuleDetail
 }
 type RuleDetail struct {
-	RsInfo []BoundRsDetail
+	RsSet  []BoundRsDetail
 	RuleId string
 }
 
@@ -210,9 +210,9 @@ func (repo *CommonQaapTcInstanceRepositoryImpl) GetCommonQaapProxyInstances(inst
 	var proxyInstancesRsp ProxyInstancesRsp
 	request := tchttp.NewCommonRequest("gaap", "2018-05-29", "DescribeProxyInstances")
 	body := map[string]interface{}{
-		"Limit":  1,
-		"Offset": 0,
-		// "ProxyIds": []string{"link-09ai6y0r"},
+		"Limit":    100,
+		"Offset":   0,
+		"ProxyIds": []string{instanceId},
 	}
 	// 设置action所需的请求数据
 	err := request.SetActionParameters(body)
@@ -235,7 +235,7 @@ func (repo *CommonQaapTcInstanceRepositoryImpl) GetCommonQaapNoneBgpIpList(insta
 	var noneBgpIpListRsp NoneBgpIpListRsp
 	request := tchttp.NewCommonRequest("gaap", "2018-05-29", "DescribeNoneBgpIpList")
 	body := map[string]interface{}{
-		"Limit":  1,
+		"Limit":  100,
 		"Offset": 0,
 	}
 	// 设置action所需的请求数据
