@@ -192,6 +192,8 @@ func (repo *TcmMetricRepositoryImpl) listSampleByBatch(
 	if repo.IsInternational && m.Meta.ProductName == "QAAP" {
 		response, err = repo.monitorClientInSinapore.GetMonitorData(request)
 	} else if util.IsStrInList(config.QcloudNamespace, m.Meta.ProductName) {
+		response, err = repo.monitorClientInGuangzhou.GetMonitorData(request)
+	} else {
 		response, err = repo.monitorClient.GetMonitorData(request)
 	}
 	if err != nil {
@@ -291,6 +293,7 @@ func NewTcmMetricRepository(cred common.CredentialIface, conf *config.TencentCon
 			return
 		}
 	}
+
 	repo = &TcmMetricRepositoryImpl{
 		credential:               cred,
 		monitorClient:            monitorClient,

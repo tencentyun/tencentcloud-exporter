@@ -44,6 +44,7 @@ CYNOSDB_MYSQL|QCE/CYNOSDB_MYSQL|[指标详情](https://cloud.tencent.com/documen
 云联网|QCE/VBC|[指标详情](https://cloud.tencent.com/document/product/248/75629)
 数据传输 |QCE/DTS|指标详情说明文档(待上线)
 专线网关 |QCE/DCG|指标详情说明文档(待上线)
+全球应用加速|QCE/QAAP|[指标详情](https://cloud.tencent.com/document/product/248/45062)
 
 `后续会有更多的产品支持`
 
@@ -89,7 +90,7 @@ products:
 ```yaml
 credential:
   access_key: <YOUR_ACCESS_KEY>                  // 必须, 云API的SecretId
-  secret_key: <YOUR_ACCESS_SECRET>            // 必须, 云API的SecretKey
+  secret_key: <YOUR_ACCESS_SECRET>               // 必须, 云API的SecretKey
   region: <REGION>                               // 必须, 实例所在区域信息
 
 rate_limit: 15                                   // 腾讯云监控拉取指标数据限制, 官方默认限制最大20qps
@@ -97,21 +98,18 @@ rate_limit: 15                                   // 腾讯云监控拉取指标�
 
 // 整个产品纬度配置, 每个产品一个item
 products:
-  - namespace: QCE/CMONGO                        // 必须, 产品命名空间; QCE前缀可自定义,CMONGO产品名不区分大小写, 可用别名
+  - namespace: QCE/CMONGO                        // 必须, 产品命名空间
     all_metrics: true                            // 常用, 推荐开启, 导出支持的所有指标
     all_instances: true                          // 常用, 推荐开启, 导出该region下的所有实例
     extra_labels: [InstanceName,Zone]            // 可选, 将实例的字段作为指标的lables导出
     only_include_metrics: [Inserts]              // 可选, 只导出这些指标, 配置时all_metrics失效
     exclude_metrics: [Reads]                     // 可选, 不导出这些指标
-    instance_filters:                            // 可选, 在all_instances开启情况下, 根据每个实例的字段进行过滤
-      - ProjectId: 1
-        Status: 1
     only_include_instances: [cmgo-xxxxxxxx]      // 可选, 只导出这些实例id, 配置时all_instances失效
     exclude_instances: [cmgo-xxxxxxxx]           // 可选, 不导出这些实例id
     custom_query_dimensions:                     // 可选, 不常用, 自定义指标查询条件, 配置时all_instances,only_include_instances,exclude_instances失效, 用于不支持按实例纬度查询的指标
       - target: cmgo-xxxxxxxx
     statistics_types: [avg]                      // 可选, 拉取N个数据点, 再进行max、min、avg、last计算, 默认last取最新值
-    period_seconds: 60                           // 可选, 指标统计周期, 默认自动获取指标支持的最小统计周期
+    period_seconds: 60                           // 可选, 指标统计周期
     range_seconds: 300                           // 可选, 选取时间范围, 开始时间=now-range_seconds, 结束时间=now
     delay_seconds: 60                            // 可选, 时间偏移量, 结束时间=now-delay_seconds
     metric_name_type: 1                          // 可选，导出指标的名字格式化类型, 1=大写转小写加下划线, 2=转小写; 默认2
@@ -125,9 +123,6 @@ metrics:
     tc_metric_rename: Inserts                    // 导出指标的显示名
     tc_metric_name_type: 1                       // 可选，导出指标的名字格式化类型, 1=大写转小写加下划线, 2=转小写; 默认1
     tc_labels: [InstanceName]                    // 可选, 将实例的字段作为指标的lables导出
-    tc_filters:                                  // 可选, 根据每个实例的字段进行过滤, 否则默认导出region下所有实例
-      - ProjectId: 1
-        Status: 1
     tc_myself_dimensions:                        // 可选, 同custom_query_dimensions
     tc_statistics: [Avg]                         // 可选, 同statistics_types
     period_seconds: 60                           // 可选, 同period_seconds
