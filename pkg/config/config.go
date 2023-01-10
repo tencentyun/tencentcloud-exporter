@@ -67,6 +67,8 @@ var (
 		"dcg":           "QCE/DCG",           // for dcg
 		"vbc":           "QCE/VBC",           // for vbc
 		"qaap":          "QCE/QAAP",          // for qaap
+		"lb_private":    "QCE/LB_PRIVATE",
+		"waf":           "QCE/WAF",
 	}
 
 	SupportStatisticsTypes = map[string]bool{

@@ -30,8 +30,8 @@ import (
 	tdmq "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tdmq/v20200217"
 	tse "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tse/v20201207"
 	vpc "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/vpc/v20170312"
+	waf "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/waf/v20180125"
 	cos "github.com/tencentyun/cos-go-sdk-v5"
-
 	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/config"
 )
@@ -304,4 +304,14 @@ func NewGAAPClient(cred common.CredentialIface, conf *config.TencentConfig) (*ga
 		cpf.HttpProfile.Endpoint = "gaap.tencentcloudapi.com"
 	}
 	return gaap.NewClient(cred, conf.Credential.Region, cpf)
+}
+
+func NewWafClient(cred common.CredentialIface, conf *config.TencentConfig) (*waf.Client, error) {
+	cpf := profile.NewClientProfile()
+	if conf.Credential.IsInternal == true {
+		cpf.HttpProfile.Endpoint = "waf.internal.tencentcloudapi.com"
+	} else {
+		cpf.HttpProfile.Endpoint = "waf.tencentcloudapi.com"
+	}
+	return waf.NewClient(cred, conf.Credential.Region, cpf)
 }
