@@ -31,7 +31,6 @@ func (repo *WafTcInstanceRepository) Get(id string) (instance TcInstance, err er
 	if err != nil {
 		return
 	}
-	level.Info(repo.logger).Log("count", resp.Response.Total)
 	if len(resp.Response.Domains) != 1 {
 		return nil, fmt.Errorf("Response instanceDetails size != 1, id=%s ", id)
 	}
@@ -64,18 +63,16 @@ getMoreInstances:
 	if total == -1 {
 		total = int64(*resp.Response.Total)
 	}
-	level.Info(repo.logger).Log("count", resp.Response.Total)
-	level.Info(repo.logger).Log("RequestId", resp.Response.RequestId)
 	for _, meta := range resp.Response.Domains {
-		ins, e := NewWafTcInstance(*meta.InstanceId, meta)
+		ins, e := NewWafTcInstance(*meta.Domain, meta)
 		if e != nil {
 			level.Error(repo.logger).Log("msg", "Create Waf instance fail", "id", *meta.InstanceId)
 			continue
 		}
 		instances = append(instances, ins)
 	}
-	offset += limit
-	if offset < uint64(total) {
+	offset++
+	if (offset-1)*limit < uint64(total) {
 		req.Offset = &offset
 		goto getMoreInstances
 	}
