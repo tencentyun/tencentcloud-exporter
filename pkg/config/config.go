@@ -79,7 +79,7 @@ var (
 	}
 )
 
-var QcloudNamespace = []string{"COS", "CDN", "QAAP"}
+var QcloudNamespace = []string{"COS", "CDN", "QAAP", "WAF"}
 
 type TencentCredential struct {
 	AccessKey   string `yaml:"access_key"`
