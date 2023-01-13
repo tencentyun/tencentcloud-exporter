@@ -25,8 +25,21 @@ func (repo *WafTcInstanceRepository) GetInstanceKey() string {
 	return "InstanceId"
 }
 
+var domain = "Domain"
+var exactMatchTrue = true
+
 func (repo *WafTcInstanceRepository) Get(id string) (instance TcInstance, err error) {
 	req := sdk.NewDescribeDomainsRequest()
+	var offset uint64 = 1
+	var limit uint64 = 100
+
+	req.Offset = &offset
+	req.Limit = &limit
+	req.Filters = []*sdk.FiltersItemNew{{
+		Name:       &domain,
+		Values:     []*string{&id},
+		ExactMatch: &exactMatchTrue,
+	}}
 	resp, err := repo.client.DescribeDomains(req)
 	if err != nil {
 		return

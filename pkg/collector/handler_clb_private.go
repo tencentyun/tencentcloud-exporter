@@ -17,7 +17,7 @@ const (
 
 var (
 	ClbPrivateExcludeMetrics = []string{
-		// "ConnRatio", "OverloadCurConn", "SnatFail", // clb_snat_vip
+		"ConnRatio", "OverloadCurConn", "SnatFail", // clb_snat_vip
 		"PvvInpkg", "PvvOutpkg", "PvvConnum", "PvvIntraffic", "PvvNewConn", "PvvOuttraffic", // new_vpcid_proto_vip_vport
 		"VvIntraffic", "VvInpkg", "VvNewConn", "VvOutpkg", "VvOuttraffic", "VvConnum", // new_vip_vpcid
 	}
