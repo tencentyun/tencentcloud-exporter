@@ -72,7 +72,6 @@ getMoreInstances:
 		total = int64(*resp.Response.TotalCount)
 	}
 	for _, meta := range resp.Response.InstanceSet {
-		level.Info(repo.logger).Log("InstanceSet", *meta.InstanceId)
 		ins, e := NewCynosdbTcInstance(*meta.InstanceId, meta)
 		if e != nil {
 			level.Error(repo.logger).Log("msg", "Create Cynosdb instance fail", "id", *meta.InstanceId)

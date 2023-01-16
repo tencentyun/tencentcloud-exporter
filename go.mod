@@ -15,7 +15,7 @@ require (
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/ckafka v1.0.334
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/clb v1.0.334
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cmq v1.0.334
-	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.531
+	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.576
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cvm v1.0.334
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cynosdb v1.0.413
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/dc v1.0.334
@@ -34,6 +34,7 @@ require (
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tdmq v1.0.413
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tse v1.0.430
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/vpc v1.0.334
+	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/waf v1.0.576 // indirect
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.35
 	golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6

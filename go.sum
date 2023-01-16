@@ -239,6 +239,8 @@ github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.531 h1:E8vq
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.531/go.mod h1:7sCQWVkxcsR38nffDW057DRGk8mUjK1Ing/EFOK8s8Y=
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.534 h1:ZsJCXIZO2KfmEsrVN6a75VncTuaSkD4PNd1iXZ1I8BU=
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.534/go.mod h1:7sCQWVkxcsR38nffDW057DRGk8mUjK1Ing/EFOK8s8Y=
+github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.576 h1:6L4MeAnCk1NkuKoSfJvNPxqOrXq/HG9FqV3jl6i5t+w=
+github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.576/go.mod h1:7sCQWVkxcsR38nffDW057DRGk8mUjK1Ing/EFOK8s8Y=
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cvm v1.0.334 h1:ulfSODMy8rpKa8MfnTIPbe5HyOArnlB4RJ1qmpj09to=
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cvm v1.0.334/go.mod h1:AqyM/ZZMD7q5mHBqNY9YImbSpEpoEe7E/vrTbUWX+po=
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cynosdb v1.0.413 h1:MomwSkFrSLB16s51Yu1h4JO+p3Pzc1yesIj+oNwAVM0=
@@ -280,6 +282,8 @@ github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tse v1.0.430 h1:Brvrm1Z
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tse v1.0.430/go.mod h1:rJoqfhS+Y0GmdZuS/N4bFXfDJeh/N59W6hojoTRQ6v0=
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/vpc v1.0.334 h1:rcM2H2e8kqxv7pZcsBdaIMitNd65+3iTM8aK/q6LS7U=
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/vpc v1.0.334/go.mod h1:SKgeSsIfPEM6BeoIFiGHsWG9UsEXzkK0SkWx51H/OS8=
+github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/waf v1.0.576 h1:N9vymXFXpdUx1YNe1D82U0WzV43qg1ZunxjCq5CsygE=
+github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/waf v1.0.576/go.mod h1:8wSqOPFWWZabIv00tYbz8WGQIncUc6tC7eN48MLPkik=
 github.com/tencentyun/cos-go-sdk-v5 v0.7.35 h1:XVk5GQ4eH1q+DBUJfpaMMdU9TJZWMjwNNwv0PG5nbLQ=
 github.com/tencentyun/cos-go-sdk-v5 v0.7.35/go.mod h1:4dCEtLHGh8QPxHEkgq+nFaky7yZxQuYwgSJM87icDaw=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
