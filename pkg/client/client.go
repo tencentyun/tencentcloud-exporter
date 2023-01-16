@@ -1,6 +1,7 @@
 package client
 
 import (
+	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/regions"
 	"net/http"
 	"net/url"
 
@@ -10,6 +11,7 @@ import (
 	kafka "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/ckafka/v20190819"
 	clb "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/clb/v20180317"
 	cmq "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cmq/v20190304"
+	apiCommon "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/profile"
 	cvm "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cvm/v20170312"
 	cynosdb "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cynosdb/v20190107"
@@ -304,6 +306,17 @@ func NewGAAPClient(cred common.CredentialIface, conf *config.TencentConfig) (*ga
 		cpf.HttpProfile.Endpoint = "gaap.tencentcloudapi.com"
 	}
 	return gaap.NewClient(cred, conf.Credential.Region, cpf)
+}
+
+func NewGAAPCommonClient(cred common.CredentialIface, conf *config.TencentConfig) *apiCommon.Client {
+	cpf := profile.NewClientProfile()
+	if conf.Credential.IsInternal == true {
+		cpf.HttpProfile.Endpoint = "gaap.internal.tencentcloudapi.com"
+	} else {
+		cpf.HttpProfile.Endpoint = "gaap.tencentcloudapi.com"
+	}
+	cpf.HttpProfile.ReqMethod = "POST"
+	return apiCommon.NewCommonClient(cred, regions.Guangzhou, cpf)
 }
 
 func NewWafClient(cred common.CredentialIface, conf *config.TencentConfig) (*waf.Client, error) {
