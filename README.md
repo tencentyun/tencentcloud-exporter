@@ -46,7 +46,7 @@ CYNOSDB_MYSQL|QCE/CYNOSDB_MYSQL|[指标详情](https://cloud.tencent.com/documen
 专线网关 |QCE/DCG|指标详情说明文档(待上线)
 全球应用加速|QCE/QAAP|[指标详情](https://cloud.tencent.com/document/product/248/45062)
 WAF |QCE/WAF|指标详情说明文档(待上线)
-CLB(公网)|QCE/LB_PRIVATE|[指标详情](https://cloud.tencent.com/document/product/248/51899)
+CLB(内网)|QCE/LB_PRIVATE|[指标详情](https://cloud.tencent.com/document/product/248/51899)
 
 `后续会有更多的产品支持`
 
