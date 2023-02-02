@@ -23,14 +23,6 @@ var (
 		"activeconnratio",
 		"newactiveconnratio",
 		"outtrafficratio",
-		"rsptimeout",
-		"setreqavg",
-		"setreqmax",
-		"setrspavg",
-		"setrspmax",
-		"settotalreq",
-		"vrsptimeout",
-		"vsettotalreq",
 	}
 )
 

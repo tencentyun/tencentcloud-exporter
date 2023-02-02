@@ -33,14 +33,6 @@ func (h *cbsHandler) GetNamespace() string {
 }
 
 func (h *cbsHandler) IsMetricVaild(m *metric.TcmMetric) bool {
-	// 暂时过滤nvme盘类指标
-	var dimensions []string
-	for _, v := range m.Meta.SupportDimensions {
-		dimensions = append(dimensions, v)
-	}
-	if util.IsStrInList(dimensions, "vmUuid") {
-		return false
-	}
 	return true
 }
 
