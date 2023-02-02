@@ -61,10 +61,11 @@ func (m *TcmMetric) GetLatestPromMetrics(repo TcmMetricRepository) (pms []promet
 	et := int64(0)
 	now := time.Now().Unix()
 	if m.Conf.StatDelaySeconds > 0 {
-		st = now - m.Conf.StatPeriodSeconds - m.Conf.StatDelaySeconds
+		st = now - m.Conf.StatNumSamples*m.Conf.StatPeriodSeconds - m.Conf.StatDelaySeconds
 		et = now - m.Conf.StatDelaySeconds
 	} else {
 		st = now - m.Conf.StatNumSamples*m.Conf.StatPeriodSeconds
+		et = now
 	}
 
 	samplesList, err := repo.ListSamples(m, st, et)
