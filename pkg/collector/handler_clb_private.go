@@ -145,7 +145,6 @@ func (h *ClbPrivateHandler) GetSeriesByCustom(m *metric.TcmMetric) ([]*metric.Tc
 	}
 	return slist, nil
 }
-
 func (h *ClbPrivateHandler) getSeriesByMetricType(m *metric.TcmMetric, ins instance.TcInstance) ([]*metric.TcmSeries, error) {
 	var dimensions []string
 	for _, v := range m.Meta.SupportDimensions {
