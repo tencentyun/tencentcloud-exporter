@@ -2,6 +2,7 @@ package collector
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/go-kit/log"
@@ -15,6 +16,19 @@ import (
 const (
 	TdmqNamespace     = "QCE/TDMQ"
 	TdmqInstanceidKey = "tenant"
+)
+
+var (
+	RocketMQOnlyIncludeMetrics = []string{
+		"ropratein",
+		"roprateout",
+		"ropthroughputin",
+		"ropthroughputout",
+		"ropmsgbacklog",
+		"ropmsgaveragesize",
+		"ropinmessagetotal",
+		"ropgroupcount",
+	}
 )
 
 func init() {
@@ -36,6 +50,10 @@ func (h *tdmqHandler) GetNamespace() string {
 }
 
 func (h *tdmqHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+	// 暂时只支持 TDMQ RocketMQ 版指标
+	if !util.IsStrInList(RocketMQOnlyIncludeMetrics, strings.ToLower(m.Meta.MetricName)) {
+		return false
+	}
 	_, ok := excludeMetricName[m.Meta.MetricName]
 	if ok {
 		return false
