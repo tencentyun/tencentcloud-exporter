@@ -23,6 +23,10 @@ var (
 	}
 )
 
+var (
+	LbPrivateSupportDimensions = []string{"vip", "vpcId", "loadBalancerPort", "protocol", "lanIp", "port"}
+)
+
 func init() {
 	registerHandler(ClbPrivateNamespace, defaultHandlerEnabled, NewClbPrivateHandler)
 }
@@ -119,32 +123,35 @@ func (h *ClbPrivateHandler) GetSeriesByAll(m *metric.TcmMetric) ([]*metric.TcmSe
 	return slist, nil
 }
 
-func (h *ClbPrivateHandler) GetSeriesByCustom(m *metric.TcmMetric) ([]*metric.TcmSeries, error) {
-	var slist []*metric.TcmSeries
+func (h *ClbPrivateHandler) GetSeriesByCustom(m *metric.TcmMetric) (slist []*metric.TcmSeries, err error) {
 	for _, ql := range m.Conf.CustomQueryDimensions {
-		v, ok := ql[h.monitorQueryKey]
-		if !ok {
-			level.Error(h.logger).Log(
-				"msg", fmt.Sprintf("not found %s in queryDimensions", h.monitorQueryKey),
-				"ql", fmt.Sprintf("%v", ql))
-			continue
-		}
-		ins, err := h.collector.InstanceRepo.Get(v)
-		if err != nil {
-			level.Error(h.logger).Log("msg", "Instance not found", "err", err, "id", v)
+		if !h.checkMonitorQueryKeys(m, ql) {
 			continue
 		}
 
-		sl, err := h.getSeriesByMetricType(m, ins)
+		s, err := metric.NewTcmSeries(m, ql, nil)
 		if err != nil {
-			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+			level.Error(h.logger).Log("msg", "Create metric series fail", "metric", m.Meta.MetricName,
+				"ql", fmt.Sprintf("%v", ql))
 			continue
 		}
-		slist = append(slist, sl...)
+		slist = append(slist, s)
 	}
-	return slist, nil
+	return
 }
+func (h *ClbPrivateHandler) checkMonitorQueryKeys(m *metric.TcmMetric, ql map[string]string) bool {
+	for k := range ql {
+		if !util.IsStrInList(LbPrivateSupportDimensions, k) {
+			level.Error(h.logger).Log("msg", fmt.Sprintf("not found %s in supportQueryDimensions", k),
+				"ql", fmt.Sprintf("%v", ql),
+				"sd", fmt.Sprintf("%v", m.Meta.SupportDimensions),
+			)
+			return false
+		}
+	}
+	return true
+}
+
 func (h *ClbPrivateHandler) getSeriesByMetricType(m *metric.TcmMetric, ins instance.TcInstance) ([]*metric.TcmSeries, error) {
 	var dimensions []string
 	for _, v := range m.Meta.SupportDimensions {
