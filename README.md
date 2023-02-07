@@ -43,10 +43,11 @@ VPN 通道|QCE/VPNX|[指标详情](https://cloud.tencent.com/document/product/24
 CYNOSDB_MYSQL|QCE/CYNOSDB_MYSQL|[指标详情](https://cloud.tencent.com/document/product/248/45106)
 云联网|QCE/VBC|[指标详情](https://cloud.tencent.com/document/product/248/75629)
 数据传输 |QCE/DTS|[指标详情](https://cloud.tencent.com/document/product/248/82251)
-专线网关 |QCE/DCG|指标详情说明文档(待上线)
+专线网关 |QCE/DCG|[指标详情](https://cloud.tencent.com/document/product/248/45072)
 全球应用加速|QCE/QAAP|[指标详情](https://cloud.tencent.com/document/product/248/45062)
 Web应用防火墙 |QCE/WAF|[指标详情](https://cloud.tencent.com/document/product/248/48124)
 负载均衡CLB(内网)|QCE/LB_PRIVATE|[指标详情](https://cloud.tencent.com/document/product/248/51899)
+
 `后续会有更多的产品支持`
 
 ## 二、快速开始
