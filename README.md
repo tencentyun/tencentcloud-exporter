@@ -20,7 +20,7 @@ Redis集群版|QCE/REDIS_CLUSTER(即将下线，不推荐)|[指标详情](https:
 云服务器CVM|QCE/CVM|[指标详情](https://cloud.tencent.com/document/product/248/6843)
 COS|QCE/COS|[指标详情](https://cloud.tencent.com/document/product/248/45140)
 CDN|QCE/CDN|[指标详情](https://cloud.tencent.com/document/product/248/45138)
-负载均衡CLB(公网)|QCE/LB_PUBLIC|[指标详情](https://cloud.tencent.com/document/product/248/45047)
+负载均衡CLB(公网)|QCE/LB_PUBLIC|[指标详情](https://cloud.tencent.com/document/product/248/51898)
 负载均衡CLB(7层)|QCE/LOADBALANCE|[指标详情](https://cloud.tencent.com/document/product/248/45045)
 NAT网关|QCE/NAT_GATEWAY|[指标详情](https://cloud.tencent.com/document/product/248/45069)
 物理专线|QCE/DC|[指标详情](https://cloud.tencent.com/document/product/248/45102)
