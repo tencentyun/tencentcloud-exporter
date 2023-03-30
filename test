@@ -1,0 +1,121 @@
+# HELP promhttp_metric_handler_errors_total Total number of internal errors encountered by the promhttp metric handler.
+# TYPE promhttp_metric_handler_errors_total counter
+promhttp_metric_handler_errors_total{cause="encoding"} 0
+promhttp_metric_handler_errors_total{cause="gathering"} 0
+# HELP qce_cbs_bsdiskusage_max Metric from QCE/BLOCK_STORAGE.BsDiskUsage unit=% stat=max Desc=磁盘利用率
+# TYPE qce_cbs_bsdiskusage_max gauge
+qce_cbs_bsdiskusage_max{disk_id="disk-60vzowi3",disk_name="emr-core2_数据盘_1",instance_id="ins-8oii7mwz"} 0.06 1679369880000
+qce_cbs_bsdiskusage_max{disk_id="disk-6nkpls9x",disk_name="emr-core1_数据盘_1",instance_id="ins-i8ddl3ql"} 0.06 1679369880000
+qce_cbs_bsdiskusage_max{disk_id="disk-d4u2k019",disk_name="emr-master-first_数据盘_1",instance_id="ins-72ddmash"} 0.25 1679369880000
+# HELP qce_cbs_diskawait_avg Metric from QCE/BLOCK_STORAGE.DiskAwait unit=ms stat=avg Desc=硬盘I/O平均每次操作的等待时间
+# TYPE qce_cbs_diskawait_avg gauge
+qce_cbs_diskawait_avg{disk_id="disk-29ghqhuz",disk_name="未命名",instance_id="ins-7d7d0tad"} 1.365 1679369880000
+qce_cbs_diskawait_avg{disk_id="disk-60vzowi3",disk_name="emr-core2_数据盘_1",instance_id="ins-8oii7mwz"} 0.277 1679369880000
+qce_cbs_diskawait_avg{disk_id="disk-6nkpls9x",disk_name="emr-core1_数据盘_1",instance_id="ins-i8ddl3ql"} 0 1679369880000
+qce_cbs_diskawait_avg{disk_id="disk-73lz20rz",disk_name="emr-core1_系统盘",instance_id="ins-i8ddl3ql"} 0.322 1679369880000
+qce_cbs_diskawait_avg{disk_id="disk-7az4ou8b",disk_name="emr-master-first_系统盘",instance_id="ins-72ddmash"} 0.3 1679369880000
+qce_cbs_diskawait_avg{disk_id="disk-d4u2k019",disk_name="emr-master-first_数据盘_1",instance_id="ins-72ddmash"} 0.333 1679369880000
+qce_cbs_diskawait_avg{disk_id="disk-kgrz3r9r",disk_name="emr-core2_系统盘",instance_id="ins-8oii7mwz"} 0.378 1679369880000
+qce_cbs_diskawait_avg{disk_id="disk-lwrw31rd",disk_name="tke_cls-1wej5kab_worker_系统盘",instance_id="ins-meanfhgr"} 0.952 1679369880000
+qce_cbs_diskawait_avg{disk_id="disk-rsmwom17",disk_name="tke_cls-gwpgb67l_worker_系统盘",instance_id="ins-9z69rcxz"} 0.332 1679369880000
+qce_cbs_diskawait_avg{b_g="IEG",disk_id="disk-6byeezvx",disk_name="未命名_系统盘",instance_id="ins-5uxdjl9d"} 0.633 1679369880000
+qce_cbs_diskawait_avg{disk_id="disk-2lzibbaj",disk_name="tke_cls-b44m781p_worker_系统盘",hello="hello01",instance_id="ins-4rj6ji9x"} 0.548 1679369880000
+# HELP qce_cbs_diskreadiops_avg Metric from QCE/BLOCK_STORAGE.DiskReadIops unit=count stat=avg Desc=硬盘平均每秒读次数
+# TYPE qce_cbs_diskreadiops_avg gauge
+qce_cbs_diskreadiops_avg{disk_id="disk-29ghqhuz",disk_name="未命名",instance_id="ins-7d7d0tad"} 975.902 1679369880000
+qce_cbs_diskreadiops_avg{disk_id="disk-60vzowi3",disk_name="emr-core2_数据盘_1",instance_id="ins-8oii7mwz"} 0 1679369880000
+qce_cbs_diskreadiops_avg{disk_id="disk-6nkpls9x",disk_name="emr-core1_数据盘_1",instance_id="ins-i8ddl3ql"} 0 1679369880000
+qce_cbs_diskreadiops_avg{disk_id="disk-73lz20rz",disk_name="emr-core1_系统盘",instance_id="ins-i8ddl3ql"} 0 1679369880000
+qce_cbs_diskreadiops_avg{disk_id="disk-7az4ou8b",disk_name="emr-master-first_系统盘",instance_id="ins-72ddmash"} 0 1679369880000
+qce_cbs_diskreadiops_avg{disk_id="disk-d4u2k019",disk_name="emr-master-first_数据盘_1",instance_id="ins-72ddmash"} 0 1679369880000
+qce_cbs_diskreadiops_avg{disk_id="disk-kgrz3r9r",disk_name="emr-core2_系统盘",instance_id="ins-8oii7mwz"} 0 1679369880000
+qce_cbs_diskreadiops_avg{disk_id="disk-lwrw31rd",disk_name="tke_cls-1wej5kab_worker_系统盘",instance_id="ins-meanfhgr"} 125.361 1679369880000
+qce_cbs_diskreadiops_avg{disk_id="disk-rsmwom17",disk_name="tke_cls-gwpgb67l_worker_系统盘",instance_id="ins-9z69rcxz"} 0 1679369880000
+qce_cbs_diskreadiops_avg{b_g="IEG",disk_id="disk-6byeezvx",disk_name="未命名_系统盘",instance_id="ins-5uxdjl9d"} 0 1679369880000
+qce_cbs_diskreadiops_avg{disk_id="disk-2lzibbaj",disk_name="tke_cls-b44m781p_worker_系统盘",hello="hello01",instance_id="ins-4rj6ji9x"} 0 1679369880000
+# HELP qce_cbs_diskreadtraffic_avg Metric from QCE/BLOCK_STORAGE.DiskReadTraffic unit=KB/s stat=avg Desc=平均每秒从硬盘读到内存的数据量
+# TYPE qce_cbs_diskreadtraffic_avg gauge
+qce_cbs_diskreadtraffic_avg{disk_id="disk-29ghqhuz",disk_name="未命名",instance_id="ins-7d7d0tad"} 66968.755 1679369880000
+qce_cbs_diskreadtraffic_avg{disk_id="disk-60vzowi3",disk_name="emr-core2_数据盘_1",instance_id="ins-8oii7mwz"} 0 1679369880000
+qce_cbs_diskreadtraffic_avg{disk_id="disk-6nkpls9x",disk_name="emr-core1_数据盘_1",instance_id="ins-i8ddl3ql"} 0 1679369880000
+qce_cbs_diskreadtraffic_avg{disk_id="disk-73lz20rz",disk_name="emr-core1_系统盘",instance_id="ins-i8ddl3ql"} 0 1679369880000
+qce_cbs_diskreadtraffic_avg{disk_id="disk-7az4ou8b",disk_name="emr-master-first_系统盘",instance_id="ins-72ddmash"} 0 1679369880000
+qce_cbs_diskreadtraffic_avg{disk_id="disk-d4u2k019",disk_name="emr-master-first_数据盘_1",instance_id="ins-72ddmash"} 0 1679369880000
+qce_cbs_diskreadtraffic_avg{disk_id="disk-kgrz3r9r",disk_name="emr-core2_系统盘",instance_id="ins-8oii7mwz"} 0 1679369880000
+qce_cbs_diskreadtraffic_avg{disk_id="disk-lwrw31rd",disk_name="tke_cls-1wej5kab_worker_系统盘",instance_id="ins-meanfhgr"} 5138.527 1679369880000
+qce_cbs_diskreadtraffic_avg{disk_id="disk-rsmwom17",disk_name="tke_cls-gwpgb67l_worker_系统盘",instance_id="ins-9z69rcxz"} 0 1679369880000
+qce_cbs_diskreadtraffic_avg{b_g="IEG",disk_id="disk-6byeezvx",disk_name="未命名_系统盘",instance_id="ins-5uxdjl9d"} 0 1679369880000
+qce_cbs_diskreadtraffic_avg{disk_id="disk-2lzibbaj",disk_name="tke_cls-b44m781p_worker_系统盘",hello="hello01",instance_id="ins-4rj6ji9x"} 0 1679369880000
+# HELP qce_cbs_disksvctm_avg Metric from QCE/BLOCK_STORAGE.DiskSvctm unit=ms stat=avg Desc=硬盘平均每次I/O操作所花的时间
+# TYPE qce_cbs_disksvctm_avg gauge
+qce_cbs_disksvctm_avg{disk_id="disk-29ghqhuz",disk_name="未命名",instance_id="ins-7d7d0tad"} 0.287 1679369880000
+qce_cbs_disksvctm_avg{disk_id="disk-60vzowi3",disk_name="emr-core2_数据盘_1",instance_id="ins-8oii7mwz"} 0.277 1679369880000
+qce_cbs_disksvctm_avg{disk_id="disk-6nkpls9x",disk_name="emr-core1_数据盘_1",instance_id="ins-i8ddl3ql"} 0 1679369880000
+qce_cbs_disksvctm_avg{disk_id="disk-73lz20rz",disk_name="emr-core1_系统盘",instance_id="ins-i8ddl3ql"} 0.242 1679369880000
+qce_cbs_disksvctm_avg{disk_id="disk-7az4ou8b",disk_name="emr-master-first_系统盘",instance_id="ins-72ddmash"} 0.27 1679369880000
+qce_cbs_disksvctm_avg{disk_id="disk-d4u2k019",disk_name="emr-master-first_数据盘_1",instance_id="ins-72ddmash"} 0.333 1679369880000
+qce_cbs_disksvctm_avg{disk_id="disk-kgrz3r9r",disk_name="emr-core2_系统盘",instance_id="ins-8oii7mwz"} 0.227 1679369880000
+qce_cbs_disksvctm_avg{disk_id="disk-lwrw31rd",disk_name="tke_cls-1wej5kab_worker_系统盘",instance_id="ins-meanfhgr"} 0.491 1679369880000
+qce_cbs_disksvctm_avg{disk_id="disk-rsmwom17",disk_name="tke_cls-gwpgb67l_worker_系统盘",instance_id="ins-9z69rcxz"} 0 1679369880000
+qce_cbs_disksvctm_avg{b_g="IEG",disk_id="disk-6byeezvx",disk_name="未命名_系统盘",instance_id="ins-5uxdjl9d"} 0.485 1679369880000
+qce_cbs_disksvctm_avg{disk_id="disk-2lzibbaj",disk_name="tke_cls-b44m781p_worker_系统盘",hello="hello01",instance_id="ins-4rj6ji9x"} 0 1679369880000
+# HELP qce_cbs_diskusage_max Metric from QCE/BLOCK_STORAGE.DiskUsage unit=% stat=max Desc=磁盘分区使用率
+# TYPE qce_cbs_diskusage_max gauge
+qce_cbs_diskusage_max{disk_name="vda1",instance_id="ins-4rj6ji9x",project_id="0",vm_uuid="d707f1ff-f747-4b2b-9c1f-696c8381aaf5"} 21.16 1679369880000
+qce_cbs_diskusage_max{disk_name="vda1",instance_id="ins-5uxdjl9d",project_id="0",vm_uuid="656c04d1-bc83-4a0e-be63-f541e5ed612d"} 9.57 1679369880000
+qce_cbs_diskusage_max{disk_name="vda1",instance_id="ins-72ddmash",project_id="0",vm_uuid="38944b11-ec42-46ad-9d97-d642a70fcc32"} 51.119 1679369880000
+qce_cbs_diskusage_max{disk_name="vda1",instance_id="ins-8oii7mwz",project_id="0",vm_uuid="9dbba05b-ce0f-41ff-b96f-d2269319b97a"} 50.729 1679369880000
+qce_cbs_diskusage_max{disk_name="vda1",instance_id="ins-9z69rcxz",project_id="0",vm_uuid="38704e03-ecf5-41a2-a448-743548e423f9"} 29.629 1679369880000
+qce_cbs_diskusage_max{disk_name="vda1",instance_id="ins-i8ddl3ql",project_id="0",vm_uuid="6f18b451-4d79-4ee4-9dfa-970a91d325e2"} 50.719 1679369880000
+qce_cbs_diskusage_max{disk_name="vda1",instance_id="ins-meanfhgr",project_id="0",vm_uuid="c4a09b1c-80f5-41d9-a18f-4cf50fe1b9fd"} 32.07 1679369880000
+qce_cbs_diskusage_max{disk_name="vdb",instance_id="ins-72ddmash",project_id="0",vm_uuid="38944b11-ec42-46ad-9d97-d642a70fcc32"} 0.25 1679369880000
+qce_cbs_diskusage_max{disk_name="vdb",instance_id="ins-8oii7mwz",project_id="0",vm_uuid="9dbba05b-ce0f-41ff-b96f-d2269319b97a"} 0.06 1679369880000
+qce_cbs_diskusage_max{disk_name="vdb",instance_id="ins-i8ddl3ql",project_id="0",vm_uuid="6f18b451-4d79-4ee4-9dfa-970a91d325e2"} 0.06 1679369880000
+# HELP qce_cbs_diskutil_avg Metric from QCE/BLOCK_STORAGE.DiskUtil unit=% stat=avg Desc=硬盘有IO操作的时间与总时间的百分比
+# TYPE qce_cbs_diskutil_avg gauge
+qce_cbs_diskutil_avg{disk_id="disk-29ghqhuz",disk_name="未命名",instance_id="ins-7d7d0tad"} 28.039 1679369880000
+qce_cbs_diskutil_avg{disk_id="disk-60vzowi3",disk_name="emr-core2_数据盘_1",instance_id="ins-8oii7mwz"} 0.004 1679369880000
+qce_cbs_diskutil_avg{disk_id="disk-6nkpls9x",disk_name="emr-core1_数据盘_1",instance_id="ins-i8ddl3ql"} 0 1679369880000
+qce_cbs_diskutil_avg{disk_id="disk-73lz20rz",disk_name="emr-core1_系统盘",instance_id="ins-i8ddl3ql"} 0.231 1679369880000
+qce_cbs_diskutil_avg{disk_id="disk-7az4ou8b",disk_name="emr-master-first_系统盘",instance_id="ins-72ddmash"} 0.265 1679369880000
+qce_cbs_diskutil_avg{disk_id="disk-d4u2k019",disk_name="emr-master-first_数据盘_1",instance_id="ins-72ddmash"} 0.006 1679369880000
+qce_cbs_diskutil_avg{disk_id="disk-kgrz3r9r",disk_name="emr-core2_系统盘",instance_id="ins-8oii7mwz"} 0.223 1679369880000
+qce_cbs_diskutil_avg{disk_id="disk-lwrw31rd",disk_name="tke_cls-1wej5kab_worker_系统盘",instance_id="ins-meanfhgr"} 6.633 1679369880000
+qce_cbs_diskutil_avg{disk_id="disk-rsmwom17",disk_name="tke_cls-gwpgb67l_worker_系统盘",instance_id="ins-9z69rcxz"} 0 1679369880000
+qce_cbs_diskutil_avg{b_g="IEG",disk_id="disk-6byeezvx",disk_name="未命名_系统盘",instance_id="ins-5uxdjl9d"} 0.339 1679369880000
+qce_cbs_diskutil_avg{disk_id="disk-2lzibbaj",disk_name="tke_cls-b44m781p_worker_系统盘",hello="hello01",instance_id="ins-4rj6ji9x"} 0 1679369880000
+# HELP qce_cbs_diskwriteiops_avg Metric from QCE/BLOCK_STORAGE.DiskWriteIops unit=count stat=avg Desc=硬盘平均每秒写次数
+# TYPE qce_cbs_diskwriteiops_avg gauge
+qce_cbs_diskwriteiops_avg{disk_id="disk-29ghqhuz",disk_name="未命名",instance_id="ins-7d7d0tad"} 0 1679369880000
+qce_cbs_diskwriteiops_avg{disk_id="disk-60vzowi3",disk_name="emr-core2_数据盘_1",instance_id="ins-8oii7mwz"} 0.115 1679369880000
+qce_cbs_diskwriteiops_avg{disk_id="disk-6nkpls9x",disk_name="emr-core1_数据盘_1",instance_id="ins-i8ddl3ql"} 0.117 1679369880000
+qce_cbs_diskwriteiops_avg{disk_id="disk-73lz20rz",disk_name="emr-core1_系统盘",instance_id="ins-i8ddl3ql"} 9.817 1679369880000
+qce_cbs_diskwriteiops_avg{disk_id="disk-7az4ou8b",disk_name="emr-master-first_系统盘",instance_id="ins-72ddmash"} 10.081 1679369880000
+qce_cbs_diskwriteiops_avg{disk_id="disk-d4u2k019",disk_name="emr-master-first_数据盘_1",instance_id="ins-72ddmash"} 0.117 1679369880000
+qce_cbs_diskwriteiops_avg{disk_id="disk-kgrz3r9r",disk_name="emr-core2_系统盘",instance_id="ins-8oii7mwz"} 9.955 1679369880000
+qce_cbs_diskwriteiops_avg{disk_id="disk-lwrw31rd",disk_name="tke_cls-1wej5kab_worker_系统盘",instance_id="ins-meanfhgr"} 9.017 1679369880000
+qce_cbs_diskwriteiops_avg{disk_id="disk-rsmwom17",disk_name="tke_cls-gwpgb67l_worker_系统盘",instance_id="ins-9z69rcxz"} 2.399 1679369880000
+qce_cbs_diskwriteiops_avg{b_g="IEG",disk_id="disk-6byeezvx",disk_name="未命名_系统盘",instance_id="ins-5uxdjl9d"} 7.044 1679369880000
+qce_cbs_diskwriteiops_avg{disk_id="disk-2lzibbaj",disk_name="tke_cls-b44m781p_worker_系统盘",hello="hello01",instance_id="ins-4rj6ji9x"} 2.666 1679369880000
+# HELP qce_cbs_diskwritetraffic_avg Metric from QCE/BLOCK_STORAGE.DiskWriteTraffic unit=KB/s stat=avg Desc=平均每秒从内存写到硬盘的数据量
+# TYPE qce_cbs_diskwritetraffic_avg gauge
+qce_cbs_diskwritetraffic_avg{disk_id="disk-29ghqhuz",disk_name="未命名",instance_id="ins-7d7d0tad"} 0 1679369880000
+qce_cbs_diskwritetraffic_avg{disk_id="disk-60vzowi3",disk_name="emr-core2_数据盘_1",instance_id="ins-8oii7mwz"} 0.166 1679369880000
+qce_cbs_diskwritetraffic_avg{disk_id="disk-6nkpls9x",disk_name="emr-core1_数据盘_1",instance_id="ins-i8ddl3ql"} 0.242 1679369880000
+qce_cbs_diskwritetraffic_avg{disk_id="disk-73lz20rz",disk_name="emr-core1_系统盘",instance_id="ins-i8ddl3ql"} 68.947 1679369880000
+qce_cbs_diskwritetraffic_avg{disk_id="disk-7az4ou8b",disk_name="emr-master-first_系统盘",instance_id="ins-72ddmash"} 80.716 1679369880000
+qce_cbs_diskwritetraffic_avg{disk_id="disk-d4u2k019",disk_name="emr-master-first_数据盘_1",instance_id="ins-72ddmash"} 0.216 1679369880000
+qce_cbs_diskwritetraffic_avg{disk_id="disk-kgrz3r9r",disk_name="emr-core2_系统盘",instance_id="ins-8oii7mwz"} 72.097 1679369880000
+qce_cbs_diskwritetraffic_avg{disk_id="disk-lwrw31rd",disk_name="tke_cls-1wej5kab_worker_系统盘",instance_id="ins-meanfhgr"} 67.668 1679369880000
+qce_cbs_diskwritetraffic_avg{disk_id="disk-rsmwom17",disk_name="tke_cls-gwpgb67l_worker_系统盘",instance_id="ins-9z69rcxz"} 30.183 1679369880000
+qce_cbs_diskwritetraffic_avg{b_g="IEG",disk_id="disk-6byeezvx",disk_name="未命名_系统盘",instance_id="ins-5uxdjl9d"} 51.51 1679369880000
+qce_cbs_diskwritetraffic_avg{disk_id="disk-2lzibbaj",disk_name="tke_cls-b44m781p_worker_系统盘",hello="hello01",instance_id="ins-4rj6ji9x"} 27.521 1679369880000
+# HELP qcloud_exporter_build_info A metric with a constant '1' value labeled by version, revision, branch, and goversion from which qcloud_exporter was built.
+# TYPE qcloud_exporter_build_info gauge
+qcloud_exporter_build_info{branch="",goversion="go1.17.7",revision="",version=""} 1
+# HELP tcm_scrape_collector_duration_seconds qcloud_exporter: Duration of a collector scrape.
+# TYPE tcm_scrape_collector_duration_seconds gauge
+tcm_scrape_collector_duration_seconds{collector="QCE/BLOCK_STORAGE"} 0.924819085
+# HELP tcm_scrape_collector_success qcloud_exporter: Whether a collector succeeded.
+# TYPE tcm_scrape_collector_success gauge
+tcm_scrape_collector_success{collector="QCE/BLOCK_STORAGE"} 1

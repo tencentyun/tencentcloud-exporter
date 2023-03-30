@@ -3,6 +3,7 @@ package metric
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
@@ -134,15 +135,12 @@ func (repo *TcmMetricRepositoryImpl) GetSamples(s *TcmSeries, st int64, et int64
 		request.EndTime = &etStr
 	}
 
+	start := time.Now()
 	response := &v20180724.GetMonitorDataResponse{}
-	if repo.IsInternational && s.Metric.Meta.ProductName == "QAAP" {
-		response, err = repo.monitorClientInSinapore.GetMonitorData(request)
-	} else if util.IsStrInList(config.QcloudNamespace, s.Metric.Meta.ProductName) {
-		response, err = repo.monitorClientInGuangzhou.GetMonitorData(request)
-	} else {
-		response, err = repo.monitorClient.GetMonitorData(request)
-	}
+	response, err = repo.getMonitorDataWithRetry(s.Metric.Meta.ProductName, request)
 	if err != nil {
+		level.Error(repo.logger).Log(
+			"request start time ", stStr, "duration ", time.Since(start).Seconds(), "err ", err.Error())
 		return
 	}
 
@@ -155,6 +153,29 @@ func (repo *TcmMetricRepositoryImpl) GetSamples(s *TcmSeries, st int64, et int64
 		return
 	}
 	return
+}
+
+func (repo *TcmMetricRepositoryImpl) getMonitorDataWithRetry(
+	productName string, request *monitor.GetMonitorDataRequest) (*v20180724.GetMonitorDataResponse, error) {
+	var lastErr error
+	monitorClient := repo.monitorClient
+	if repo.IsInternational && productName == "QAAP" {
+		monitorClient = repo.monitorClientInSinapore
+	} else if util.IsStrInList(config.QcloudNamespace, productName) {
+		monitorClient = repo.monitorClientInGuangzhou
+	}
+	for i := 0; i < 3; i++ {
+		resp, err := monitorClient.GetMonitorData(request)
+		if err != nil {
+			if strings.Contains(err.Error(), "context deadline") {
+				lastErr = err
+				continue
+			}
+			return nil, err
+		}
+		return resp, nil
+	}
+	return nil, lastErr
 }
 
 func (repo *TcmMetricRepositoryImpl) ListSamples(m *TcmMetric, st int64, et int64) ([]*TcmSamples, error) {
@@ -188,17 +209,17 @@ func (repo *TcmMetricRepositoryImpl) listSampleByBatch(
 
 	request := repo.buildGetMonitorDataRequest(m, seriesList, st, et)
 
+	start := time.Now()
 	response := &v20180724.GetMonitorDataResponse{}
-	if repo.IsInternational && m.Meta.ProductName == "QAAP" {
-		response, err = repo.monitorClientInSinapore.GetMonitorData(request)
-	} else if util.IsStrInList(config.QcloudNamespace, m.Meta.ProductName) {
-		response, err = repo.monitorClientInGuangzhou.GetMonitorData(request)
-	} else {
-		response, err = repo.monitorClient.GetMonitorData(request)
-	}
+	response, err = repo.getMonitorDataWithRetry(m.Meta.ProductName, request)
 	if err != nil {
+		level.Error(repo.logger).Log(
+			"request start time ", *request.StartTime,
+			"duration ", time.Since(start).Seconds(),
+			"err ", err.Error())
 		return nil, err
 	}
+
 	for _, points := range response.Response.DataPoints {
 		samples, ql, e := repo.buildSamples(m, points)
 		if e != nil {
