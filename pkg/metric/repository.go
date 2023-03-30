@@ -3,6 +3,7 @@ package metric
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
@@ -166,7 +167,7 @@ func (repo *TcmMetricRepositoryImpl) getMonitorDataWithRetry(
 	for i := 0; i < 3; i++ {
 		resp, err := monitorClient.GetMonitorData(request)
 		if err != nil {
-			if err.Error() == context.DeadlineExceeded.Error() {
+			if strings.Contains(err.Error(), context.DeadlineExceeded.Error()) {
 				lastErr = err
 				continue
 			}
