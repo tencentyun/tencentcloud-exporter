@@ -36,7 +36,7 @@ func (h *ZookeeperHandler) GetNamespace() string {
 	return ZookeeperNamespace
 }
 
-func (h *ZookeeperHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *ZookeeperHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	_, ok := excludeMetricName[m.Meta.MetricName]
 	if ok {
 		return false

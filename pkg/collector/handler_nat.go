@@ -27,7 +27,7 @@ func (h *natHandler) GetNamespace() string {
 	return NatNamespace
 }
 
-func (h *natHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *natHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	return true
 }
 

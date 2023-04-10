@@ -34,7 +34,7 @@ func (h *lighthouseHandler) GetNamespace() string {
 	return LighthouseNamespace
 }
 
-func (h *lighthouseHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *lighthouseHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	if util.IsStrInList(CvmInvalidMetricNames, strings.ToLower(m.Meta.MetricName)) {
 		return false
 	}

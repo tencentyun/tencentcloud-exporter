@@ -34,7 +34,7 @@ func (h *dtsHandler) GetNamespace() string {
 	return DTSNamespace
 }
 
-func (h *dtsHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *dtsHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	_, ok := excludeMetricName[m.Meta.MetricName]
 	if ok {
 		return false
@@ -171,7 +171,7 @@ func (h *dtsHandler) getReplicationSeries(m *metric.TcmMetric, ins instance.TcIn
 	}
 	for _, replication := range replications.Response.JobList {
 		ql := map[string]string{
-			"replicationjobid":   *replication.JobId,
+			"replicationjobid":    *replication.JobId,
 			"replicationjob_name": *replication.JobName,
 		}
 		s, err := metric.NewTcmSeries(m, ql, ins)

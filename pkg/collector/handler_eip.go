@@ -22,7 +22,7 @@ type eipHandler struct {
 func (h *eipHandler) GetNamespace() string {
 	return EIPNamespace
 }
-func (h *eipHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *eipHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	// ignore node/shard metric, bug for cloud monitor if filter dim
 	if len(m.Meta.SupportDimensions) != 1 {
 		return false

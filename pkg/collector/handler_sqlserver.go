@@ -28,7 +28,7 @@ func (h *sqlServerHandler) GetNamespace() string {
 	return SqlServerNamespace
 }
 
-func (h *sqlServerHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *sqlServerHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	return true
 }
 

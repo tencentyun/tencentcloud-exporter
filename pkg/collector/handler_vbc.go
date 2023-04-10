@@ -44,7 +44,7 @@ func (h *VbcHandler) GetNamespace() string {
 	return VbcNamespace
 }
 
-func (h *VbcHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *VbcHandler) IsMetricValid(m *metric.TcmMetric) bool {
 
 	_, ok := excludeMetricName[m.Meta.MetricName]
 	if ok {

@@ -8,6 +8,7 @@ import (
 	cbs "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cbs/v20170312"
 	cdb "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cdb/v20170320"
 	cdn "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cdn/v20180606"
+	cfs "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cfs/v20190719"
 	kafka "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/ckafka/v20190819"
 	clb "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/clb/v20180317"
 	cmq "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cmq/v20190304"
@@ -327,4 +328,14 @@ func NewWafClient(cred common.CredentialIface, conf *config.TencentConfig) (*waf
 		cpf.HttpProfile.Endpoint = "waf.tencentcloudapi.com"
 	}
 	return waf.NewClient(cred, conf.Credential.Region, cpf)
+}
+
+func NewCfsClient(cred common.CredentialIface, conf *config.TencentConfig) (*cfs.Client, error) {
+	cpf := profile.NewClientProfile()
+	if conf.Credential.IsInternal == true {
+		cpf.HttpProfile.Endpoint = "cfs.internal.tencentcloudapi.com"
+	} else {
+		cpf.HttpProfile.Endpoint = "cfs.tencentcloudapi.com"
+	}
+	return cfs.NewClient(cred, conf.Credential.Region, cpf)
 }

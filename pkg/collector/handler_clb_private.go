@@ -43,7 +43,7 @@ func (h *ClbPrivateHandler) GetNamespace() string {
 	return ClbPrivateNamespace
 }
 
-func (h *ClbPrivateHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *ClbPrivateHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	if util.IsStrInList(ClbPrivateExcludeMetrics, m.Meta.MetricName) {
 		return false
 	}

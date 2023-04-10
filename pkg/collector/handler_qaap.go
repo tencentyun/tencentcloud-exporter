@@ -53,7 +53,7 @@ func (h *QaapHandler) GetNamespace() string {
 	return QaapNamespace
 }
 
-func (h *QaapHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *QaapHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	_, ok := excludeMetricName[m.Meta.MetricName]
 	if ok {
 		return false

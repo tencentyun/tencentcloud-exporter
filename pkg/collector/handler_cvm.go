@@ -38,7 +38,7 @@ func (h *cvmHandler) GetNamespace() string {
 	return CvmNamespace
 }
 
-func (h *cvmHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *cvmHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	if util.IsStrInList(CvmInvalidMetricNames, strings.ToLower(m.Meta.MetricName)) {
 		return false
 	}

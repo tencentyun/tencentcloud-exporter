@@ -22,7 +22,7 @@ type kafkaHandler struct {
 func (h *kafkaHandler) GetNamespace() string {
 	return MariaDBNamespace
 }
-func (h *kafkaHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *kafkaHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	if len(m.Meta.SupportDimensions) != 1 {
 		return false
 	}

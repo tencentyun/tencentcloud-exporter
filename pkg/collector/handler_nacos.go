@@ -35,7 +35,7 @@ func (h *NacosHandler) GetNamespace() string {
 	return NacosNamespace
 }
 
-func (h *NacosHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *NacosHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	_, ok := excludeMetricName[m.Meta.MetricName]
 	if ok {
 		return false

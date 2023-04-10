@@ -34,7 +34,7 @@ func (h *cosHandler) GetNamespace() string {
 	return CosNamespace
 }
 
-func (h *cosHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *cosHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	// cos大部分指标不支持300以下的统计纬度
 	if m.Conf.StatPeriodSeconds < 300 {
 		m.Conf.StatPeriodSeconds = 300

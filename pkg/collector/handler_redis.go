@@ -45,7 +45,7 @@ func (h *redisHandler) GetNamespace() string {
 	return RedisNamespace
 }
 
-func (h *redisHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *redisHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	if strings.ToLower(m.Conf.CustomProductName) == "cluster_redis" {
 		if util.IsStrInList(RedisClusterMetricNames, strings.ToLower(m.Meta.MetricName)) {
 			return true

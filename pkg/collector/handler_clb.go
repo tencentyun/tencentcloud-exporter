@@ -32,7 +32,7 @@ func (h *clbHandler) GetNamespace() string {
 	return ClbNamespace
 }
 
-func (h *clbHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *clbHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	return true
 }
 

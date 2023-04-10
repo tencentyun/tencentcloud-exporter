@@ -32,7 +32,7 @@ func (h *CynosdbHandler) GetNamespace() string {
 	return CynosdbNamespace
 }
 
-func (h *CynosdbHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *CynosdbHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	_, ok := excludeMetricName[m.Meta.MetricName]
 	if ok {
 		return false

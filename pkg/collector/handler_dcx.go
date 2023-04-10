@@ -37,7 +37,7 @@ func (h *dcxHandler) GetNamespace() string {
 	return DcxNamespace
 }
 
-func (h *dcxHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *dcxHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	return true
 }
 

@@ -27,7 +27,7 @@ func (h *DcgHandler) GetNamespace() string {
 	return DcgNamespace
 }
 
-func (h *DcgHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *DcgHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	_, ok := excludeMetricName[m.Meta.MetricName]
 	if ok {
 		return false

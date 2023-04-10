@@ -171,7 +171,7 @@ func (c *TcProductCollector) createMetricWithProductConf(mname string, pconf con
 			return nil, err
 		}
 		// 指标过滤
-		if !c.handler.IsMetricVaild(nm) {
+		if !c.handler.IsMetricValid(nm) {
 			// ignore invalid metric
 			return nil, nil
 		}
@@ -210,7 +210,7 @@ func (c *TcProductCollector) createMetricWithMetricConf(mconf config.TencentMetr
 			return nil, err
 		}
 		// 指标过滤
-		if !c.handler.IsMetricVaild(nm) {
+		if !c.handler.IsMetricValid(nm) {
 			return nil, fmt.Errorf("metric not support")
 		}
 		err = c.handler.ModifyMetric(nm)

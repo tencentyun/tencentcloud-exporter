@@ -33,7 +33,7 @@ func (h *WafHandler) GetNamespace() string {
 	return WafNamespace
 }
 
-func (h *WafHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *WafHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	_, ok := excludeMetricName[m.Meta.MetricName]
 	if ok {
 		return false

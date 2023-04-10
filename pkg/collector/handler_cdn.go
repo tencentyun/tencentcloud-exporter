@@ -31,7 +31,7 @@ func (h *cdnHandler) GetNamespace() string {
 	return CdnNamespace
 }
 
-func (h *cdnHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *cdnHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	_, ok := excludeMetricName[m.Meta.MetricName]
 	if ok {
 		return false

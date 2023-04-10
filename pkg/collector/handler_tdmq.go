@@ -49,7 +49,7 @@ func (h *tdmqHandler) GetNamespace() string {
 	return TdmqNamespace
 }
 
-func (h *tdmqHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *tdmqHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	// 暂时只支持 TDMQ RocketMQ 版指标
 	if !util.IsStrInList(RocketMQOnlyIncludeMetrics, strings.ToLower(m.Meta.MetricName)) {
 		return false

@@ -32,7 +32,7 @@ func (h *cbsHandler) GetNamespace() string {
 	return CbsNamespace
 }
 
-func (h *cbsHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *cbsHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	// 暂时过滤nvme盘类指标
 	var dimensions []string
 	for _, v := range m.Meta.SupportDimensions {

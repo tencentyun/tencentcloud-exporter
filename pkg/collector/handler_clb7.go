@@ -54,7 +54,7 @@ func (h *clb7Handler) GetNamespace() string {
 	return Clb7Namespace
 }
 
-func (h *clb7Handler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *clb7Handler) IsMetricValid(m *metric.TcmMetric) bool {
 	if util.IsStrInList(Clb7ExcludeMetrics, strings.ToLower(m.Meta.MetricName)) {
 		return false
 	}
