@@ -43,7 +43,7 @@ func (h *VpnxHandler) IsMetricVaild(m *metric.TcmMetric) bool {
 }
 
 func NewVpnxHandler(cred common.CredentialIface, c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
-	handler = &tdmqHandler{
+	handler = &VpnxHandler{
 		baseProductHandler: baseProductHandler{
 			monitorQueryKey: VpnxInstanceidKey,
 			collector:       c,
