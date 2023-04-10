@@ -1,9 +1,12 @@
 package client
 
 import (
-	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/regions"
+	"net"
 	"net/http"
 	"net/url"
+	"time"
+
+	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/regions"
 
 	cbs "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cbs/v20170312"
 	cdb "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cdb/v20170320"
@@ -45,7 +48,29 @@ func NewMonitorClient(cred common.CredentialIface, conf *config.TencentConfig, r
 	} else {
 		cpf.HttpProfile.Endpoint = "monitor.tencentcloudapi.com"
 	}
-	return monitor.NewClient(cred, region, cpf)
+	return newClient(cred, region, cpf)
+}
+
+func newClient(credential common.CredentialIface,
+	region string, clientProfile *profile.ClientProfile) (client *monitor.Client, err error) {
+	client = &monitor.Client{}
+	transport := &http.Transport{
+		Proxy: http.ProxyFromEnvironment,
+		DialContext: (&net.Dialer{
+			Timeout:   30 * time.Second,
+			KeepAlive: 5 * time.Second,
+		}).DialContext,
+		ForceAttemptHTTP2:     true,
+		MaxIdleConns:          0,
+		IdleConnTimeout:       30 * time.Second,
+		TLSHandshakeTimeout:   30 * time.Second,
+		ExpectContinueTimeout: 1 * time.Second,
+	}
+	clientProfile.HttpProfile.ReqTimeout = 5
+	client.Init(region).
+		WithCredential(credential).
+		WithProfile(clientProfile).WithHttpTransport(transport)
+	return
 }
 
 func NewMongodbClient(cred common.CredentialIface, conf *config.TencentConfig) (*mongodb.Client, error) {
