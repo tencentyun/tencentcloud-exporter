@@ -43,7 +43,7 @@ func (h *DcgHandler) IsMetricVaild(m *metric.TcmMetric) bool {
 }
 
 func NewDcgHandler(cred common.CredentialIface, c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
-	handler = &tdmqHandler{
+	handler = &DcgHandler{
 		baseProductHandler: baseProductHandler{
 			monitorQueryKey: DcgInstanceidKey,
 			collector:       c,

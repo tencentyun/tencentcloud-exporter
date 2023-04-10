@@ -43,7 +43,7 @@ func (h *VpngwHandler) IsMetricVaild(m *metric.TcmMetric) bool {
 }
 
 func NewVpngwHandler(cred common.CredentialIface, c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
-	handler = &tdmqHandler{
+	handler = &VpngwHandler{
 		baseProductHandler: baseProductHandler{
 			monitorQueryKey: VpngwInstanceidKey,
 			collector:       c,
