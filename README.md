@@ -20,7 +20,7 @@ Redis集群版|QCE/REDIS_CLUSTER(即将下线，不推荐)|[指标详情](https:
 云服务器CVM|QCE/CVM|[指标详情](https://cloud.tencent.com/document/product/248/6843)
 COS|QCE/COS|[指标详情](https://cloud.tencent.com/document/product/248/45140)
 CDN|QCE/CDN|[指标详情](https://cloud.tencent.com/document/product/248/45138)
-负载均衡CLB(公网)|QCE/LB_PUBLIC|[指标详情](https://cloud.tencent.com/document/product/248/45047)
+负载均衡CLB(公网)|QCE/LB_PUBLIC|[指标详情](https://cloud.tencent.com/document/product/248/51898)
 负载均衡CLB(7层)|QCE/LOADBALANCE|[指标详情](https://cloud.tencent.com/document/product/248/45045)
 NAT网关|QCE/NAT_GATEWAY|[指标详情](https://cloud.tencent.com/document/product/248/45069)
 物理专线|QCE/DC|[指标详情](https://cloud.tencent.com/document/product/248/45102)
@@ -43,10 +43,11 @@ VPN 通道|QCE/VPNX|[指标详情](https://cloud.tencent.com/document/product/24
 CYNOSDB_MYSQL|QCE/CYNOSDB_MYSQL|[指标详情](https://cloud.tencent.com/document/product/248/45106)
 云联网|QCE/VBC|[指标详情](https://cloud.tencent.com/document/product/248/75629)
 数据传输 |QCE/DTS|[指标详情](https://cloud.tencent.com/document/product/248/82251)
-专线网关 |QCE/DCG|指标详情说明文档(待上线)
+专线网关 |QCE/DCG|[指标详情](https://cloud.tencent.com/document/product/248/45072)
 全球应用加速|QCE/QAAP|[指标详情](https://cloud.tencent.com/document/product/248/45062)
 Web应用防火墙 |QCE/WAF|[指标详情](https://cloud.tencent.com/document/product/248/48124)
 负载均衡CLB(内网)|QCE/LB_PRIVATE|[指标详情](https://cloud.tencent.com/document/product/248/51899)
+
 `后续会有更多的产品支持`
 
 ## 二、快速开始
