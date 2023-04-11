@@ -22,7 +22,7 @@ type lighthouseHandler struct {
 	baseProductHandler
 }
 
-func (h *lighthouseHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *lighthouseHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	if !util.IsStrInList(meta.SupportDimensions, LighthouseInstanceIDKey) {
 		meta.SupportDimensions = append(meta.SupportDimensions, LighthouseInstanceIDKey)
 	}

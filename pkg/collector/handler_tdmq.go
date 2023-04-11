@@ -41,7 +41,7 @@ type tdmqHandler struct {
 	topicRepo     instance.TdmqTcInstanceRocketMQTopicsRepository
 }
 
-func (h *tdmqHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *tdmqHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 

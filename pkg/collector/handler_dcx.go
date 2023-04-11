@@ -26,7 +26,7 @@ type dcxHandler struct {
 	baseProductHandler
 }
 
-func (h *dcxHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *dcxHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	if util.IsStrInList(DcxInvalidMetricNames, strings.ToLower(meta.MetricName)) {
 		return false
 	}

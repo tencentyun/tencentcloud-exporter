@@ -19,7 +19,7 @@ type VpngwHandler struct {
 	baseProductHandler
 }
 
-func (h *VpngwHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *VpngwHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 

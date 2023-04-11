@@ -27,7 +27,7 @@ type NacosHandler struct {
 	interfaceRepo instance.NacosTcInstanceInterfaceRepository
 }
 
-func (h *NacosHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *NacosHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 

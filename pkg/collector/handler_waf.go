@@ -25,7 +25,7 @@ type WafHandler struct {
 	baseProductHandler
 }
 
-func (h *WafHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *WafHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 

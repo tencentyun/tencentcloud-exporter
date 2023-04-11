@@ -36,7 +36,7 @@ type VbcHandler struct {
 	dRegionRepo instance.VbcTcInstanceDRegionRepository
 }
 
-func (h *VbcHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *VbcHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 

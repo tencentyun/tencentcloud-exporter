@@ -19,7 +19,7 @@ type dcHandler struct {
 	baseProductHandler
 }
 
-func (h *dcHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *dcHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 

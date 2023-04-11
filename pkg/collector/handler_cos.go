@@ -26,7 +26,7 @@ type cosHandler struct {
 	baseProductHandler
 }
 
-func (h *cosHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *cosHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 

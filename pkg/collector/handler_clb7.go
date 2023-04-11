@@ -42,7 +42,7 @@ type clb7Handler struct {
 	baseProductHandler
 }
 
-func (h *clb7Handler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *clb7Handler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	if !util.IsStrInList(meta.SupportDimensions, Clb7InstanceidKey) {
 		meta.SupportDimensions = append(meta.SupportDimensions, Clb7InstanceidKey)
 	}

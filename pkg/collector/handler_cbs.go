@@ -24,7 +24,7 @@ type cbsHandler struct {
 	instanceInfosRepo instance.CbsTcInstanceInfosRepository
 }
 
-func (h *cbsHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *cbsHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 

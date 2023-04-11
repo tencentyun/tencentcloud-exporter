@@ -37,7 +37,7 @@ type redisHandler struct {
 	baseProductHandler
 }
 
-func (h *redisHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *redisHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 

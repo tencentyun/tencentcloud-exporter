@@ -28,7 +28,7 @@ type ZookeeperHandler struct {
 	interfaceRepo instance.ZookeeperTcInstanceInterfaceRepository
 }
 
-func (h *ZookeeperHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *ZookeeperHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 

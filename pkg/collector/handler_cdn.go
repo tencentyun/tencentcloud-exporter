@@ -23,7 +23,7 @@ type cdnHandler struct {
 	baseProductHandler
 }
 
-func (h *cdnHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *cdnHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 

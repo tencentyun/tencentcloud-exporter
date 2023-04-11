@@ -20,7 +20,7 @@ type ProductHandler interface {
 	// 获取云监控指标namespace
 	GetNamespace() string
 	// 对指标元数据做检验, true=可用, false=跳过
-	IsMetricMetaVaild(meta *metric.TcmMeta) bool
+	IsMetricMetaValid(meta *metric.TcmMeta) bool
 	// 修改指标元数据
 	ModifyMetricMeta(meta *metric.TcmMeta) error
 	// 对指标做校验, true=可用, false=跳过
@@ -42,7 +42,7 @@ type baseProductHandler struct {
 	logger          log.Logger
 }
 
-func (h *baseProductHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *baseProductHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 

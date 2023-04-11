@@ -26,7 +26,7 @@ type dtsHandler struct {
 	migrateInfosRepo instance.DtsTcInstanceMigrateInfosRepository
 }
 
-func (h *dtsHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *dtsHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 

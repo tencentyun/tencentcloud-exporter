@@ -26,7 +26,7 @@ type cvmHandler struct {
 	baseProductHandler
 }
 
-func (h *cvmHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *cvmHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	if !util.IsStrInList(meta.SupportDimensions, CvmInstanceidKey) {
 		meta.SupportDimensions = append(meta.SupportDimensions, CvmInstanceidKey)
 	}

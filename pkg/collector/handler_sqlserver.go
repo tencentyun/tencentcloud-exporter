@@ -20,7 +20,7 @@ type sqlServerHandler struct {
 	baseProductHandler
 }
 
-func (h *sqlServerHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *sqlServerHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 

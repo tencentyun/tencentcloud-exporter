@@ -35,7 +35,7 @@ type ClbPrivateHandler struct {
 	baseProductHandler
 }
 
-func (h *ClbPrivateHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *ClbPrivateHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 

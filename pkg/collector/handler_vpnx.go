@@ -19,7 +19,7 @@ type VpnxHandler struct {
 	baseProductHandler
 }
 
-func (h *VpnxHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *VpnxHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 

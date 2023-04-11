@@ -28,7 +28,7 @@ type cdbHandler struct {
 	baseProductHandler
 }
 
-func (h *cdbHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *cdbHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 

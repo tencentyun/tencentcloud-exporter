@@ -24,7 +24,7 @@ type CynosdbHandler struct {
 	baseProductHandler
 }
 
-func (h *CynosdbHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *CynosdbHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 

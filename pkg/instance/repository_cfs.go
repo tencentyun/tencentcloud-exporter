@@ -2,7 +2,6 @@ package instance
 
 import (
 	"fmt"
-
 	"github.com/tencentyun/tencentcloud-exporter/pkg/common"
 
 	"github.com/go-kit/log"
@@ -80,4 +79,36 @@ func NewCfsTcInstanceRepository(cred common.CredentialIface, c *config.TencentCo
 		logger:     logger,
 	}
 	return
+}
+
+// Replications
+type CfsSnapshotsRepository interface {
+	GetCfsSnapshotsInfo(instanceId string) (*sdk.DescribeCfsSnapshotsResponse, error)
+}
+
+type CfsSnapshotsRepositoryImpl struct {
+	client *sdk.Client
+	logger log.Logger
+}
+
+func (repo *CfsSnapshotsRepositoryImpl) GetCfsSnapshotsInfo(instanceId string) (*sdk.DescribeCfsSnapshotsResponse, error) {
+	req := sdk.NewDescribeCfsSnapshotsRequest()
+	var offset uint64 = 0
+	var limit uint64 = 100
+	req.Limit = &limit
+	req.Offset = &offset
+	req.FileSystemId = &instanceId
+	return repo.client.DescribeCfsSnapshots(req)
+}
+
+func NewCfsSnapshotsRepositoryRepository(cred common.CredentialIface, c *config.TencentConfig, logger log.Logger) (CfsSnapshotsRepository, error) {
+	cli, err := client.NewCfsClient(cred, c)
+	if err != nil {
+		return nil, err
+	}
+	repo := &CfsSnapshotsRepositoryImpl{
+		client: cli,
+		logger: logger,
+	}
+	return repo, nil
 }

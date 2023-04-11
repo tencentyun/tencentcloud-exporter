@@ -45,7 +45,7 @@ type QaapHandler struct {
 	qaapInstanceInfoRepo       instance.QaapTcInstanceInfoRepository
 }
 
-func (h *QaapHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *QaapHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 
