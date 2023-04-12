@@ -33,10 +33,25 @@ func (repo *EIPTcInstanceRepository) Get(id string) (instance TcInstance, err er
 	if err != nil {
 		return
 	}
-	if len(resp.Response.AddressSet) != 1 {
+
+	var meta *sdk.Address
+	if len(resp.Response.AddressSet) == 0 {
+		reqV6 := sdk.NewDescribeIp6AddressesRequest()
+		reqV6.Ip6AddressIds = []*string{&id}
+		respV6, err := repo.client.DescribeIp6Addresses(reqV6)
+		if err != nil {
+			return
+		}
+		if len(respV6.Response.AddressSet) == 1 {
+			meta = respV6.Response.AddressSet[0]
+		} else {
+			return nil, fmt.Errorf("Response instanceDetails size != 1, id=%s ", id)
+		}
+	} else if len(resp.Response.AddressSet) == 1 {
+		meta = resp.Response.AddressSet[0]
+	} else {
 		return nil, fmt.Errorf("Response instanceDetails size != 1, id=%s ", id)
 	}
-	meta := resp.Response.AddressSet[0]
 	instance, err = NewEIPTcInstance(*meta.AddressIp, meta)
 	if err != nil {
 		return
@@ -77,6 +92,32 @@ getMoreInstances:
 	if offset < total {
 		req.Offset = &offset
 		goto getMoreInstances
+	}
+
+	reqV6 := sdk.NewDescribeIp6AddressesRequest()
+	offset, limit, total = 0, 100, -1
+	reqV6.Offset = &offset
+	reqV6.Limit = &limit
+getMoreV6Instances:
+	respV6, err := repo.client.DescribeIp6Addresses(reqV6)
+	if err != nil {
+		return
+	}
+	if total == -1 {
+		total = *respV6.Response.TotalCount
+	}
+	for _, meta := range respV6.Response.AddressSet {
+		ins, e := NewEIPTcInstance(*meta.AddressIp, meta)
+		if e != nil {
+			level.Error(repo.logger).Log("msg", "Create cdb instance fail", "id", *meta.InstanceId)
+			continue
+		}
+		instances = append(instances, ins)
+	}
+	offset += limit
+	if offset < total {
+		req.Offset = &offset
+		goto getMoreV6Instances
 	}
 
 	return
