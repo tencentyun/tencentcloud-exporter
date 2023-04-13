@@ -40,7 +40,7 @@ func (repo *EIPTcInstanceRepository) Get(id string) (instance TcInstance, err er
 		reqV6.Ip6AddressIds = []*string{&id}
 		respV6, err := repo.client.DescribeIp6Addresses(reqV6)
 		if err != nil {
-			return
+			return nil, err
 		}
 		if len(respV6.Response.AddressSet) == 1 {
 			meta = respV6.Response.AddressSet[0]
