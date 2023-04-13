@@ -244,13 +244,14 @@ func (c *TcProductCollector) Collect(ch chan<- prometheus.Metric) (err error) {
 	for _, query := range c.Querys {
 		go func(q *metric.TcmQuery) {
 			defer wg.Done()
-			pms, err := q.GetPromMetrics()
-			if err != nil {
+			pms, err0 := q.GetPromMetrics()
+			if err0 != nil {
 				level.Error(c.logger).Log(
 					"msg", "Get samples fail",
 					"err", err,
 					"metric", q.Metric.Id,
 				)
+				err = err0
 			} else {
 				for _, pm := range pms {
 					ch <- pm
