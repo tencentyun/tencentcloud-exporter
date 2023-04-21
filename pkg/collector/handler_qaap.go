@@ -9,6 +9,7 @@ import (
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -80,7 +81,6 @@ func (h *QaapHandler) GetSeries(m *metric.TcmMetric) ([]*metric.TcmSeries, error
 	if m.Conf.IsCustomQueryDimensions() {
 		return h.GetSeriesByCustom(m)
 	}
-
 	return nil, fmt.Errorf("must config all_instances or only_include_instances or custom_query_dimensions")
 }
 
@@ -95,7 +95,7 @@ func (h *QaapHandler) GetSeriesByOnly(m *metric.TcmMetric) ([]*metric.TcmSeries,
 		sl, err := h.getSeriesByMetricType(m, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
 			continue
 		}
 		slist = append(slist, sl...)
@@ -116,7 +116,7 @@ func (h *QaapHandler) GetSeriesByAll(m *metric.TcmMetric) ([]*metric.TcmSeries, 
 		sl, err := h.getSeriesByMetricType(m, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
 			continue
 		}
 		slist = append(slist, sl...)
@@ -143,7 +143,7 @@ func (h *QaapHandler) GetSeriesByCustom(m *metric.TcmMetric) ([]*metric.TcmSerie
 		sl, err := h.getSeriesByMetricType(m, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
 			continue
 		}
 		slist = append(slist, sl...)
@@ -172,6 +172,7 @@ func (h *QaapHandler) getSeriesByMetricType(m *metric.TcmMetric, ins instance.Tc
 }
 
 func (h *QaapHandler) getInstanceSeries(m *metric.TcmMetric, ins instance.TcInstance) ([]*metric.TcmSeries, error) {
+
 	var series []*metric.TcmSeries
 	ql := map[string]string{
 		h.monitorQueryKey: ins.GetMonitorQueryKey(),
@@ -187,7 +188,67 @@ func (h *QaapHandler) getInstanceSeries(m *metric.TcmMetric, ins instance.TcInst
 
 func (h *QaapHandler) getQaapListenerRsSeries(m *metric.TcmMetric, ins instance.TcInstance) ([]*metric.TcmSeries, error) {
 	var series []*metric.TcmSeries
+	var tcpSeries, udpSeries []*metric.TcmSeries
+	var wg sync.WaitGroup
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		tcpSeries, _ = h.getTcpSeries(m, ins)
+		series = append(series, tcpSeries...)
+	}()
+	go func() {
+		defer wg.Done()
+		udpSeries, _ = h.getUdpSeries(m, ins)
+		series = append(series, udpSeries...)
+	}()
+	wg.Wait()
 
+	// tcpListenersInfos, err := h.qaapInstanceInfoRepo.GetTCPListenersInfo(ins.GetInstanceId())
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// fmt.Println(ins.GetMonitorQueryKey(), "getTcpSeries耗时", time.Since(start).Milliseconds(), "series", len(series))
+	// for _, tcpListenersInfo := range tcpListenersInfos.Response.ListenerSet {
+	// 	for _, realServerSet := range tcpListenersInfo.RealServerSet {
+	// 		ql := map[string]string{
+	// 			h.monitorQueryKey:  ins.GetMonitorQueryKey(),
+	// 			"listenerId":       *tcpListenersInfo.ListenerId,
+	// 			"originServerInfo": *realServerSet.RealServerIP,
+	// 			"protocol":         *tcpListenersInfo.Protocol,
+	// 			"listenerName":     *tcpListenersInfo.ListenerName,
+	// 		}
+	// 		s, err := metric.NewTcmSeries(m, ql, ins)
+	// 		if err != nil {
+	// 			return nil, err
+	// 		}
+	// 		series = append(series, s)
+	// 	}
+	// }
+	// start1 := time.Now()
+	// udpListenersInfos, err := h.qaapInstanceInfoRepo.GetUDPListenersInfo(ins.GetInstanceId())
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// fmt.Println(ins.GetMonitorQueryKey(), "getUdpSeries耗时", time.Since(start1).Milliseconds(), "series", len(series))
+	// for _, udpListenersInfo := range udpListenersInfos.Response.ListenerSet {
+	// 	for _, realServerSet := range udpListenersInfo.RealServerSet {
+	// 		ql := map[string]string{
+	// 			h.monitorQueryKey:  ins.GetMonitorQueryKey(),
+	// 			"listenerId":       *udpListenersInfo.ListenerId,
+	// 			"originServerInfo": *realServerSet.RealServerIP,
+	// 			"protocol":         *udpListenersInfo.Protocol,
+	// 			"listenerName":     *udpListenersInfo.ListenerName,
+	// 		}
+	// 		s, err := metric.NewTcmSeries(m, ql, ins)
+	// 		if err != nil {
+	// 			return nil, err
+	// 		}
+	// 		series = append(series, s)
+	// 	}
+	// }
+	return series, nil
+}
+func (h *QaapHandler) getTcpSeries(m *metric.TcmMetric, ins instance.TcInstance) (series []*metric.TcmSeries, err error) {
 	tcpListenersInfos, err := h.qaapInstanceInfoRepo.GetTCPListenersInfo(ins.GetInstanceId())
 	if err != nil {
 		return nil, err
@@ -208,6 +269,9 @@ func (h *QaapHandler) getQaapListenerRsSeries(m *metric.TcmMetric, ins instance.
 			series = append(series, s)
 		}
 	}
+	return series, nil
+}
+func (h *QaapHandler) getUdpSeries(m *metric.TcmMetric, ins instance.TcInstance) (series []*metric.TcmSeries, err error) {
 	udpListenersInfos, err := h.qaapInstanceInfoRepo.GetUDPListenersInfo(ins.GetInstanceId())
 	if err != nil {
 		return nil, err

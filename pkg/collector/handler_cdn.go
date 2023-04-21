@@ -82,7 +82,7 @@ func (h *cdnHandler) GetSeriesByOnly(m *metric.TcmMetric) ([]*metric.TcmSeries, 
 		s, err := metric.NewTcmSeries(m, ql, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", insId)
+				"metric", m.Meta.MetricName, "instance", insId)
 			continue
 		}
 		slist = append(slist, s)
@@ -113,7 +113,7 @@ func (h *cdnHandler) GetSeriesByAll(m *metric.TcmMetric) ([]*metric.TcmSeries, e
 		s, err := metric.NewTcmSeries(m, ql, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
 			continue
 		}
 		slist = append(slist, s)

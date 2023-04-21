@@ -74,7 +74,7 @@ func (h *WafHandler) GetSeriesByOnly(m *metric.TcmMetric) ([]*metric.TcmSeries, 
 		sl, err := h.getSeriesByMetricType(m, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
 			continue
 		}
 		slist = append(slist, sl...)
@@ -95,7 +95,7 @@ func (h *WafHandler) GetSeriesByAll(m *metric.TcmMetric) ([]*metric.TcmSeries, e
 		sl, err := h.getSeriesByMetricType(m, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId(), "error", err)
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId(), "error", err)
 			continue
 		}
 		slist = append(slist, sl...)
@@ -122,7 +122,7 @@ func (h *WafHandler) GetSeriesByCustom(m *metric.TcmMetric) ([]*metric.TcmSeries
 		sl, err := h.getSeriesByMetricType(m, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
 			continue
 		}
 		slist = append(slist, sl...)

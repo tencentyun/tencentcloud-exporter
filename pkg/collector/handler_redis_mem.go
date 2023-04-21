@@ -19,24 +19,26 @@ const (
 )
 
 var (
-//RedisMemInstanceMetricNames = []string{
-//	"cpuutil", "cpumaxutil", "memused", "memutil", "memmaxutil", "keys", "expired", "evicted", "connections",
-//	"connectionsutil", "inflow", "inbandwidthutil", "inflowlimit", "outflow", "outbandwidthutil",
-//	"outflowlimit", "latencyavg", "latencymax", "latencyread", "latencywrite", "latencyother",
-//	"commands", "cmdread", "cmdwrite", "cmdother", "cmdbigvalue", "cmdkeycount", "cmdmget", "cmdslow",
-//	"cmdhits", "cmdmiss", "cmderr", "cmdhitsratio",
-//}
-//RedisMemProxyMetricNames = []string{
-//	"cpuutilproxy", "commandsproxy", "cmdkeycountproxy", "cmdmgetproxy", "cmderrproxy", "cmdbigvalueproxy",
-//	"connectionsproxy", "connectionsutilproxy", "inflowproxy", "inbandwidthutilproxy",
-//	"inflowlimitproxy", "outflowproxy", "outbandwidthutilproxy", "outflowlimitproxy",
-//	"latencyavgproxy", "latencymaxproxy", "latencyreadproxy", "latencywriteproxy", "latencyotherproxy",
-//}
-//RedisMemNodeMetricNames = []string{
-//	"cpuutilnode", "connectionsnode", "connectionsutilnode", "memusednode", "memutilnode",
-//	"keysnode", "expirednode", "evictednode", "repldelaynode", "commandsnode", "cmdreadnode",
-//	"cmdwritenode", "cmdothernode", "cmdslownode", "cmdhitsnode", "cmdmissnode", "cmdhitsrationode",
-//}
+//	RedisMemInstanceMetricNames = []string{
+//		"cpuutil", "cpumaxutil", "memused", "memutil", "memmaxutil", "keys", "expired", "evicted", "connections",
+//		"connectionsutil", "inflow", "inbandwidthutil", "inflowlimit", "outflow", "outbandwidthutil",
+//		"outflowlimit", "latencyavg", "latencymax", "latencyread", "latencywrite", "latencyother",
+//		"commands", "cmdread", "cmdwrite", "cmdother", "cmdbigvalue", "cmdkeycount", "cmdmget", "cmdslow",
+//		"cmdhits", "cmdmiss", "cmderr", "cmdhitsratio",
+//	}
+//
+//	RedisMemProxyMetricNames = []string{
+//		"cpuutilproxy", "commandsproxy", "cmdkeycountproxy", "cmdmgetproxy", "cmderrproxy", "cmdbigvalueproxy",
+//		"connectionsproxy", "connectionsutilproxy", "inflowproxy", "inbandwidthutilproxy",
+//		"inflowlimitproxy", "outflowproxy", "outbandwidthutilproxy", "outflowlimitproxy",
+//		"latencyavgproxy", "latencymaxproxy", "latencyreadproxy", "latencywriteproxy", "latencyotherproxy",
+//	}
+//
+//	RedisMemNodeMetricNames = []string{
+//		"cpuutilnode", "connectionsnode", "connectionsutilnode", "memusednode", "memutilnode",
+//		"keysnode", "expirednode", "evictednode", "repldelaynode", "commandsnode", "cmdreadnode",
+//		"cmdwritenode", "cmdothernode", "cmdslownode", "cmdhitsnode", "cmdmissnode", "cmdhitsrationode",
+//	}
 )
 
 func init() {
@@ -81,7 +83,7 @@ func (h *redisMemHandler) GetSeriesByOnly(m *metric.TcmMetric) ([]*metric.TcmSer
 		sl, err := h.getSeriesByMetricType(m, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
 			continue
 		}
 		slist = append(slist, sl...)
@@ -102,7 +104,7 @@ func (h *redisMemHandler) GetSeriesByAll(m *metric.TcmMetric) ([]*metric.TcmSeri
 		sl, err := h.getSeriesByMetricType(m, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
 			continue
 		}
 		slist = append(slist, sl...)
@@ -129,7 +131,7 @@ func (h *redisMemHandler) GetSeriesByCustom(m *metric.TcmMetric) ([]*metric.TcmS
 		sl, err := h.getSeriesByMetricType(m, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
 			continue
 		}
 		slist = append(slist, sl...)

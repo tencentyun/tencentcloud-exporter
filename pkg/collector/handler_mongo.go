@@ -80,7 +80,7 @@ func (h *mongoHandler) GetSeriesByOnly(m *metric.TcmMetric) ([]*metric.TcmSeries
 		sl, err := h.getSeriesByMetricType(m, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", insId)
+				"metric", m.Meta.MetricName, "instance", insId)
 			continue
 		}
 		slist = append(slist, sl...)
@@ -101,7 +101,7 @@ func (h *mongoHandler) GetSeriesByAll(m *metric.TcmMetric) ([]*metric.TcmSeries,
 		sl, err := h.getSeriesByMetricType(m, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
 			continue
 		}
 		slist = append(slist, sl...)
@@ -137,7 +137,7 @@ func (h *mongoHandler) getSeriesByMetricType(m *metric.TcmMetric, ins instance.T
 		}
 		s, err := metric.NewTcmSeries(m, ql, ins)
 		if err != nil {
-			return nil, fmt.Errorf("create metric series fail, metric=%s, instacne=%s",
+			return nil, fmt.Errorf("create metric series fail, metric=%s, instance=%s",
 				m.Meta.MetricName, ins.GetInstanceId())
 		}
 		slist = append(slist, s)
@@ -145,7 +145,7 @@ func (h *mongoHandler) getSeriesByMetricType(m *metric.TcmMetric, ins instance.T
 		// 副本集纬度
 		meta, ok := ins.GetMeta().(*mongodb.InstanceDetail)
 		if !ok {
-			return nil, fmt.Errorf("get instacne raw meta fail, metric=%s, instacne=%s",
+			return nil, fmt.Errorf("get instance raw meta fail, metric=%s, instance=%s",
 				m.Meta.MetricName, ins.GetInstanceId())
 		}
 		for _, rep := range meta.ReplicaSets {
@@ -156,7 +156,7 @@ func (h *mongoHandler) getSeriesByMetricType(m *metric.TcmMetric, ins instance.T
 			s, err := metric.NewTcmSeries(m, ql, ins)
 			if err != nil {
 				level.Error(h.logger).Log("msg", "Create metric series fail",
-					"metric", m.Meta.MetricName, "instacne", *rep.ReplicaSetId)
+					"metric", m.Meta.MetricName, "instance", *rep.ReplicaSetId)
 			} else {
 				slist = append(slist, s)
 			}
@@ -165,7 +165,7 @@ func (h *mongoHandler) getSeriesByMetricType(m *metric.TcmMetric, ins instance.T
 		// 节点纬度
 		meta, ok := ins.GetMeta().(*mongodb.InstanceDetail)
 		if !ok {
-			return nil, fmt.Errorf("get instacne raw meta fail, metric=%s, instacne=%s",
+			return nil, fmt.Errorf("get instance raw meta fail, metric=%s, instance=%s",
 				m.Meta.MetricName, ins.GetInstanceId())
 		}
 		for _, rep := range meta.ReplicaSets {
@@ -177,7 +177,7 @@ func (h *mongoHandler) getSeriesByMetricType(m *metric.TcmMetric, ins instance.T
 			s, err := metric.NewTcmSeries(m, ql, ins)
 			if err != nil {
 				level.Error(h.logger).Log("msg", "Create metric series fail",
-					"metric", m.Meta.MetricName, "instacne", nprimary)
+					"metric", m.Meta.MetricName, "instance", nprimary)
 			} else {
 				slist = append(slist, s)
 			}
@@ -191,7 +191,7 @@ func (h *mongoHandler) getSeriesByMetricType(m *metric.TcmMetric, ins instance.T
 				s, err := metric.NewTcmSeries(m, ql, ins)
 				if err != nil {
 					level.Error(h.logger).Log("msg", "Create metric series fail",
-						"metric", m.Meta.MetricName, "instacne", nslave)
+						"metric", m.Meta.MetricName, "instance", nslave)
 				} else {
 					slist = append(slist, s)
 				}
