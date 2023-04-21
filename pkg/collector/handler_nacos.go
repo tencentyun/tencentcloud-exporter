@@ -199,14 +199,14 @@ func NewNacosHandler(cred common.CredentialIface, c *TcProductCollector, logger 
 	if err != nil {
 		return nil, err
 	}
-	relodInterval := time.Duration(c.ProductConf.RelodIntervalMinutes * int64(time.Minute))
-	podRepoCahe := instance.NewTcNacosInstancePodCache(podRepo, relodInterval, logger)
+	reloadInterval := time.Duration(c.ProductConf.ReloadIntervalMinutes * int64(time.Minute))
+	podRepoCahe := instance.NewTcNacosInstancePodCache(podRepo, reloadInterval, logger)
 
 	interfaceRepo, err := instance.NewNacosTcInstanceInterfaceRepository(cred, c.Conf, logger)
 	if err != nil {
 		return nil, err
 	}
-	interfaceRepoCahe := instance.NewTcNacosInstanceInterfaceCache(interfaceRepo, relodInterval, logger)
+	interfaceRepoCahe := instance.NewTcNacosInstanceInterfaceCache(interfaceRepo, reloadInterval, logger)
 	handler = &NacosHandler{
 		baseProductHandler: baseProductHandler{
 			monitorQueryKey: NacosInstanceidKey,

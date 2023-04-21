@@ -208,7 +208,7 @@ func NewDTSHandler(cred common.CredentialIface, c *TcProductCollector, logger lo
 	if err != nil {
 		return nil, err
 	}
-	reloadInterval := time.Duration(c.ProductConf.RelodIntervalMinutes * int64(time.Minute))
+	reloadInterval := time.Duration(c.ProductConf.ReloadIntervalMinutes * int64(time.Minute))
 	migrateInfosRepoCahe := instance.NewTcDtsInstanceMigrateInfosCache(migrateInfosRepo, reloadInterval, logger)
 
 	replicationRepo, err := instance.NewDtsTcInstanceReplicationsRepository(cred, c.Conf, logger)

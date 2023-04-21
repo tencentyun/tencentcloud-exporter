@@ -9,6 +9,7 @@ import (
 	"github.com/tencentyun/tencentcloud-exporter/pkg/metric"
 	"github.com/tencentyun/tencentcloud-exporter/pkg/util"
 	"strconv"
+	"time"
 )
 
 const (
@@ -169,14 +170,15 @@ func NewCfsHandler(cred common.CredentialIface, c *TcProductCollector, logger lo
 	if err != nil {
 		return nil, err
 	}
-	// replicationRepoCache := instance.NewCfsSnapshotsRepositoryRepositoryCache(replicationRepo, reloadInterval, logger)
+	reloadInterval := time.Duration(c.ProductConf.ReloadIntervalMinutes * int64(time.Minute))
+	cfsSnapshotsRepoCache := instance.NewCfsSnapshotsRepositoryRepositoryCache(cfsSnapshotsRepo, reloadInterval, logger)
 	handler = &CfsHandler{
 		baseProductHandler: baseProductHandler{
 			monitorQueryKey: CfsInstanceIdKey,
 			collector:       c,
 			logger:          logger,
 		},
-		cfsSnapshotsRepo: cfsSnapshotsRepo,
+		cfsSnapshotsRepo: cfsSnapshotsRepoCache,
 	}
 	return
 

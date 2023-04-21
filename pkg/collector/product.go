@@ -302,19 +302,19 @@ func (c *TcProductCollector) Collect(ch chan<- prometheus.Metric) (err error) {
 }
 
 type TcProductCollectorReloader struct {
-	collector     *TcProductCollector
-	relodInterval time.Duration
-	ctx           context.Context
-	cancel        context.CancelFunc
-	logger        log.Logger
+	collector      *TcProductCollector
+	reloadInterval time.Duration
+	ctx            context.Context
+	cancel         context.CancelFunc
+	logger         log.Logger
 }
 
 func (r *TcProductCollectorReloader) Run() {
-	ticker := time.NewTicker(r.relodInterval)
+	ticker := time.NewTicker(r.reloadInterval)
 	defer ticker.Stop()
 
 	// sleep when first start
-	time.Sleep(r.relodInterval)
+	time.Sleep(r.reloadInterval)
 
 	for {
 		level.Info(r.logger).Log("msg", "start reload product metadata", "Namespace", r.collector.Namespace)
@@ -357,7 +357,7 @@ func NewTcProductCollector(namespace string, metricRepo metric.TcmMetricReposito
 		}
 		// var instanceRepo instance.TcInstanceRepository
 		// 使用instance缓存
-		reloadInterval := time.Duration(pconf.RelodIntervalMinutes * int64(time.Minute))
+		reloadInterval := time.Duration(pconf.ReloadIntervalMinutes * int64(time.Minute))
 		instanceRepoCache = instance.NewTcInstanceCache(instanceRepo, reloadInterval, logger)
 	}
 
@@ -394,14 +394,14 @@ func NewTcProductCollector(namespace string, metricRepo metric.TcmMetricReposito
 }
 
 func NewTcProductCollectorReloader(ctx context.Context, collector *TcProductCollector,
-	relodInterval time.Duration, logger log.Logger) *TcProductCollectorReloader {
+	reloadInterval time.Duration, logger log.Logger) *TcProductCollectorReloader {
 	childCtx, cancel := context.WithCancel(ctx)
 	reloader := &TcProductCollectorReloader{
-		collector:     collector,
-		relodInterval: relodInterval,
-		ctx:           childCtx,
-		cancel:        cancel,
-		logger:        logger,
+		collector:      collector,
+		reloadInterval: reloadInterval,
+		ctx:            childCtx,
+		cancel:         cancel,
+		logger:         logger,
 	}
 	return reloader
 }

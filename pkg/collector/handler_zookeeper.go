@@ -200,14 +200,14 @@ func NewZookeeperHandler(cred common.CredentialIface, c *TcProductCollector, log
 	if err != nil {
 		return nil, err
 	}
-	relodInterval := time.Duration(c.ProductConf.RelodIntervalMinutes * int64(time.Minute))
-	podRepoCahe := instance.NewTcZookeeperInstancePodCache(podRepo, relodInterval, logger)
+	reloadInterval := time.Duration(c.ProductConf.ReloadIntervalMinutes * int64(time.Minute))
+	podRepoCahe := instance.NewTcZookeeperInstancePodCache(podRepo, reloadInterval, logger)
 
 	interfaceRepo, err := instance.NewZookeeperTcInstanceInterfaceRepository(cred, c.Conf, logger)
 	if err != nil {
 		return nil, err
 	}
-	interfaceRepoCahe := instance.NewTcZookeeperInstanceInterfaceCache(interfaceRepo, relodInterval, logger)
+	interfaceRepoCahe := instance.NewTcZookeeperInstanceInterfaceCache(interfaceRepo, reloadInterval, logger)
 
 	handler = &ZookeeperHandler{
 		baseProductHandler: baseProductHandler{

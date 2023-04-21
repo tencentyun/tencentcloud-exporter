@@ -407,14 +407,14 @@ func NewQaapHandler(cred common.CredentialIface, c *TcProductCollector, logger l
 	if err != nil {
 		return nil, err
 	}
-	reloadInterval := time.Duration(c.ProductConf.RelodIntervalMinutes * int64(time.Minute))
-	qaapInstanceInfoCache := instance.NewTcGaapInstanceeInfosCache(qaapInstanceInfo, reloadInterval, logger)
+	reloadInterval := time.Duration(c.ProductConf.ReloadIntervalMinutes * int64(time.Minute))
+	qaapInstanceInfoCache := instance.NewTcGaapInstanceInfosCache(qaapInstanceInfo, reloadInterval, logger)
 
 	commonQaapInstanceInfoRepo, err := instance.NewCommonQaapTcInstanceRepository(cred, c.Conf, logger)
 	if err != nil {
 		return nil, err
 	}
-	commonQaapInstanceInfoCache := instance.NewTcCommonGaapInstanceeInfosCache(commonQaapInstanceInfoRepo, reloadInterval, logger)
+	commonQaapInstanceInfoCache := instance.NewTcCommonGaapInstanceInfosCache(commonQaapInstanceInfoRepo, reloadInterval, logger)
 
 	handler = &QaapHandler{
 		baseProductHandler: baseProductHandler{

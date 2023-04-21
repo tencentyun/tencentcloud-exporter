@@ -115,7 +115,7 @@ products:
     range_seconds: 300                           // 可选, 选取时间范围, 开始时间=now-range_seconds, 结束时间=now
     delay_seconds: 60                            // 可选, 时间偏移量, 结束时间=now-delay_seconds
     metric_name_type: 1                          // 可选，导出指标的名字格式化类型, 1=大写转小写加下划线, 2=转小写; 默认2
-    relod_interval_minutes: 60                   // 可选, 在all_instances=true时, 周期reload实例列表, 建议频率不要太频繁
+    reload_interval_minutes: 60                   // 可选, 在all_instances=true时, 周期reload实例列表, 建议频率不要太频繁
 
 
 // 单个指标纬度配置, 每个指标一个item

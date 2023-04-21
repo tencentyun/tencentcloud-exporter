@@ -210,14 +210,14 @@ func NewTdmqHandler(cred common.CredentialIface, c *TcProductCollector, logger l
 	if err != nil {
 		return nil, err
 	}
-	relodInterval := time.Duration(c.ProductConf.RelodIntervalMinutes * int64(time.Minute))
-	namespaceRepoCahe := instance.NewTcTdmqInstanceNamespaceCache(namespaceRepo, relodInterval, logger)
+	reloadInterval := time.Duration(c.ProductConf.ReloadIntervalMinutes * int64(time.Minute))
+	namespaceRepoCahe := instance.NewTcTdmqInstanceNamespaceCache(namespaceRepo, reloadInterval, logger)
 
 	topicRepo, err := instance.NewTdmqTcInstanceRocketMQTopicsRepository(cred, c.Conf, logger)
 	if err != nil {
 		return nil, err
 	}
-	topicRepoCahe := instance.NewTcTdmqInstanceTopicsCache(topicRepo, relodInterval, logger)
+	topicRepoCahe := instance.NewTcTdmqInstanceTopicsCache(topicRepo, reloadInterval, logger)
 
 	handler = &tdmqHandler{
 		baseProductHandler: baseProductHandler{

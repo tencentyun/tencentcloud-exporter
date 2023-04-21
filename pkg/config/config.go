@@ -12,11 +12,11 @@ import (
 )
 
 const (
-	DefaultPeriodSeconds        = 60
-	DefaultDelaySeconds         = 300
-	DefaultRelodIntervalMinutes = 60
-	DefaultRateLimit            = 15
-	DefaultQueryMetricBatchSize = 50
+	DefaultPeriodSeconds         = 60
+	DefaultDelaySeconds          = 300
+	DefaultReloadIntervalMinutes = 60
+	DefaultRateLimit             = 15
+	DefaultQueryMetricBatchSize  = 50
 
 	EnvAccessKey   = "TENCENTCLOUD_SECRET_ID"
 	EnvSecretKey   = "TENCENTCLOUD_SECRET_KEY"
@@ -122,7 +122,7 @@ type TencentProduct struct {
 	RangeSeconds          int64               `yaml:"range_seconds"`
 	DelaySeconds          int64               `yaml:"delay_seconds"`
 	MetricNameType        int32               `yaml:"metric_name_type"` // 1=大写转下划线, 2=全小写
-	RelodIntervalMinutes  int64               `yaml:"relod_interval_minutes"`
+	ReloadIntervalMinutes int64               `yaml:"reload_interval_minutes"`
 }
 
 type metadataResponse struct {
@@ -258,8 +258,8 @@ func (c *TencentConfig) fillDefault() {
 	}
 
 	for index, product := range c.Products {
-		if product.RelodIntervalMinutes <= 0 {
-			c.Products[index].RelodIntervalMinutes = DefaultRelodIntervalMinutes
+		if product.ReloadIntervalMinutes <= 0 {
+			c.Products[index].ReloadIntervalMinutes = DefaultReloadIntervalMinutes
 		}
 	}
 }

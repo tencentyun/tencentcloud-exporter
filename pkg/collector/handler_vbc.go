@@ -193,8 +193,8 @@ func NewVbcHandler(cred common.CredentialIface, c *TcProductCollector, logger lo
 	if err != nil {
 		return nil, err
 	}
-	relodInterval := time.Duration(c.ProductConf.RelodIntervalMinutes * int64(time.Minute))
-	dRegionRepoCahe := instance.NewVbcTcInstanceDRegionRepositoryCache(dRegionRepo, relodInterval, logger)
+	reloadInterval := time.Duration(c.ProductConf.ReloadIntervalMinutes * int64(time.Minute))
+	dRegionRepoCahe := instance.NewVbcTcInstanceDRegionRepositoryCache(dRegionRepo, reloadInterval, logger)
 
 	handler = &VbcHandler{
 		baseProductHandler: baseProductHandler{
