@@ -26,7 +26,7 @@ type cosHandler struct {
 	baseProductHandler
 }
 
-func (h *cosHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *cosHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 
@@ -34,7 +34,7 @@ func (h *cosHandler) GetNamespace() string {
 	return CosNamespace
 }
 
-func (h *cosHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *cosHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	// cos大部分指标不支持300以下的统计纬度
 	if m.Conf.StatPeriodSeconds < 300 {
 		m.Conf.StatPeriodSeconds = 300
@@ -78,7 +78,7 @@ func (h *cosHandler) GetSeriesByAll(m *metric.TcmMetric) ([]*metric.TcmSeries, e
 		s, err := metric.NewTcmSeries(m, ql, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
 			continue
 		}
 		slist = append(slist, s)

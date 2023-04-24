@@ -26,7 +26,7 @@ type dtsHandler struct {
 	migrateInfosRepo instance.DtsTcInstanceMigrateInfosRepository
 }
 
-func (h *dtsHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *dtsHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 
@@ -34,7 +34,7 @@ func (h *dtsHandler) GetNamespace() string {
 	return DTSNamespace
 }
 
-func (h *dtsHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *dtsHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	_, ok := excludeMetricName[m.Meta.MetricName]
 	if ok {
 		return false
@@ -76,7 +76,7 @@ func (h *dtsHandler) GetSeriesByOnly(m *metric.TcmMetric) ([]*metric.TcmSeries, 
 		sl, err := h.getSeriesByMetricType(m, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
 			continue
 		}
 		slist = append(slist, sl...)
@@ -97,7 +97,7 @@ func (h *dtsHandler) GetSeriesByAll(m *metric.TcmMetric) ([]*metric.TcmSeries, e
 		sl, err := h.getSeriesByMetricType(m, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
 			continue
 		}
 		slist = append(slist, sl...)
@@ -124,7 +124,7 @@ func (h *dtsHandler) GetSeriesByCustom(m *metric.TcmMetric) ([]*metric.TcmSeries
 		sl, err := h.getSeriesByMetricType(m, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
 			continue
 		}
 		slist = append(slist, sl...)
@@ -171,7 +171,7 @@ func (h *dtsHandler) getReplicationSeries(m *metric.TcmMetric, ins instance.TcIn
 	}
 	for _, replication := range replications.Response.JobList {
 		ql := map[string]string{
-			"replicationjobid":   *replication.JobId,
+			"replicationjobid":    *replication.JobId,
 			"replicationjob_name": *replication.JobName,
 		}
 		s, err := metric.NewTcmSeries(m, ql, ins)
@@ -208,7 +208,7 @@ func NewDTSHandler(cred common.CredentialIface, c *TcProductCollector, logger lo
 	if err != nil {
 		return nil, err
 	}
-	reloadInterval := time.Duration(c.ProductConf.RelodIntervalMinutes * int64(time.Minute))
+	reloadInterval := time.Duration(c.ProductConf.ReloadIntervalMinutes * int64(time.Minute))
 	migrateInfosRepoCahe := instance.NewTcDtsInstanceMigrateInfosCache(migrateInfosRepo, reloadInterval, logger)
 
 	replicationRepo, err := instance.NewDtsTcInstanceReplicationsRepository(cred, c.Conf, logger)

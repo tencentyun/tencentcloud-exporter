@@ -20,7 +20,7 @@ type sqlServerHandler struct {
 	baseProductHandler
 }
 
-func (h *sqlServerHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *sqlServerHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 
@@ -28,7 +28,7 @@ func (h *sqlServerHandler) GetNamespace() string {
 	return SqlServerNamespace
 }
 
-func (h *sqlServerHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *sqlServerHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	return true
 }
 

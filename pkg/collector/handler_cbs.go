@@ -24,7 +24,7 @@ type cbsHandler struct {
 	instanceInfosRepo instance.CbsTcInstanceInfosRepository
 }
 
-func (h *cbsHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *cbsHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 
@@ -32,7 +32,7 @@ func (h *cbsHandler) GetNamespace() string {
 	return CbsNamespace
 }
 
-func (h *cbsHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *cbsHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	// 暂时过滤nvme盘类指标
 	var dimensions []string
 	for _, v := range m.Meta.SupportDimensions {
@@ -76,7 +76,7 @@ func (h *cbsHandler) GetSeriesByOnly(m *metric.TcmMetric) ([]*metric.TcmSeries, 
 			sl, err := h.getSeriesByMetricType(m, nil, cvmIds)
 			if err != nil {
 				level.Error(h.logger).Log("msg", "Create metric series fail",
-					"metric", m.Meta.MetricName, "instacne", cvmIds)
+					"metric", m.Meta.MetricName, "instance", cvmIds)
 				continue
 			}
 			slist = append(slist, sl...)
@@ -92,7 +92,7 @@ func (h *cbsHandler) GetSeriesByOnly(m *metric.TcmMetric) ([]*metric.TcmSeries, 
 			sl, err := h.getSeriesByMetricType(m, ins, nil)
 			if err != nil {
 				level.Error(h.logger).Log("msg", "Create metric series fail",
-					"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+					"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
 				continue
 			}
 			slist = append(slist, sl...)
@@ -112,7 +112,7 @@ func (h *cbsHandler) GetSeriesByAll(m *metric.TcmMetric) ([]*metric.TcmSeries, e
 		sl, err := h.getSeriesByMetricType(m, nil, nil)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne")
+				"metric", m.Meta.MetricName, "instance")
 		}
 		slist = append(slist, sl...)
 	} else {
@@ -128,7 +128,7 @@ func (h *cbsHandler) GetSeriesByAll(m *metric.TcmMetric) ([]*metric.TcmSeries, e
 			sl, err := h.getSeriesByMetricType(m, ins, nil)
 			if err != nil {
 				level.Error(h.logger).Log("msg", "Create metric series fail",
-					"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+					"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
 				continue
 			}
 			slist = append(slist, sl...)
@@ -157,7 +157,7 @@ func (h *cbsHandler) GetSeriesByCustom(m *metric.TcmMetric) ([]*metric.TcmSeries
 		sl, err := h.getSeriesByMetricType(m, ins, nil)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
 			continue
 		}
 		slist = append(slist, sl...)

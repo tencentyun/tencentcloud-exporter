@@ -20,11 +20,11 @@ type ProductHandler interface {
 	// 获取云监控指标namespace
 	GetNamespace() string
 	// 对指标元数据做检验, true=可用, false=跳过
-	IsMetricMetaVaild(meta *metric.TcmMeta) bool
+	IsMetricMetaValid(meta *metric.TcmMeta) bool
 	// 修改指标元数据
 	ModifyMetricMeta(meta *metric.TcmMeta) error
 	// 对指标做校验, true=可用, false=跳过
-	IsMetricVaild(m *metric.TcmMetric) bool
+	IsMetricValid(m *metric.TcmMetric) bool
 	// 修改指标
 	ModifyMetric(m *metric.TcmMetric) error
 	// 获取该指标下符合条件的所有实例, 并生成所有的series
@@ -42,7 +42,7 @@ type baseProductHandler struct {
 	logger          log.Logger
 }
 
-func (h *baseProductHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *baseProductHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 
@@ -50,7 +50,7 @@ func (h *baseProductHandler) ModifyMetricMeta(meta *metric.TcmMeta) error {
 	return nil
 }
 
-func (h *baseProductHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *baseProductHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	p, err := m.Meta.GetPeriod(m.Conf.StatPeriodSeconds)
 	if err != nil {
 		return false
@@ -95,7 +95,7 @@ func (h *baseProductHandler) GetSeriesByOnly(m *metric.TcmMetric) ([]*metric.Tcm
 		s, err := metric.NewTcmSeries(m, ql, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", insId)
+				"metric", m.Meta.MetricName, "instance", insId)
 			continue
 		}
 		slist = append(slist, s)
@@ -119,7 +119,7 @@ func (h *baseProductHandler) GetSeriesByAll(m *metric.TcmMetric) ([]*metric.TcmS
 		s, err := metric.NewTcmSeries(m, ql, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
 			continue
 		}
 		slist = append(slist, s)
@@ -146,7 +146,7 @@ func (h *baseProductHandler) GetSeriesByCustom(m *metric.TcmMetric) ([]*metric.T
 		s, err := metric.NewTcmSeries(m, ql, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"err", err, "metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+				"err", err, "metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
 			continue
 		}
 		slist = append(slist, s)

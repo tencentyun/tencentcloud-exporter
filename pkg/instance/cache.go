@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
+	cfs "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cfs/v20190719"
 	dtsNew "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/dts/v20211206"
 	gaap "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/gaap/v20180529"
 	sdk "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/redis/v20180412"
@@ -45,25 +46,25 @@ func (c *TcInstanceCache) Get(id string) (TcInstance, error) {
 }
 
 func (c *TcInstanceCache) ListByIds(ids []string) (insList []TcInstance, err error) {
-	err = c.checkNeedreload()
+	err = c.checkNeedReload()
 	if err != nil {
 		return nil, err
 	}
 
-	var notexists []string
+	var notExists []string
 	for _, id := range ids {
 		ins, ok := c.cache[id]
 		if ok {
 			insList = append(insList, ins)
 		} else {
-			notexists = append(notexists, id)
+			notExists = append(notExists, id)
 		}
 	}
 	return
 }
 
 func (c *TcInstanceCache) ListByFilters(filters map[string]string) (insList []TcInstance, err error) {
-	err = c.checkNeedreload()
+	err = c.checkNeedReload()
 	if err != nil {
 		return
 	}
@@ -84,7 +85,7 @@ func (c *TcInstanceCache) ListByFilters(filters map[string]string) (insList []Tc
 	return
 }
 
-func (c *TcInstanceCache) checkNeedreload() error {
+func (c *TcInstanceCache) checkNeedReload() error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -487,7 +488,7 @@ func NewTcDtsInstanceReplicationsInfosCache(repo DtsTcInstanceReplicationsReposi
 }
 
 // vbc
-type TcVbcInstanceeDRegionCache struct {
+type TcVbcInstanceDRegionCache struct {
 	Raw            VbcTcInstanceDRegionRepository
 	cache          map[string]*vbc.DescribeCcnRegionBandwidthLimitsResponse
 	lastReloadTime map[string]time.Time
@@ -497,7 +498,7 @@ type TcVbcInstanceeDRegionCache struct {
 	logger log.Logger
 }
 
-func (c *TcVbcInstanceeDRegionCache) GetVbcDRegionInfo(instanceId string) (*vbc.DescribeCcnRegionBandwidthLimitsResponse, error) {
+func (c *TcVbcInstanceDRegionCache) GetVbcDRegionInfo(instanceId string) (*vbc.DescribeCcnRegionBandwidthLimitsResponse, error) {
 	lrtime, exists := c.lastReloadTime[instanceId]
 	if exists && time.Now().Sub(lrtime) < c.reloadInterval {
 		namespace, ok := c.cache[instanceId]
@@ -517,7 +518,7 @@ func (c *TcVbcInstanceeDRegionCache) GetVbcDRegionInfo(instanceId string) (*vbc.
 }
 
 func NewVbcTcInstanceDRegionRepositoryCache(repo VbcTcInstanceDRegionRepository, reloadInterval time.Duration, logger log.Logger) VbcTcInstanceDRegionRepository {
-	cache := &TcVbcInstanceeDRegionCache{
+	cache := &TcVbcInstanceDRegionCache{
 		Raw:            repo,
 		cache:          map[string]*vbc.DescribeCcnRegionBandwidthLimitsResponse{},
 		lastReloadTime: map[string]time.Time{},
@@ -528,7 +529,7 @@ func NewVbcTcInstanceDRegionRepositoryCache(repo VbcTcInstanceDRegionRepository,
 }
 
 // gaap
-type TcGaapInstanceeInfosCache struct {
+type TcGaapInstanceInfosCache struct {
 	Raw            QaapTcInstanceInfoRepository
 	tcpCache       map[string]*gaap.DescribeTCPListenersResponse
 	udpCache       map[string]*gaap.DescribeUDPListenersResponse
@@ -540,7 +541,7 @@ type TcGaapInstanceeInfosCache struct {
 	logger log.Logger
 }
 
-func (c *TcGaapInstanceeInfosCache) GetTCPListenersInfo(instanceId string) (*gaap.DescribeTCPListenersResponse, error) {
+func (c *TcGaapInstanceInfosCache) GetTCPListenersInfo(instanceId string) (*gaap.DescribeTCPListenersResponse, error) {
 	lrtime, exists := c.lastReloadTime[instanceId]
 	if exists && time.Now().Sub(lrtime) < c.reloadInterval {
 		namespace, ok := c.tcpCache[instanceId]
@@ -553,12 +554,14 @@ func (c *TcGaapInstanceeInfosCache) GetTCPListenersInfo(instanceId string) (*gaa
 	if err != nil {
 		return nil, err
 	}
+	c.mu.Lock()
 	c.tcpCache[instanceId] = tcpListeners
 	c.lastReloadTime[instanceId] = time.Now()
+	c.mu.Unlock()
 	level.Debug(c.logger).Log("msg", "Get gaap Namespaces info from api", "instanceId", instanceId)
 	return tcpListeners, nil
 }
-func (c *TcGaapInstanceeInfosCache) GetUDPListenersInfo(instanceId string) (*gaap.DescribeUDPListenersResponse, error) {
+func (c *TcGaapInstanceInfosCache) GetUDPListenersInfo(instanceId string) (*gaap.DescribeUDPListenersResponse, error) {
 	lrtime, exists := c.lastReloadTime[instanceId]
 	if exists && time.Now().Sub(lrtime) < c.reloadInterval {
 		namespace, ok := c.udpCache[instanceId]
@@ -571,12 +574,14 @@ func (c *TcGaapInstanceeInfosCache) GetUDPListenersInfo(instanceId string) (*gaa
 	if err != nil {
 		return nil, err
 	}
+	c.mu.Lock()
 	c.udpCache[instanceId] = udpListeners
 	c.lastReloadTime[instanceId] = time.Now()
+	c.mu.Unlock()
 	level.Debug(c.logger).Log("msg", "Get gaap Namespaces info from api", "instanceId", instanceId)
 	return udpListeners, nil
 }
-func (c *TcGaapInstanceeInfosCache) GetProxyGroupList(instanceId string) (*gaap.DescribeProxyGroupListResponse, error) {
+func (c *TcGaapInstanceInfosCache) GetProxyGroupList(instanceId string) (*gaap.DescribeProxyGroupListResponse, error) {
 	lrtime, exists := c.lastReloadTime[instanceId]
 	if exists && time.Now().Sub(lrtime) < c.reloadInterval {
 		namespace, ok := c.groupCache[instanceId]
@@ -589,14 +594,16 @@ func (c *TcGaapInstanceeInfosCache) GetProxyGroupList(instanceId string) (*gaap.
 	if err != nil {
 		return nil, err
 	}
+	c.mu.Lock()
 	c.groupCache[instanceId] = proxyGroupList
 	c.lastReloadTime[instanceId] = time.Now()
+	c.mu.Unlock()
 	level.Debug(c.logger).Log("msg", "Get gaap Namespaces info from api", "instanceId", instanceId)
 	return proxyGroupList, nil
 }
 
-func NewTcGaapInstanceeInfosCache(repo QaapTcInstanceInfoRepository, reloadInterval time.Duration, logger log.Logger) QaapTcInstanceInfoRepository {
-	cache := &TcGaapInstanceeInfosCache{
+func NewTcGaapInstanceInfosCache(repo QaapTcInstanceInfoRepository, reloadInterval time.Duration, logger log.Logger) QaapTcInstanceInfoRepository {
+	cache := &TcGaapInstanceInfosCache{
 		Raw:            repo,
 		tcpCache:       map[string]*gaap.DescribeTCPListenersResponse{},
 		udpCache:       map[string]*gaap.DescribeUDPListenersResponse{},
@@ -608,7 +615,7 @@ func NewTcGaapInstanceeInfosCache(repo QaapTcInstanceInfoRepository, reloadInter
 	return cache
 }
 
-type TcCommonGaapInstanceeInfosCache struct {
+type TcCommonGaapInstanceInfosCache struct {
 	Raw                 CommonQaapTcInstanceRepository
 	proxyInstancesCache map[string]ProxyInstancesRsp
 	noneBgpIpListCache  map[string]NoneBgpIpListRsp
@@ -619,7 +626,7 @@ type TcCommonGaapInstanceeInfosCache struct {
 	logger log.Logger
 }
 
-func (c *TcCommonGaapInstanceeInfosCache) GetCommonQaapProxyInstances(instanceId string) (ProxyInstancesRsp, error) {
+func (c *TcCommonGaapInstanceInfosCache) GetCommonQaapProxyInstances(instanceId string) (ProxyInstancesRsp, error) {
 	lrtime, exists := c.lastReloadTime[instanceId]
 	if exists && time.Now().Sub(lrtime) < c.reloadInterval {
 		namespace, ok := c.proxyInstancesCache[instanceId]
@@ -632,12 +639,14 @@ func (c *TcCommonGaapInstanceeInfosCache) GetCommonQaapProxyInstances(instanceId
 	if err != nil {
 		return ProxyInstancesRsp{}, err
 	}
+	c.mu.Lock()
 	c.proxyInstancesCache[instanceId] = proxyGroupList
 	c.lastReloadTime[instanceId] = time.Now()
+	c.mu.Unlock()
 	level.Debug(c.logger).Log("msg", "Get gaap Namespaces info from api", "instanceId", instanceId)
 	return proxyGroupList, nil
 }
-func (c *TcCommonGaapInstanceeInfosCache) GetCommonQaapNoneBgpIpList(instanceId string) (NoneBgpIpListRsp, error) {
+func (c *TcCommonGaapInstanceInfosCache) GetCommonQaapNoneBgpIpList(instanceId string) (NoneBgpIpListRsp, error) {
 	lrtime, exists := c.lastReloadTime[instanceId]
 	if exists && time.Now().Sub(lrtime) < c.reloadInterval {
 		namespace, ok := c.noneBgpIpListCache[instanceId]
@@ -650,20 +659,63 @@ func (c *TcCommonGaapInstanceeInfosCache) GetCommonQaapNoneBgpIpList(instanceId 
 	if err != nil {
 		return NoneBgpIpListRsp{}, err
 	}
+	c.mu.Lock()
 	c.noneBgpIpListCache[instanceId] = proxyGroupList
 	c.lastReloadTime[instanceId] = time.Now()
+	c.mu.Unlock()
 	level.Debug(c.logger).Log("msg", "Get gaap Namespaces info from api", "instanceId", instanceId)
 	return proxyGroupList, nil
 }
 
-func NewTcCommonGaapInstanceeInfosCache(repo CommonQaapTcInstanceRepository, reloadInterval time.Duration, logger log.Logger) CommonQaapTcInstanceRepository {
-	cache := &TcCommonGaapInstanceeInfosCache{
+func NewTcCommonGaapInstanceInfosCache(repo CommonQaapTcInstanceRepository, reloadInterval time.Duration, logger log.Logger) CommonQaapTcInstanceRepository {
+	cache := &TcCommonGaapInstanceInfosCache{
 		Raw:                 repo,
 		proxyInstancesCache: map[string]ProxyInstancesRsp{},
 		noneBgpIpListCache:  map[string]NoneBgpIpListRsp{},
 		lastReloadTime:      map[string]time.Time{},
 		reloadInterval:      reloadInterval,
 		logger:              logger,
+	}
+	return cache
+}
+
+// cfs
+type TcCfsInstanceSnapshotsCache struct {
+	Raw            CfsSnapshotsRepository
+	cache          map[string]*cfs.DescribeCfsSnapshotsResponse
+	lastReloadTime map[string]time.Time
+	reloadInterval time.Duration
+	mu             sync.Mutex
+
+	logger log.Logger
+}
+
+func (c *TcCfsInstanceSnapshotsCache) GetCfsSnapshotsInfo(instanceId string) (*cfs.DescribeCfsSnapshotsResponse, error) {
+	lrtime, exists := c.lastReloadTime[instanceId]
+	if exists && time.Now().Sub(lrtime) < c.reloadInterval {
+		cfsSnapshotsInfoCache, ok := c.cache[instanceId]
+		if ok {
+			return cfsSnapshotsInfoCache, nil
+		}
+	}
+
+	cfsSnapshotsInfo, err := c.Raw.GetCfsSnapshotsInfo(instanceId)
+	if err != nil {
+		return nil, err
+	}
+	c.cache[instanceId] = cfsSnapshotsInfo
+	c.lastReloadTime[instanceId] = time.Now()
+	level.Debug(c.logger).Log("msg", "Get vbc Namespaces info from api", "instanceId", instanceId)
+	return cfsSnapshotsInfo, nil
+}
+
+func NewCfsSnapshotsRepositoryRepositoryCache(repo CfsSnapshotsRepository, reloadInterval time.Duration, logger log.Logger) CfsSnapshotsRepository {
+	cache := &TcCfsInstanceSnapshotsCache{
+		Raw:            repo,
+		cache:          map[string]*cfs.DescribeCfsSnapshotsResponse{},
+		lastReloadTime: map[string]time.Time{},
+		reloadInterval: reloadInterval,
+		logger:         logger,
 	}
 	return cache
 }

@@ -36,7 +36,7 @@ type VbcHandler struct {
 	dRegionRepo instance.VbcTcInstanceDRegionRepository
 }
 
-func (h *VbcHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *VbcHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 
@@ -44,7 +44,7 @@ func (h *VbcHandler) GetNamespace() string {
 	return VbcNamespace
 }
 
-func (h *VbcHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *VbcHandler) IsMetricValid(m *metric.TcmMetric) bool {
 
 	_, ok := excludeMetricName[m.Meta.MetricName]
 	if ok {
@@ -87,7 +87,7 @@ func (h *VbcHandler) GetSeriesByOnly(m *metric.TcmMetric) ([]*metric.TcmSeries, 
 		sl, err := h.getSeriesByMetricType(m, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
 			continue
 		}
 		slist = append(slist, sl...)
@@ -108,7 +108,7 @@ func (h *VbcHandler) GetSeriesByAll(m *metric.TcmMetric) ([]*metric.TcmSeries, e
 		sl, err := h.getSeriesByMetricType(m, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
 			continue
 		}
 		slist = append(slist, sl...)
@@ -193,8 +193,8 @@ func NewVbcHandler(cred common.CredentialIface, c *TcProductCollector, logger lo
 	if err != nil {
 		return nil, err
 	}
-	relodInterval := time.Duration(c.ProductConf.RelodIntervalMinutes * int64(time.Minute))
-	dRegionRepoCahe := instance.NewVbcTcInstanceDRegionRepositoryCache(dRegionRepo, relodInterval, logger)
+	reloadInterval := time.Duration(c.ProductConf.ReloadIntervalMinutes * int64(time.Minute))
+	dRegionRepoCahe := instance.NewVbcTcInstanceDRegionRepositoryCache(dRegionRepo, reloadInterval, logger)
 
 	handler = &VbcHandler{
 		baseProductHandler: baseProductHandler{

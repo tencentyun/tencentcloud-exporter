@@ -25,7 +25,7 @@ type WafHandler struct {
 	baseProductHandler
 }
 
-func (h *WafHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *WafHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 
@@ -33,7 +33,7 @@ func (h *WafHandler) GetNamespace() string {
 	return WafNamespace
 }
 
-func (h *WafHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *WafHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	_, ok := excludeMetricName[m.Meta.MetricName]
 	if ok {
 		return false
@@ -74,7 +74,7 @@ func (h *WafHandler) GetSeriesByOnly(m *metric.TcmMetric) ([]*metric.TcmSeries, 
 		sl, err := h.getSeriesByMetricType(m, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
 			continue
 		}
 		slist = append(slist, sl...)
@@ -95,7 +95,7 @@ func (h *WafHandler) GetSeriesByAll(m *metric.TcmMetric) ([]*metric.TcmSeries, e
 		sl, err := h.getSeriesByMetricType(m, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId(), "error", err)
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId(), "error", err)
 			continue
 		}
 		slist = append(slist, sl...)
@@ -122,7 +122,7 @@ func (h *WafHandler) GetSeriesByCustom(m *metric.TcmMetric) ([]*metric.TcmSeries
 		sl, err := h.getSeriesByMetricType(m, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
 			continue
 		}
 		slist = append(slist, sl...)

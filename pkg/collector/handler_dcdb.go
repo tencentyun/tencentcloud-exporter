@@ -23,7 +23,7 @@ func (h *dcdbHandler) GetNamespace() string {
 	return DcdbNamespace
 }
 
-func (h *dcdbHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *dcdbHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	// ignore node/shard metric, bug for cloud monitor if filter dim
 	if len(m.Meta.SupportDimensions) != 1 {
 		return false

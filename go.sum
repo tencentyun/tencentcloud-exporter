@@ -220,6 +220,8 @@ github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cdb v1.0.413 h1:6cQPfHc
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cdb v1.0.413/go.mod h1:TEuicyMWitW1zPkLbknGYg+VBGNE5N7GckvCF+hurWo=
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cdn v1.0.437 h1:siozcBuF+BM1j2+nTAUMap7rUNJrBgFvxS8pM8TqY/M=
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cdn v1.0.437/go.mod h1:NSx2qKvoTWBKc1hBp5oUNwbbR3tzdBuTqfnAmb71KBo=
+github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cfs v1.0.634 h1:r8qQAHGEQU16qBvAPD/Ws7iHCj74WiTsn3bCa2WbZUg=
+github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cfs v1.0.634/go.mod h1:fkxeKfvsWh1A+wyS2zULxvGmVqltbqJwPHnS8aJcsjM=
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/ckafka v1.0.334 h1:LOXFeP3NHL/0PFFXA2GhYH/i7rDbcBwhcJJvqRdFO/w=
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/ckafka v1.0.334/go.mod h1:toYhD7pJDpz6XY3cf/zhUXtKDRt1CbLkgmOidQ2j8kA=
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/clb v1.0.334 h1:NeYNgw78v+qhxWbROjHaazaeEWigt6xTvg7CUS1dt6g=
@@ -241,6 +243,8 @@ github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.534 h1:ZsJC
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.534/go.mod h1:7sCQWVkxcsR38nffDW057DRGk8mUjK1Ing/EFOK8s8Y=
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.576 h1:6L4MeAnCk1NkuKoSfJvNPxqOrXq/HG9FqV3jl6i5t+w=
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.576/go.mod h1:7sCQWVkxcsR38nffDW057DRGk8mUjK1Ing/EFOK8s8Y=
+github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.634 h1:xSW5zhVEl+Lp7gJ9Bah1XUAzpGdLB1JrcFmJ+r16RJw=
+github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.634/go.mod h1:7sCQWVkxcsR38nffDW057DRGk8mUjK1Ing/EFOK8s8Y=
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cvm v1.0.334 h1:ulfSODMy8rpKa8MfnTIPbe5HyOArnlB4RJ1qmpj09to=
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cvm v1.0.334/go.mod h1:AqyM/ZZMD7q5mHBqNY9YImbSpEpoEe7E/vrTbUWX+po=
 github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cynosdb v1.0.413 h1:MomwSkFrSLB16s51Yu1h4JO+p3Pzc1yesIj+oNwAVM0=

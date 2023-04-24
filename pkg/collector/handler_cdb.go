@@ -28,7 +28,7 @@ type cdbHandler struct {
 	baseProductHandler
 }
 
-func (h *cdbHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *cdbHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 
@@ -36,7 +36,7 @@ func (h *cdbHandler) GetNamespace() string {
 	return CdbNamespace
 }
 
-func (h *cdbHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *cdbHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	_, ok := excludeMetricName[m.Meta.MetricName]
 	if ok {
 		return false

@@ -28,7 +28,7 @@ type ZookeeperHandler struct {
 	interfaceRepo instance.ZookeeperTcInstanceInterfaceRepository
 }
 
-func (h *ZookeeperHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *ZookeeperHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 
@@ -36,7 +36,7 @@ func (h *ZookeeperHandler) GetNamespace() string {
 	return ZookeeperNamespace
 }
 
-func (h *ZookeeperHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *ZookeeperHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	_, ok := excludeMetricName[m.Meta.MetricName]
 	if ok {
 		return false
@@ -77,7 +77,7 @@ func (h *ZookeeperHandler) GetSeriesByOnly(m *metric.TcmMetric) ([]*metric.TcmSe
 		sl, err := h.getSeriesByMetricType(m, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
 			continue
 		}
 		slist = append(slist, sl...)
@@ -98,7 +98,7 @@ func (h *ZookeeperHandler) GetSeriesByAll(m *metric.TcmMetric) ([]*metric.TcmSer
 		sl, err := h.getSeriesByMetricType(m, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
 			continue
 		}
 		slist = append(slist, sl...)
@@ -125,7 +125,7 @@ func (h *ZookeeperHandler) GetSeriesByCustom(m *metric.TcmMetric) ([]*metric.Tcm
 		sl, err := h.getSeriesByMetricType(m, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
 			continue
 		}
 		slist = append(slist, sl...)
@@ -200,14 +200,14 @@ func NewZookeeperHandler(cred common.CredentialIface, c *TcProductCollector, log
 	if err != nil {
 		return nil, err
 	}
-	relodInterval := time.Duration(c.ProductConf.RelodIntervalMinutes * int64(time.Minute))
-	podRepoCahe := instance.NewTcZookeeperInstancePodCache(podRepo, relodInterval, logger)
+	reloadInterval := time.Duration(c.ProductConf.ReloadIntervalMinutes * int64(time.Minute))
+	podRepoCahe := instance.NewTcZookeeperInstancePodCache(podRepo, reloadInterval, logger)
 
 	interfaceRepo, err := instance.NewZookeeperTcInstanceInterfaceRepository(cred, c.Conf, logger)
 	if err != nil {
 		return nil, err
 	}
-	interfaceRepoCahe := instance.NewTcZookeeperInstanceInterfaceCache(interfaceRepo, relodInterval, logger)
+	interfaceRepoCahe := instance.NewTcZookeeperInstanceInterfaceCache(interfaceRepo, reloadInterval, logger)
 
 	handler = &ZookeeperHandler{
 		baseProductHandler: baseProductHandler{

@@ -24,7 +24,7 @@ type CynosdbHandler struct {
 	baseProductHandler
 }
 
-func (h *CynosdbHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *CynosdbHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 
@@ -32,7 +32,7 @@ func (h *CynosdbHandler) GetNamespace() string {
 	return CynosdbNamespace
 }
 
-func (h *CynosdbHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *CynosdbHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	_, ok := excludeMetricName[m.Meta.MetricName]
 	if ok {
 		return false
@@ -74,7 +74,7 @@ func (h *CynosdbHandler) GetSeriesByOnly(m *metric.TcmMetric) ([]*metric.TcmSeri
 		sl, err := h.getSeriesByMetricType(m, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
 			continue
 		}
 		slist = append(slist, sl...)
@@ -95,7 +95,7 @@ func (h *CynosdbHandler) GetSeriesByAll(m *metric.TcmMetric) ([]*metric.TcmSerie
 		sl, err := h.getSeriesByMetricType(m, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
 			continue
 		}
 		slist = append(slist, sl...)
@@ -122,7 +122,7 @@ func (h *CynosdbHandler) GetSeriesByCustom(m *metric.TcmMetric) ([]*metric.TcmSe
 		sl, err := h.getSeriesByMetricType(m, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
 			continue
 		}
 		slist = append(slist, sl...)

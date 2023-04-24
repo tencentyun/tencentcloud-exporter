@@ -19,7 +19,7 @@ type VpngwHandler struct {
 	baseProductHandler
 }
 
-func (h *VpngwHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *VpngwHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 
@@ -27,7 +27,7 @@ func (h *VpngwHandler) GetNamespace() string {
 	return VpngwNamespace
 }
 
-func (h *VpngwHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *VpngwHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	_, ok := excludeMetricName[m.Meta.MetricName]
 	if ok {
 		return false

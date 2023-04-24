@@ -116,13 +116,13 @@ func NewTcMonitorCollector(cred common.CredentialIface, conf *config.TencentConf
 		level.Info(logger).Log("msg", "Create product collecter ok", "Namespace", namespace)
 
 		if pconf.IsReloadEnable() {
-			relodInterval := time.Duration(pconf.RelodIntervalMinutes * int64(time.Minute))
-			reloader := NewTcProductCollectorReloader(context.TODO(), collector, relodInterval, logger)
+			reloadInterval := time.Duration(pconf.ReloadIntervalMinutes * int64(time.Minute))
+			reloader := NewTcProductCollectorReloader(context.TODO(), collector, reloadInterval, logger)
 			reloaders[namespace] = reloader
 			go reloader.Run()
 			level.Info(logger).Log(
 				"msg", fmt.Sprintf("reload %s instances every %d minutes",
-					namespace, pconf.RelodIntervalMinutes),
+					namespace, pconf.ReloadIntervalMinutes),
 			)
 		}
 	}

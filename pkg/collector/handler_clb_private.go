@@ -35,7 +35,7 @@ type ClbPrivateHandler struct {
 	baseProductHandler
 }
 
-func (h *ClbPrivateHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *ClbPrivateHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 
@@ -43,7 +43,7 @@ func (h *ClbPrivateHandler) GetNamespace() string {
 	return ClbPrivateNamespace
 }
 
-func (h *ClbPrivateHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *ClbPrivateHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	if util.IsStrInList(ClbPrivateExcludeMetrics, m.Meta.MetricName) {
 		return false
 	}
@@ -94,7 +94,7 @@ func (h *ClbPrivateHandler) GetSeriesByOnly(m *metric.TcmMetric) ([]*metric.TcmS
 		sl, err := h.getSeriesByMetricType(m, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
 			continue
 		}
 		slist = append(slist, sl...)
@@ -115,7 +115,7 @@ func (h *ClbPrivateHandler) GetSeriesByAll(m *metric.TcmMetric) ([]*metric.TcmSe
 		sl, err := h.getSeriesByMetricType(m, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId(), "error", err)
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId(), "error", err)
 			continue
 		}
 		slist = append(slist, sl...)

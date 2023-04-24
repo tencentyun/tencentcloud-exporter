@@ -23,7 +23,7 @@ type cdnHandler struct {
 	baseProductHandler
 }
 
-func (h *cdnHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *cdnHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 
@@ -31,7 +31,7 @@ func (h *cdnHandler) GetNamespace() string {
 	return CdnNamespace
 }
 
-func (h *cdnHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *cdnHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	_, ok := excludeMetricName[m.Meta.MetricName]
 	if ok {
 		return false
@@ -82,7 +82,7 @@ func (h *cdnHandler) GetSeriesByOnly(m *metric.TcmMetric) ([]*metric.TcmSeries, 
 		s, err := metric.NewTcmSeries(m, ql, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", insId)
+				"metric", m.Meta.MetricName, "instance", insId)
 			continue
 		}
 		slist = append(slist, s)
@@ -113,7 +113,7 @@ func (h *cdnHandler) GetSeriesByAll(m *metric.TcmMetric) ([]*metric.TcmSeries, e
 		s, err := metric.NewTcmSeries(m, ql, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
 			continue
 		}
 		slist = append(slist, s)

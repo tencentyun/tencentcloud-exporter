@@ -27,7 +27,7 @@ type NacosHandler struct {
 	interfaceRepo instance.NacosTcInstanceInterfaceRepository
 }
 
-func (h *NacosHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *NacosHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 
@@ -35,7 +35,7 @@ func (h *NacosHandler) GetNamespace() string {
 	return NacosNamespace
 }
 
-func (h *NacosHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *NacosHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	_, ok := excludeMetricName[m.Meta.MetricName]
 	if ok {
 		return false
@@ -76,7 +76,7 @@ func (h *NacosHandler) GetSeriesByOnly(m *metric.TcmMetric) ([]*metric.TcmSeries
 		sl, err := h.getSeriesByMetricType(m, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
 			continue
 		}
 		slist = append(slist, sl...)
@@ -97,7 +97,7 @@ func (h *NacosHandler) GetSeriesByAll(m *metric.TcmMetric) ([]*metric.TcmSeries,
 		sl, err := h.getSeriesByMetricType(m, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId(), "error", err)
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId(), "error", err)
 			continue
 		}
 		slist = append(slist, sl...)
@@ -124,7 +124,7 @@ func (h *NacosHandler) GetSeriesByCustom(m *metric.TcmMetric) ([]*metric.TcmSeri
 		sl, err := h.getSeriesByMetricType(m, ins)
 		if err != nil {
 			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instacne", ins.GetInstanceId())
+				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
 			continue
 		}
 		slist = append(slist, sl...)
@@ -199,14 +199,14 @@ func NewNacosHandler(cred common.CredentialIface, c *TcProductCollector, logger 
 	if err != nil {
 		return nil, err
 	}
-	relodInterval := time.Duration(c.ProductConf.RelodIntervalMinutes * int64(time.Minute))
-	podRepoCahe := instance.NewTcNacosInstancePodCache(podRepo, relodInterval, logger)
+	reloadInterval := time.Duration(c.ProductConf.ReloadIntervalMinutes * int64(time.Minute))
+	podRepoCahe := instance.NewTcNacosInstancePodCache(podRepo, reloadInterval, logger)
 
 	interfaceRepo, err := instance.NewNacosTcInstanceInterfaceRepository(cred, c.Conf, logger)
 	if err != nil {
 		return nil, err
 	}
-	interfaceRepoCahe := instance.NewTcNacosInstanceInterfaceCache(interfaceRepo, relodInterval, logger)
+	interfaceRepoCahe := instance.NewTcNacosInstanceInterfaceCache(interfaceRepo, reloadInterval, logger)
 	handler = &NacosHandler{
 		baseProductHandler: baseProductHandler{
 			monitorQueryKey: NacosInstanceidKey,

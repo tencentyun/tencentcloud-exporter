@@ -19,7 +19,7 @@ type VpnxHandler struct {
 	baseProductHandler
 }
 
-func (h *VpnxHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *VpnxHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 
@@ -27,7 +27,7 @@ func (h *VpnxHandler) GetNamespace() string {
 	return VpnxNamespace
 }
 
-func (h *VpnxHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *VpnxHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	_, ok := excludeMetricName[m.Meta.MetricName]
 	if ok {
 		return false

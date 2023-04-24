@@ -22,7 +22,7 @@ type lighthouseHandler struct {
 	baseProductHandler
 }
 
-func (h *lighthouseHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *lighthouseHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	if !util.IsStrInList(meta.SupportDimensions, LighthouseInstanceIDKey) {
 		meta.SupportDimensions = append(meta.SupportDimensions, LighthouseInstanceIDKey)
 	}
@@ -34,7 +34,7 @@ func (h *lighthouseHandler) GetNamespace() string {
 	return LighthouseNamespace
 }
 
-func (h *lighthouseHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *lighthouseHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	if util.IsStrInList(CvmInvalidMetricNames, strings.ToLower(m.Meta.MetricName)) {
 		return false
 	}

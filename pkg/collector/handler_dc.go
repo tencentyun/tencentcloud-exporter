@@ -19,7 +19,7 @@ type dcHandler struct {
 	baseProductHandler
 }
 
-func (h *dcHandler) IsMetricMetaVaild(meta *metric.TcmMeta) bool {
+func (h *dcHandler) IsMetricMetaValid(meta *metric.TcmMeta) bool {
 	return true
 }
 
@@ -27,7 +27,7 @@ func (h *dcHandler) GetNamespace() string {
 	return DcNamespace
 }
 
-func (h *dcHandler) IsMetricVaild(m *metric.TcmMetric) bool {
+func (h *dcHandler) IsMetricValid(m *metric.TcmMetric) bool {
 	return true
 }
 
