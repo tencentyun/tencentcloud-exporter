@@ -102,13 +102,11 @@ func (c *TcProductCollector) LoadMetricsByProductConf() error {
 				series, err := c.handler.GetSeries(nm)
 				if err != nil {
 					level.Error(c.logger).Log("msg", "create metric series err", "err", err, "Namespace", c.Namespace, "name", mname)
-					// continue
 				}
 				level.Info(c.logger).Log("msg", "found instances", "count", len(series), "Namespace", c.Namespace, "name", mname, "cost", time.Since(start).Milliseconds())
 				err = nm.LoadSeries(series)
 				if err != nil {
 					level.Error(c.logger).Log("msg", "load metric series err", "err", err, "Namespace", c.Namespace, "name", mname)
-					// continue
 				}
 				group.Done()
 			}(mname, wg)
@@ -116,7 +114,6 @@ func (c *TcProductCollector) LoadMetricsByProductConf() error {
 		wg.Wait()
 	} else {
 		for _, mname := range metricNames {
-			start := time.Now()
 			nm, err := c.createMetricWithProductConf(mname, pconf)
 			if err != nil {
 				level.Warn(c.logger).Log("msg", "Create metric fail", "err", err, "Namespace", c.Namespace, "name", mname)
@@ -134,7 +131,7 @@ func (c *TcProductCollector) LoadMetricsByProductConf() error {
 				level.Error(c.logger).Log("msg", "create metric series err", "err", err, "Namespace", c.Namespace, "name", mname)
 				continue
 			}
-			level.Info(c.logger).Log("msg", "found instances", "count", len(series), "Namespace", c.Namespace, "name", mname, "cost", time.Since(start).Milliseconds())
+			level.Info(c.logger).Log("msg", "found instances", "count", len(series), "Namespace", c.Namespace, "name", mname, "cost")
 			err = nm.LoadSeries(series)
 			if err != nil {
 				level.Error(c.logger).Log("msg", "load metric series err", "err", err, "Namespace", c.Namespace, "name", mname)
@@ -380,12 +377,10 @@ func NewTcProductCollector(namespace string, metricRepo metric.TcmMetricReposito
 	if err != nil {
 		return nil, err
 	}
-	start := time.Now()
 	err = c.LoadMetricsByProductConf()
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("耗时", time.Since(start).Milliseconds())
 	err = c.initQuerys()
 	if err != nil {
 		return nil, err

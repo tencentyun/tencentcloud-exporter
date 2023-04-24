@@ -554,8 +554,10 @@ func (c *TcGaapInstanceInfosCache) GetTCPListenersInfo(instanceId string) (*gaap
 	if err != nil {
 		return nil, err
 	}
+	c.mu.Lock()
 	c.tcpCache[instanceId] = tcpListeners
 	c.lastReloadTime[instanceId] = time.Now()
+	c.mu.Unlock()
 	level.Debug(c.logger).Log("msg", "Get gaap Namespaces info from api", "instanceId", instanceId)
 	return tcpListeners, nil
 }
@@ -572,8 +574,10 @@ func (c *TcGaapInstanceInfosCache) GetUDPListenersInfo(instanceId string) (*gaap
 	if err != nil {
 		return nil, err
 	}
+	c.mu.Lock()
 	c.udpCache[instanceId] = udpListeners
 	c.lastReloadTime[instanceId] = time.Now()
+	c.mu.Unlock()
 	level.Debug(c.logger).Log("msg", "Get gaap Namespaces info from api", "instanceId", instanceId)
 	return udpListeners, nil
 }
@@ -590,8 +594,10 @@ func (c *TcGaapInstanceInfosCache) GetProxyGroupList(instanceId string) (*gaap.D
 	if err != nil {
 		return nil, err
 	}
+	c.mu.Lock()
 	c.groupCache[instanceId] = proxyGroupList
 	c.lastReloadTime[instanceId] = time.Now()
+	c.mu.Unlock()
 	level.Debug(c.logger).Log("msg", "Get gaap Namespaces info from api", "instanceId", instanceId)
 	return proxyGroupList, nil
 }
@@ -633,8 +639,10 @@ func (c *TcCommonGaapInstanceInfosCache) GetCommonQaapProxyInstances(instanceId 
 	if err != nil {
 		return ProxyInstancesRsp{}, err
 	}
+	c.mu.Lock()
 	c.proxyInstancesCache[instanceId] = proxyGroupList
 	c.lastReloadTime[instanceId] = time.Now()
+	c.mu.Unlock()
 	level.Debug(c.logger).Log("msg", "Get gaap Namespaces info from api", "instanceId", instanceId)
 	return proxyGroupList, nil
 }
@@ -651,8 +659,10 @@ func (c *TcCommonGaapInstanceInfosCache) GetCommonQaapNoneBgpIpList(instanceId s
 	if err != nil {
 		return NoneBgpIpListRsp{}, err
 	}
+	c.mu.Lock()
 	c.noneBgpIpListCache[instanceId] = proxyGroupList
 	c.lastReloadTime[instanceId] = time.Now()
+	c.mu.Unlock()
 	level.Debug(c.logger).Log("msg", "Get gaap Namespaces info from api", "instanceId", instanceId)
 	return proxyGroupList, nil
 }

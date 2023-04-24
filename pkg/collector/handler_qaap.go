@@ -207,7 +207,6 @@ func (h *QaapHandler) getQaapListenerRsSeries(m *metric.TcmMetric, ins instance.
 	// if err != nil {
 	// 	return nil, err
 	// }
-	// fmt.Println(ins.GetMonitorQueryKey(), "getTcpSeries耗时", time.Since(start).Milliseconds(), "series", len(series))
 	// for _, tcpListenersInfo := range tcpListenersInfos.Response.ListenerSet {
 	// 	for _, realServerSet := range tcpListenersInfo.RealServerSet {
 	// 		ql := map[string]string{
@@ -224,12 +223,10 @@ func (h *QaapHandler) getQaapListenerRsSeries(m *metric.TcmMetric, ins instance.
 	// 		series = append(series, s)
 	// 	}
 	// }
-	// start1 := time.Now()
 	// udpListenersInfos, err := h.qaapInstanceInfoRepo.GetUDPListenersInfo(ins.GetInstanceId())
 	// if err != nil {
 	// 	return nil, err
 	// }
-	// fmt.Println(ins.GetMonitorQueryKey(), "getUdpSeries耗时", time.Since(start1).Milliseconds(), "series", len(series))
 	// for _, udpListenersInfo := range udpListenersInfos.Response.ListenerSet {
 	// 	for _, realServerSet := range udpListenersInfo.RealServerSet {
 	// 		ql := map[string]string{
