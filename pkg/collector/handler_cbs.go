@@ -214,7 +214,7 @@ func (h *cbsHandler) getInstanceSeries(m *metric.TcmMetric, ins instance.TcInsta
 }
 
 func NewCbsHandler(cred common.CredentialIface, c *TcProductCollector, logger log.Logger) (handler ProductHandler, err error) {
-	instanceInfosRepoCahe, err := instance.NewCbsTcInstanceInfosRepository(cred, c.Conf, logger)
+	instanceInfosRepoCache, err := instance.NewCbsTcInstanceInfosRepository(cred, c.Conf, logger)
 	if err != nil {
 		return nil, err
 	}
@@ -225,7 +225,7 @@ func NewCbsHandler(cred common.CredentialIface, c *TcProductCollector, logger lo
 			collector:       c,
 			logger:          logger,
 		},
-		instanceInfosRepo: instanceInfosRepoCahe,
+		instanceInfosRepo: instanceInfosRepoCache,
 	}
 	return
 

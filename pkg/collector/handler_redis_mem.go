@@ -216,7 +216,7 @@ func NewRedisMemHandler(cred common.CredentialIface, c *TcProductCollector, logg
 		return nil, err
 	}
 	reloadInterval := time.Duration(c.ProductConf.ReloadIntervalMinutes * int64(time.Minute))
-	nodeRepoCahe := instance.NewTcRedisInstanceNodeCache(nodeRepo, reloadInterval, logger)
+	nodeRepoCache := instance.NewTcRedisInstanceNodeCache(nodeRepo, reloadInterval, logger)
 
 	handler := &redisMemHandler{
 		baseProductHandler: baseProductHandler{
@@ -224,7 +224,7 @@ func NewRedisMemHandler(cred common.CredentialIface, c *TcProductCollector, logg
 			collector:       c,
 			logger:          logger,
 		},
-		nodeRepo: nodeRepoCahe,
+		nodeRepo: nodeRepoCache,
 	}
 	return handler, nil
 }

@@ -12,7 +12,7 @@ require (
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cbs v1.0.334
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cdb v1.0.413
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cdn v1.0.437
-	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cfs v1.0.634 // indirect
+	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cfs v1.0.634
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/ckafka v1.0.334
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/clb v1.0.334
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cmq v1.0.334
@@ -35,7 +35,7 @@ require (
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tdmq v1.0.413
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tse v1.0.430
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/vpc v1.0.334
-	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/waf v1.0.576 // indirect
+	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/waf v1.0.576
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.35
 	golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
