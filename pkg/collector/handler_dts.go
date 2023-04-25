@@ -13,7 +13,7 @@ import (
 
 const (
 	DTSNamespace     = "QCE/DTS"
-	DTSInstanceidKey = "SubscribeId"
+	DTSInstanceIdKey = "SubscribeId"
 )
 
 func init() {
@@ -85,23 +85,36 @@ func (h *dtsHandler) GetSeriesByOnly(m *metric.TcmMetric) ([]*metric.TcmSeries, 
 }
 
 func (h *dtsHandler) GetSeriesByAll(m *metric.TcmMetric) ([]*metric.TcmSeries, error) {
-	var slist []*metric.TcmSeries
-	insList, err := h.collector.InstanceRepo.ListByFilters(m.Conf.InstanceFilters)
-	if err != nil {
-		return nil, err
+	var dimensions []string
+	for _, v := range m.Meta.SupportDimensions {
+		dimensions = append(dimensions, v)
 	}
-	for _, ins := range insList {
-		if len(m.Conf.ExcludeInstances) != 0 && util.IsStrInList(m.Conf.ExcludeInstances, ins.GetInstanceId()) {
-			continue
-		}
-		sl, err := h.getSeriesByMetricType(m, ins)
+	var slist []*metric.TcmSeries
+	if util.IsStrInList(dimensions, "replicationjobid") || util.IsStrInList(dimensions, "migratejobid") {
+		sl, err := h.getSeriesByMetricType(m, nil)
 		if err != nil {
-			level.Error(h.logger).Log("msg", "Create metric series fail",
-				"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
-			continue
+			level.Error(h.logger).Log("msg", "Create metric series fail", "metric", m.Meta.MetricName)
 		}
 		slist = append(slist, sl...)
+	} else {
+		insList, err := h.collector.InstanceRepo.ListByFilters(m.Conf.InstanceFilters)
+		if err != nil {
+			return nil, err
+		}
+		for _, ins := range insList {
+			if len(m.Conf.ExcludeInstances) != 0 && util.IsStrInList(m.Conf.ExcludeInstances, ins.GetInstanceId()) {
+				continue
+			}
+			sl, err := h.getSeriesByMetricType(m, ins)
+			if err != nil {
+				level.Error(h.logger).Log("msg", "Create metric series fail",
+					"metric", m.Meta.MetricName, "instance", ins.GetInstanceId())
+				continue
+			}
+			slist = append(slist, sl...)
+		}
 	}
+
 	return slist, nil
 }
 
@@ -209,7 +222,7 @@ func NewDTSHandler(cred common.CredentialIface, c *TcProductCollector, logger lo
 		return nil, err
 	}
 	reloadInterval := time.Duration(c.ProductConf.ReloadIntervalMinutes * int64(time.Minute))
-	migrateInfosRepoCahe := instance.NewTcDtsInstanceMigrateInfosCache(migrateInfosRepo, reloadInterval, logger)
+	migrateInfosRepoCache := instance.NewTcDtsInstanceMigrateInfosCache(migrateInfosRepo, reloadInterval, logger)
 
 	replicationRepo, err := instance.NewDtsTcInstanceReplicationsRepository(cred, c.Conf, logger)
 	if err != nil {
@@ -219,11 +232,11 @@ func NewDTSHandler(cred common.CredentialIface, c *TcProductCollector, logger lo
 
 	handler = &dtsHandler{
 		baseProductHandler: baseProductHandler{
-			monitorQueryKey: DTSInstanceidKey,
+			monitorQueryKey: DTSInstanceIdKey,
 			collector:       c,
 			logger:          logger,
 		},
-		migrateInfosRepo: migrateInfosRepoCahe,
+		migrateInfosRepo: migrateInfosRepoCache,
 		replicationRepo:  replicationRepoCache,
 	}
 	return
