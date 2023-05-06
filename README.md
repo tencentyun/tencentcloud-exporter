@@ -1,4 +1,8 @@
 # 腾讯云监控 Exporter v2
+## 公告
+尊敬的用户，由于资源和人力等客观原因，本插件后续将不再更新迭代，建议使用腾讯云托管的Prometheus监控服务，可通过【集成中心】-【云监控】功能一键安装采集腾讯云产品基础监控数据。   
+产品入口：https://console.cloud.tencent.com/monitor/prometheus   
+使用文档指引：https://cloud.tencent.com/document/product/1416/76388   
 
 腾讯云监控已于2022年09月01日开始对超出免费额度的 API 接口的请求进行计费，需要手动开通 API 付费，详见计费说明与开通指引。     
 开通页面：https://buy.cloud.tencent.com/APIRequestBuy    
