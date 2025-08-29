@@ -72,7 +72,13 @@ func (repo *RedisTcInstanceRepository) ListByFilters(filters map[string]string) 
 	var total int64 = -1
 	req.Offset = &offset
 	req.Limit = &limit
-	req.Status = []*int64{common.Int64Ptr(2)}
+	req.Status = []*int64{
+    common.Int64Ptr(0),  // 待初始化
+    common.Int64Ptr(1),  // 初始化中
+    common.Int64Ptr(2),  // 运行中
+}
+
+	// req.Status = []*int64{common.Int64Ptr(2)}
 
 getMoreInstances:
 	resp, err := repo.client.DescribeInstances(req)
